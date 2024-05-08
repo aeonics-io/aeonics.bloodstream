@@ -127,7 +127,7 @@ public class Endpoints
 		.build()
 		.<Endpoint.Rest.Type>cast()
 		.url("/oidc/login")
-		.method("POST")
+		.method("GET")
 		;
 	
 	private static class response_ extends Endpoint.Rest.Type
@@ -243,31 +243,9 @@ public class Endpoints
 		.method("GET")
 		;
 	
-	private static final Endpoint.Rest.Type providers = new Endpoint.Rest() { }
-		.template()
-		.summary("Lists the authentication providers enabled for the specified user")
-		.description("This endpoint returns the lists of authentication providers enabled for the specified login.")
-		.add(new Parameter("login").optional(false).min(1).max(100)
-			.summary("The user login")
-			.description("The user login.")
-			)
-		.build()
-		.<Rest.Type>cast()
-		.process((parameters) ->
-		{
-			Data list = Data.list();
-			for( Provider.Type p : Registry.of(Provider.class) )
-				if( p.supports(parameters.asString("login")) )
-					list.add(p.export());
-			return list;
-		})
-		.url("/oidc/providers")
-		.method("GET")
-		;
 	public static void register(Action.Type router)
 	{
 		router.addRelation("endpoints", login);
 		router.addRelation("endpoints", response);
-		router.addRelation("endpoints", providers);
 	}
 }

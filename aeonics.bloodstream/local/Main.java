@@ -17,6 +17,7 @@ import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
 import aeonics.entity.security.Rule;
+import aeonics.entity.security.User;
 import aeonics.http.Router;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
@@ -38,9 +39,10 @@ public class Main extends Plugin
 	
 	public void start()
 	{
-		Manager.of(Lifecycle.class).on(Phase.RUN, Callback.once(() -> onRun()));
-		Manager.of(Lifecycle.class).on(Phase.CONFIG, Callback.once(() -> onConfig()));
 		Manager.of(Lifecycle.class).on(Phase.LOAD, Callback.once(() -> onLoad()));
+		Manager.of(Lifecycle.class).on(Phase.CONFIG, Callback.once(() -> onConfig()));
+		Manager.of(Lifecycle.class).on(Phase.RUN, Callback.once(() -> onRun()));
+		Manager.of(Lifecycle.class).after(Phase.RUN, Callback.once(() -> afterRun()));
 	}
 	
 	private static void onLoad()
@@ -73,7 +75,7 @@ public class Main extends Plugin
 		c.declare(Security.class, new Parameter("otp.issuer")
 			.summary("OTP issuer name")
 			.description("The name of the OTP issuer to be displayed by MFA apps.")
-			.defaultValue(Data.of("SHA1")));
+			.defaultValue(Data.of("Aeonics Bloodstream Enterprise Suite")));
 		
 		// ===========================
 		// OP stuff
@@ -152,7 +154,7 @@ public class Main extends Plugin
 			{
 				// generate a new key now
 				KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-	            keyGen.initialize(2048);
+	            keyGen.initialize(4096);
 	            KeyPair pair = keyGen.generateKeyPair();
 	            
 	            // set the config -> re-trigger the watch
@@ -186,8 +188,31 @@ public class Main extends Plugin
 		Action.Type router = Registry.of(Action.class).get(Manager.of(Config.class).get(Router.class, "default").asString());
 		
 		aeonics.endpoint.meta.Endpoints.register(router);
+		aeonics.oidc.Endpoints.register(router);
 		aeonics.oidc.op.Endpoints.register(router);
 		aeonics.oidc.rp.Endpoints.register(router);
 		aeonics.oidc.TOTP.register(router);
+	}
+	
+	private static void afterRun()
+	{
+		// default oidc client and rp
+		RelyingParty.Type rp = new RelyingParty().template().build(Data.map()
+			.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
+			.addRelation("groups", "Administrators")
+			.name("Local Provider")
+			.<RelyingParty.Type>cast();
+		OidcProvider.Type provider = new OidcProvider().template().build(Data.map()
+			.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
+			.put("client_id", rp.clientId())
+			.put("client_secret", rp.clientSecret()))
+			.name("Local Authentication")
+			.<OidcProvider.Type>cast();
+		provider.join(Data.map()
+			.put("iss", provider.issuer())
+			.put("sub", "admin")
+			.put("aud", provider.id())
+			.put("exp", System.currentTimeMillis()/1000 + 3600),
+			Registry.of(User.class).get("admin"));
 	}
 }

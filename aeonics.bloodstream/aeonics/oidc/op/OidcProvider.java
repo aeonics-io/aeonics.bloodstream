@@ -22,7 +22,7 @@ import aeonics.util.Http;
 
 public class OidcProvider extends Provider
 {
-	public static class Type extends Provider.Type
+	public static class Type extends Provider.Remote
 	{
 		private Data urls = null;
 		private Data jwks = null;
@@ -159,7 +159,7 @@ public class OidcProvider extends Provider
 			User.Type u = Registry.of(User.class).get(user);
 			if( u == null ) return false;
 			Data match = privateData(u);
-			return match != null && match.isList() && match.size() > 0;
+			return match != null && match.isList("sub") && match.size() > 0;
 		}
 
 		public User.Type authenticate(Data context)
@@ -193,12 +193,12 @@ public class OidcProvider extends Provider
 			{
 				// associate to existing user
 				Data bind = privateData(existing);
-				if( bind == null || !bind.isList() ) bind = Data.list();
-				for( Data b : bind )
+				if( bind == null || !bind.isList("sub") ) bind = Data.map().put("sub", Data.list());
+				for( Data b : bind.get("sub") )
 					if( b.asString().equals(sub) )
 						return existing;
 				
-				bind.add(sub);
+				bind.get("sub").add(sub);
 				privateData(existing, bind);
 				
 				// reverse bind
@@ -210,7 +210,7 @@ public class OidcProvider extends Provider
 				// create user
 				existing = Factory.of(User.class).get(User.class).build().name(name);
 				// bind him
-				privateData(existing, Data.list().add(sub));
+				privateData(existing, Data.map().put("sub", Data.list().add(sub)));
 				// reverse bind
 				Manager.of(Vault.class).set(Manager.of(Security.class).hash(id() + "." + sub), Data.map().put("user", existing.id()), this);
 				
@@ -228,24 +228,29 @@ public class OidcProvider extends Provider
 			for( Data sub : p )
 				Manager.of(Vault.class).remove(Manager.of(Security.class).hash(id() + "." + sub), this);
 		}
+		
+		public Data export()
+		{
+			return super.export()
+				.put("redirect_uri", redirectUri());
+		}
 	}
 	
 	protected Class<? extends Type> defaultTarget() { return OidcProvider.Type.class; }
 	protected Supplier<? extends Type> defaultCreator() { return OidcProvider.Type::new; }
-	protected Class<? extends Provider> category() { return OidcProvider.class; }
-
+	
 	public Template<? extends Provider.Type> template()
 	{
 		return super.template()
 			.summary("OIDC Identity Provider")
-			.description("Delegates the authentication to an OIDC Identity Provider. The OIDC Identity Provider must suport the \"email\" scope. Users must be provisionned in the system to match successfully.")
+			.description("Delegates the authentication to an OIDC Identity Provider. Users must be provisionned in the system to match successfully.")
 			.add(new Parameter("wellknown")
 				.summary("Well known OpenID Configuration URL")
 				.description("The full URL to the /.well-known/openid-configuration file."))
-			.add(new Parameter("clientId")
+			.add(new Parameter("client_id")
 				.summary("Client ID")
 				.description("The client ID provided by the OIDC Provider."))
-			.add(new Parameter("clientSecret")
+			.add(new Parameter("client_secret")
 				.summary("Client secret")
 				.description("The client secret provided by the OIDC Provider."))
 			;

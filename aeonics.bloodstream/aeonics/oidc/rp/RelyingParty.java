@@ -4,6 +4,8 @@ import java.util.function.Supplier;
 
 import aeonics.data.Data;
 import aeonics.entity.Entity;
+import aeonics.entity.security.Group;
+import aeonics.entity.security.Role;
 import aeonics.entity.security.User;
 import aeonics.manager.Manager;
 import aeonics.manager.Security;
@@ -52,14 +54,14 @@ public class RelyingParty extends Item<RelyingParty.Type>
 			.summary("OpenID Connect Relying Party")
 			.description("Authorize a third party to use OpenID Connect or OAuth2 to authenticate users and obtain user tokens. When requesting a token using the Client Credentials Grant flow, the client will be mapped to an existing user. "
 					+ "The Cliend ID is the ID of this item. All OpenID endpoint information can be found at /.well-known/openid-configuration")
-			.add(new Parameter("redirectUri")
+			.add(new Parameter("redirect_uri")
 				.summary("Redirect URI")
 				.description("The redirection URL to send the Authorization Code."))
-			.add(new Parameter("allowPasswordGrant")
+			.add(new Parameter("allow_password_grant")
 				.summary("Allow Password Grant")
 				.description("Allow this client to use the OAuth2 Password Grant flow.")
 				.defaultValue(Data.of(false)))
-			.add(new Parameter("allowClientCredentialsGrant")
+			.add(new Parameter("allow_client_credentials_grant")
 				.summary("Allow Client Credentials Grant")
 				.description("Allow this client to use the OAuth2 Client Credentials Grant flow and authenticate as an app.")
 				.defaultValue(Data.of(false)))
@@ -69,9 +71,11 @@ public class RelyingParty extends Item<RelyingParty.Type>
 				.description("The technical application user this client will map to when using the Client Credentials Grant flow")
 				.max(1))
 			.add(new Relationship("scopes")
+				.category(Role.class)
 				.summary("Scope")
 				.description("The list of security roles to enable as scopes for this client"))
 			.add(new Relationship("groups")
+				.category(Group.class)
 				.summary("Group")
 				.description("The list of security user groups allowed to use this client. If a user is not member of one of these groups, then login will be denied."))
 			.builder((data, instance) -> 
