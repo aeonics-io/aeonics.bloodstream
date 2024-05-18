@@ -63,7 +63,7 @@ public class Main extends Plugin
 			.description("The OTP time window in seconds.")
 			.rule(Parameter.DIGIT)
 			.defaultValue(Data.of(30)));
-		c.declare(Security.class, new Parameter("otp.period")
+		c.declare(Security.class, new Parameter("otp.digits")
 			.summary("OTP number of digits")
 			.description("The number of OTP code digits.")
 			.rule(Parameter.DIGIT)
@@ -198,11 +198,13 @@ public class Main extends Plugin
 	{
 		// default oidc client and rp
 		RelyingParty.Type rp = new RelyingParty().template().build(Data.map()
+			.put("__internal", true)
 			.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
 			.addRelation("groups", "Administrators")
 			.name("Local Provider")
 			.<RelyingParty.Type>cast();
 		OidcProvider.Type provider = new OidcProvider().template().build(Data.map()
+			.put("__internal", true)
 			.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
 			.put("client_id", rp.clientId())
 			.put("client_secret", rp.clientSecret()))
@@ -214,5 +216,6 @@ public class Main extends Plugin
 			.put("aud", provider.id())
 			.put("exp", System.currentTimeMillis()/1000 + 3600),
 			Registry.of(User.class).get("admin"));
+		Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
 	}
 }

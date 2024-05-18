@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import aeonics.data.Data;
 import aeonics.entity.Entity;
+import aeonics.entity.Registry;
 import aeonics.entity.security.Group;
 import aeonics.entity.security.Role;
 import aeonics.entity.security.User;
@@ -19,15 +20,15 @@ public class RelyingParty extends Item<RelyingParty.Type>
 {
 	public static class Type extends Entity
 	{
-		public String redirectUri() { return valueOf("redirectUri").asString(); }
-		public String clientId() { return id().toString(); }
+		public String redirectUri() { return valueOf("redirect_uri").asString(); }
+		public String clientId() { return id(); }
 		public User.Type user() { for( Tuple<Entity, Data> t : relations("user") ) return ((User.Type)t.a); return null; }
 		
 		private String secret = null;
 		public String clientSecret() { return secret; }
 		
-		public boolean allowPasswordGrant() { return valueOf("allowPasswordGrant").asBool(); }
-		public boolean allowClientCredentialsGrant() { return valueOf("allowClientCredentialsGrant").asBool(); }
+		public boolean allowPasswordGrant() { return valueOf("allow_password_grant").asBool(); }
+		public boolean allowClientCredentialsGrant() { return valueOf("allow_client_credentials_grant").asBool(); }
 		
 		public boolean hasScope(String scope)
 		{
@@ -85,6 +86,7 @@ public class RelyingParty extends Item<RelyingParty.Type>
 					if( data.containsKey("__secret") ) ((RelyingParty.Type)instance).secret = data.asString("__secret");
 					else ((RelyingParty.Type)instance).secret = Manager.of(Security.class).randomHash();
 				}
+				Registry.add(instance);
 			});
 	}
 }

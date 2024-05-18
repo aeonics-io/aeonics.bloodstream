@@ -20,22 +20,22 @@ public class Common
 	public static String OP_ISSUER_URL = "https://localhost";
 	
 	/**
-	 * lifetime validity of the access token
+	 * lifetime validity of the access token in seconds
 	 */
 	public static long OP_ACCESS_TOKEN_TTL = 86400;
 	
 	/**
-	 * lifetime validity of the id token
+	 * lifetime validity of the id token in seconds
 	 */
 	public static long OP_ID_TOKEN_TTL = 300;
 	
 	/**
-	 * lifetime validity of the refresh token
+	 * lifetime validity of the refresh token in seconds
 	 */
 	public static long OP_REFRESH_TOKEN_TTL = 2592000;
 	
 	/**
-	 * lifetime validity of the authentication flow
+	 * lifetime validity of the authentication flow in seconds
 	 */
 	public static long OP_AUTH_CODE_TTL = 180;
 	

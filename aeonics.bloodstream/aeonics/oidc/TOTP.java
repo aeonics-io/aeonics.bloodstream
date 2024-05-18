@@ -10,8 +10,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import aeonics.data.Data;
 import aeonics.entity.Action;
+import aeonics.entity.Registry;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
+import aeonics.http.HttpException;
 import aeonics.http.Endpoint.Rest;
 import aeonics.template.Parameter;
 import aeonics.manager.Config;
@@ -53,7 +55,7 @@ public class TOTP
 	
 	private static byte[] secretFromUserAndSalt(User.Type user, long salt) throws Throwable
 	{
-		byte[] hash = Manager.of(Security.class).hash(user.name() + "#" + salt).getBytes();
+		byte[] hash = Manager.of(Security.class).hash(user.id() + "#" + salt).getBytes();
 		byte[] secret = new byte[6];
 		
 		for( int i = 0; i < 6; i++ ) secret[i] = hash[i];
@@ -66,42 +68,61 @@ public class TOTP
 		.template()
 		.summary("Enroll with TOTP")
 		.description("This endpoint can be used to enable TOTP for the current user.")
+		.add(new Parameter("code")
+			.summary("Authentication code")
+			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to enroll the user with TOTP.")
+			.optional(true))
 		.build()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
+			
+			if( !params.isEmpty("code") )
+			{
+				Data data = Common.Code.get(params.asString("code"));
+				if( data == null )
+					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+				user = Registry.of(User.class).get(data.asString("otp_user"));
+				if( user == null )
+				{
+					Common.Code.remove(params.asString("code"));
+					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+				}
+			}
 			
 			// https://github.com/google/google-authenticator/wiki/Key-Uri-Format
 	    	// otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30
 			
-			if( user == User.ANONYMOUS || user == User.SYSTEM ) throw new SecurityException("Invalid user");
-			if( enrolled(user) ) throw new SecurityException("Already enrolled");
+			if( user == User.ANONYMOUS || user == User.SYSTEM )
+				throw new HttpException(403, Data.map().put("error", "invalid_request").put("error_description", "Invalid user"));
+			if( enrolled(user) )
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Already enrolled"));
 			
 			Data info = Data.map()
 				.put("salt", SecureRandom.getInstanceStrong().nextLong())
 				.put("period", Manager.of(Config.class).get(Security.class, "otp.period"))
 				.put("digits", Manager.of(Config.class).get(Security.class, "otp.digits"))
 				.put("algorithm", Manager.of(Config.class).get(Security.class, "otp.algorithm"));
-			Common.OTP.put(user.id().toString(), info);
-			
-			// generate secret and url
+			Common.OTP.put(user.id(), info);
+
 			String secret = base32Encode(secretFromUserAndSalt(user, info.asLong("salt")));
-			info.put("secret", secret);
-			info.put("url", "otpauth://totp/" 
-					+ URLEncoder.encode(Manager.of(Config.class).get(Security.class, "otp.issuer").asString(), StandardCharsets.UTF_8) + ":" 
-					+ URLEncoder.encode(user.name(), StandardCharsets.UTF_8) + "?" +
-				"secret=" + base32Encode(secretFromUserAndSalt(user, info.asLong("salt"))) +
-				"&issuer=" + URLEncoder.encode(Manager.of(Config.class).get(Security.class, "otp.issuer").asString(), StandardCharsets.UTF_8) +
+
+			// clone info to avoid modifications
+			return Data.map()
+				.put("period", info.get("period"))
+				.put("digits", info.get("digits"))
+				.put("algorithm", info.get("algorithm"))
+				.put("secret", secret)
+				.put("url", "otpauth://totp/" 
+					+ URLEncoder.encode(Manager.of(Config.class).get(Security.class, "otp.issuer").asString(), StandardCharsets.UTF_8).replace("+", "%20") + ":" 
+					+ URLEncoder.encode(user.name(), StandardCharsets.UTF_8).replace("+", "%20") + "?" +
+				"secret=" + secret +
+				"&issuer=" + URLEncoder.encode(Manager.of(Config.class).get(Security.class, "otp.issuer").asString(), StandardCharsets.UTF_8).replace("+", "%20") +
 				"&algorithm=" + info.asString("algorithm") +
 				"&digits=" + info.asString("digits") +
 				"&period=" + info.asString("period"));
-			
-			// remove the salt, it is private
-			info.remove("salt");
-			
-			return info;
 		})
 		.url("/oauth/otp/register")
 		.method("POST")
@@ -120,12 +141,14 @@ public class TOTP
 		.process((params, user, request) ->
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
-			if( user == User.ANONYMOUS || user == User.SYSTEM ) throw new SecurityException("Invalid user");
-			if( !check(user, params.asString("otp")) ) throw new SecurityException("Invalid OTP");
+			if( user == User.ANONYMOUS || user == User.SYSTEM )
+				throw new HttpException(403, Data.map().put("error", "invalid_request").put("error_description", "Invalid user"));
+			if( !check(user, params.asString("otp")) )
+				throw new HttpException(403, Data.map().put("error", "invalid_request").put("error_description", "OTP code mismatch"));
 			
-			Common.OTP.remove(user.id().toString());
+			Common.OTP.remove(user.id());
 			return null;
 		})
 		.url("/oauth/otp/unregister")
@@ -136,12 +159,29 @@ public class TOTP
 		.template()
 		.summary("Check for TOTP")
 		.description("This endpoint can be used to check if the current user has enrolled with TOTP.")
+		.add(new Parameter("code")
+			.summary("Authentication code")
+			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to check if the target user has enrolled with TOTP.")
+			.optional(true))
 		.build()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
+			
+			if( !params.isEmpty("code") )
+			{
+				Data data = Common.Code.get(params.asString("code"));
+				if( data == null )
+					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+				user = Registry.of(User.class).get(data.asString("otp_user"));
+				if( user == null )
+				{
+					Common.Code.remove(params.asString("code"));
+					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+				}
+			}
 			
 			return Data.map().put("exists", enrolled(user));
 		})
@@ -165,7 +205,7 @@ public class TOTP
 	{
 		if( user == User.ANONYMOUS || user == User.SYSTEM ) return false;
 		
-		Data info = Common.OTP.get(user.id().toString());
+		Data info = Common.OTP.get(user.id());
 		if( info == null || info.isEmpty() ) return false;
 		else return true;
 	}
@@ -178,11 +218,15 @@ public class TOTP
 	 */
 	public static boolean check(User.Type user, String otp) 
 	{
+		// TODO : if the code matched, then mark it so it cannot be used anymore
+		// -> keep only the last successful match
+		// this would prevent replay attacks in the same time window.
+		
 		try
 		{
 			if( user == User.ANONYMOUS || user == User.SYSTEM ) return false;
 			
-			Data info = Common.OTP.get(user.id().toString());
+			Data info = Common.OTP.get(user.id());
 			if( info == null || info.isEmpty() ) return false;
 			
 			long now = System.currentTimeMillis();
@@ -201,6 +245,8 @@ public class TOTP
 	
 	private static boolean checkAt(Data info, byte[] secret, String otp, long time) throws Exception
 	{
+		int current = Integer.parseInt(otp);
+		
 		long timeslice = time / 1000L / info.asLong("period");
         
         Mac mac = Mac.getInstance("Hmac" + info.asString("algorithm"));
@@ -214,6 +260,6 @@ public class TOTP
                       (hmac[offset + 3] & 0xff);
         int totp = binary % (int) Math.pow(10, info.asInt("digits"));
         
-        return otp.equals("" + totp);
+        return current == totp;
 	}
 }

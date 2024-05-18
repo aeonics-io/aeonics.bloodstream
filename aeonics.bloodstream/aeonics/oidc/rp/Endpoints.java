@@ -14,7 +14,6 @@ import aeonics.entity.Registry;
 import aeonics.entity.security.Provider;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
-import aeonics.http.Endpoint.Rest;
 import aeonics.manager.Config;
 import aeonics.manager.Logger;
 import aeonics.manager.Manager;
@@ -41,8 +40,8 @@ public class Endpoints
 			.put("code", 302)
 			.put("headers", Data.map().put("Location", 
 				Common.OP_ISSUER_URL + "/oauth/ui/error" +
-				"?error=" + error + 
-				"&error_description=" + java.net.URLEncoder.encode(description, StandardCharsets.ISO_8859_1)));
+				"?error=" + (error == null ? "server_error" : error) + 
+				"&error_description=" + java.net.URLEncoder.encode(description == null ? "" : description, StandardCharsets.ISO_8859_1)));
 	}
 	
 	/**
@@ -56,16 +55,18 @@ public class Endpoints
 		if( parts.length != 3 ) throw new RuntimeException("Invalid JWT");
 		
 		int sigoffset = jwt.lastIndexOf('.');
-		Data header = Json.decode(new String(Base64.getDecoder().decode(parts[0].getBytes()), StandardCharsets.UTF_8));
+		Data header = Json.decode(new String(Base64.getUrlDecoder().decode(parts[0].getBytes()), StandardCharsets.UTF_8));
 		
 		if( !header.asString("alg").equals("RS256") ) throw new RuntimeException("Unsupported JWT alg : " + header.asString("alg"));
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initVerify(provider.publicKey(header.asString("kid")));
 		signature.update(jwt.getBytes(), 0, sigoffset);
-		if( !signature.verify(jwt.getBytes(), sigoffset+1, jwt.length()-sigoffset-1) )
+		
+		byte[] sig = Base64.getUrlDecoder().decode(parts[2]);
+		if( !signature.verify(sig) )
 			throw new SecurityException("Invalid JWT signature");
 		
-		return Json.decode(new String(Base64.getDecoder().decode(parts[1].getBytes()), StandardCharsets.UTF_8));
+		return Json.decode(new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8));
 	}
 	
 	private static class login_ extends Endpoint.Rest.Type
@@ -79,12 +80,11 @@ public class Endpoints
 				String provider = params.asString("provider");
 				
 				if( provider == null || provider.isBlank() ) return redirectError("invalid_state", "Invalid security provider");
-				if( !request.content().get("headers").asString("referer").startsWith(Common.OP_ISSUER_URL) ) return redirectError("invalid_state", "Invalid referer");
 				
 				Provider.Type p = Registry.of(Provider.class).get(provider);
 				if( !(p instanceof OidcProvider.Type) ) return redirectError("invalid_state", "Incompatible security provider");
 				
-				if( Common.Code.count() > Manager.of(Config.class).get("security.code.pending.max").asInt() ) return redirectError("server_error", "Too many pending requests (" + Common.Code.count() + ")");
+				if( Common.Code.count() > Manager.of(Config.class).get(Security.class, "oidc.op.auth_code.max").asInt() ) return redirectError("server_error", "Too many pending requests (" + Common.Code.count() + ")");
 				
 				String state = "ae-" + Manager.of(Security.class).randomHash();
 				Data relayState = Data.map()
@@ -93,7 +93,7 @@ public class Endpoints
 					.put("_time", System.currentTimeMillis());
 				
 				Common.Code.put(state, relayState);
-	
+					
 				return Data.map()
 					.put("isHttpResponse", true)
 					.put("code", 302)
@@ -134,78 +134,78 @@ public class Endpoints
 	{
 		public Data process(Data params, User.Type user, Message request)
 		{
-			try {
-			Data relayState = null;
-			String state = null, code = null;
-			
-			if( !request.metadata().asBool("tls") ) return redirectError("invalid_state", "Unsecure connection");
-			
-			if( !params.isEmpty("error") ) return redirectError(params.asString("error"), params.asString("error_description"));
-			
-			state = params.asString("state");
-			if( state == null || state.isBlank() ) return redirectError("invalid_state", "Invalid OIDC state");
-				
-			code = params.asString("code");
-			if( code == null || state.isBlank() ) return redirectError("invalid_code", "Invalid OIDC code");
-				
-			relayState = Common.Code.remove(state);
-			if( relayState == null ) return redirectError("invalid_state", "Missing or expired request");
-			
-			Provider.Type p = Registry.of(Provider.class).get(relayState.asString("provider"));
-			if( !(p instanceof OidcProvider.Type) ) return redirectError("invalid_state", "Incompatible security provider");
-			OidcProvider.Type op = ((OidcProvider.Type)p);
-			
-			String tokenUrl = op.tokenUrl();
-			Data response = null;
-			
-			try
+			try 
 			{
-				response = Http.post(tokenUrl,Data.map()
-					.put("grant_type", "authorization_code")
-					.put("code", code)
-					.put("redirect_uri", op.redirectUri())
-					.put("client_id", op.clientId())
-					.put("client_secret", op.clientSecret())
-					);
-			}
-			catch(Http.Error e)
-			{
-				Data body = Json.decode(e.body);
-				return redirectError(body.asString("error"), body.asString("error_description"));
-			}
-			
-			Data jwt = null;
-			
-			try { jwt = checkJwt(op, response.asString("id_token")); }
-			catch(Exception e) { return redirectError("invalid_token", e.getMessage()); }
-			
-			user = op.authenticate(jwt);
-			if( user == null || user == User.ANONYMOUS ) return redirectError("invalid_token", "Failed to authenticate");
-			
-			String token = null;
-			if( jwt.asString("iss").equals(Common.OP_ISSUER_URL) )
-				token = response.asString("access_token");
-			else
-				token = Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL, true, "topic", "http").value();
-			
-			String referer = relayState.asString("referer");
-			int start_host = referer.indexOf("//")+2;
-			int start_path = referer.indexOf("/", start_host);
-			int end_path = referer.indexOf("/", start_path+1);
-			String hostname = referer.substring(start_host, start_path > 0 ? start_path : referer.length());
-			String path = start_path < 0 ? "/" : referer.substring(start_path, end_path > 0 ? end_path : referer.length());
-			
-			return Data.map()
-				.put("isHttpResponse", true)
-				.put("code", 302)
-				.put("headers", Data.map().put("Location", referer)
-					.put("Set-Cookie", 
-					"token=" + URLEncoder.encode(token, StandardCharsets.UTF_8) + 
-				 	";domain=" + hostname +
-					";SameSite=Lax" +
-					";max-age=" + Common.OP_ACCESS_TOKEN_TTL + 
-					";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) + 
-					";path=" + path));
+				Data relayState = null;
+				String state = null, code = null;
+				
+				if( !request.metadata().asBool("tls") ) return redirectError("invalid_state", "Unsecure connection");
+				
+				if( !params.isEmpty("error") ) return redirectError(params.asString("error"), params.asString("error_description"));
+				
+				state = params.asString("state");
+				if( state == null || state.isBlank() ) return redirectError("invalid_state", "Invalid OIDC state");
+					
+				code = params.asString("code");
+				if( code == null || code.isBlank() ) return redirectError("invalid_code", "Invalid OIDC code");
+					
+				relayState = Common.Code.remove(state);
+				if( relayState == null ) return redirectError("invalid_state", "Missing or expired request");
+				
+				Provider.Type p = Registry.of(Provider.class).get(relayState.asString("provider"));
+				if( !(p instanceof OidcProvider.Type) ) return redirectError("invalid_state", "Incompatible security provider");
+				OidcProvider.Type op = ((OidcProvider.Type)p);
+				
+				String tokenUrl = op.tokenUrl();
+				Data response = null;
+
+				try
+				{
+					response = Http.post(tokenUrl,Data.map()
+						.put("grant_type", "authorization_code")
+						.put("code", code)
+						.put("redirect_uri", op.redirectUri())
+						.put("client_id", op.clientId())
+						.put("client_secret", op.clientSecret())
+						);
+				}
+				catch(Http.Error e)
+				{
+					Data body = Json.decode(e.body);
+					return redirectError(body.asString("error"), body.asString("error_description"));
+				}
+				
+				Data jwt = null;				
+				try { jwt = checkJwt(op, response.asString("id_token")); }
+				catch(Exception e) { return redirectError("invalid_token", e.getMessage()); }
+				
+				user = op.authenticate(jwt);
+				if( user == null || user == User.ANONYMOUS ) return redirectError("invalid_token", "Failed to authenticate");
+				
+				String token = null;
+				if( jwt.asString("iss").equals(Common.OP_ISSUER_URL) )
+					token = response.asString("access_token");
+				else
+					token = Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL, true, "topic", "http").value();
+				
+				String referer = relayState.asString("referer");
+				int start_host = referer.indexOf("//")+2;
+				int start_path = referer.indexOf("/", start_host);
+				int end_path = referer.indexOf("/", start_path+1);
+				String hostname = referer.substring(start_host, start_path > 0 ? start_path : referer.length());
+				String path = start_path < 0 ? "/" : referer.substring(start_path, end_path > 0 ? end_path : referer.length());
+				
+				return Data.map()
+					.put("isHttpResponse", true)
+					.put("code", 302)
+					.put("headers", Data.map().put("Location", referer)
+						.put("Set-Cookie", 
+						"token=" + URLEncoder.encode(token, StandardCharsets.UTF_8) + 
+					 	";domain=" + hostname +
+						";SameSite=Lax" +
+						";max-age=" + Common.OP_ACCESS_TOKEN_TTL + 
+						";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) + 
+						";path=" + path));
 			}
 			catch(Exception e)
 			{
@@ -224,7 +224,7 @@ public class Endpoints
 		.add(new Parameter("state")
 			.summary("Internal state")
 			.description("The opaque authentication state that was used during initiation of the login request.")
-			.optional(false))
+			.optional(true))
 		.add(new Parameter("code")
 			.summary("Authentication code")
 			.description("The authorization code generated by the OpenID provider.")

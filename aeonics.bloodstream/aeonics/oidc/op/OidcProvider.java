@@ -149,8 +149,8 @@ public class OidcProvider extends Provider
 			}
 		}
 		
-		public String clientId() { return valueOf("clientId").asString(); }
-		public String clientSecret() { return valueOf("clientSecret").asString(); }
+		public String clientId() { return valueOf("client_id").asString(); }
+		public String clientSecret() { return valueOf("client_secret").asString(); }
 		public String loginPageRedirectUrl() { return Common.OP_ISSUER_URL + "/oidc/login?provider=" + id(); }
 		public String redirectUri() { return Common.OP_ISSUER_URL + "/oidc/response"; }
 		
@@ -165,7 +165,7 @@ public class OidcProvider extends Provider
 		public User.Type authenticate(Data context)
 		{
 			if( context == null || !context.isMap() || !context.containsKey("sub") || !context.asString("iss").equals(issuer()) ) return null;
-			if( !context.asString("iss").equals(issuer()) || !context.asString("aud").equals(id()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
+			if( !context.asString("iss").equals(issuer()) || !context.asString("aud").equals(clientId()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
 			
 			String sub = context.asString("sub");
 			Data data = Manager.of(Vault.class).get(Manager.of(Security.class).hash(id() + "." + sub), this);

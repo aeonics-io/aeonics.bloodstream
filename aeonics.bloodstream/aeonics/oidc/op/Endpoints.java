@@ -94,14 +94,14 @@ public class Endpoints
 			id_token.put("nonce", nonce);
 		
 		String jwt = 
-			  Base64.getUrlEncoder().withoutPadding().encodeToString(Data.map().put("alg", "RS256").put("kid", "default").toString().getBytes())
+			  Base64.getUrlEncoder().withoutPadding().encodeToString(Data.map().put("alg", "RS256").put("kid", "default").put("typ", "JWT").toString().getBytes())
 			+ "."
 			+ Base64.getUrlEncoder().withoutPadding().encodeToString(id_token.toString().getBytes());
 		
 		signature.update(jwt.getBytes());
 		
 		jwt += "." + Base64.getUrlEncoder().withoutPadding().encodeToString(signature.sign());
-		return "";
+		return jwt;
 	}
 	
 	/**
@@ -127,8 +127,8 @@ public class Endpoints
 			if( !uri.endsWith("#") && !uri.endsWith("&") ) uri += "&";
 		}
 		else uri += "?";
-		
-		uri += "error=" + error + "&error_description=" + java.net.URLEncoder.encode(description, StandardCharsets.ISO_8859_1);
+
+		uri += "error=" + (error == null ? "server_error" : error) + "&error_description=" + java.net.URLEncoder.encode(description == null ? "" : description, StandardCharsets.ISO_8859_1);
 		if( state != null && !state.isBlank() ) uri += "&state=" + java.net.URLEncoder.encode(state, StandardCharsets.ISO_8859_1);
 		
 		return Data.map()
@@ -165,7 +165,7 @@ public class Endpoints
 		.process((params, user, request) ->
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			return Data.map()
 				// URL using the https scheme with no query or fragment components that the OP asserts as its Issuer Identifier.
@@ -213,7 +213,7 @@ public class Endpoints
 		.process((params, user, request) ->
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			return Data.map().put("keys", Data.list().add(Data.map()
 				.put("kty", "RSA")
@@ -239,7 +239,7 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			String code = params.asString("code");
 			if( code.isBlank() )
@@ -273,7 +273,7 @@ public class Endpoints
 				if( t == null || t.user() == User.ANONYMOUS )
 				{
 					Common.Code.remove(code);
-					return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), !data.asString("flow").equals("normal"));
+					return redirectError(c, "access_denied", "Invalid access token", data.asString("state"), data.asString("flow").equals("implicit"));
 				}
 				trusted = true;
 			}
@@ -290,7 +290,7 @@ public class Endpoints
 			if( user == null || user == User.ANONYMOUS )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Invalid credentials", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			// check if user is allowed by the client groups
@@ -307,7 +307,7 @@ public class Endpoints
 			if( !member )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Missing group membership", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			if( user.hasRole(Role.SUPERADMIN) || (!trusted && TOTP.enrolled(user)) )
@@ -353,7 +353,7 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			String code = params.asString("code");
 			if( code.isBlank() )
@@ -374,13 +374,13 @@ public class Endpoints
 			if( user == null )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Tampered", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Tampered", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			if( !TOTP.check(user, params.asString("otp")) )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			else
 			{
@@ -419,15 +419,11 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request) throws Exception
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			String code = params.asString("code");
 			if (code.isBlank())
 				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Missing code"));
-			
-			int state = params.asInt("state");
-			if (state != 2 && state != 4)
-				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid consent"));
 			
 			Data data = Common.Code.get(code);
 			if (data == null)
@@ -440,23 +436,23 @@ public class Endpoints
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "Invalid client"));
 			}
 			
-			if( state == 2 ) // rejected consent
+			if( !params.asBool("granted") ) // rejected consent
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "No consent", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "No consent", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			user = Registry.of(User.class).get(data.asString("user"));
 			if( user == null )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Tampered", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Tampered", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			if( user == User.ANONYMOUS )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), !data.asString("flow").equals("normal"));
+				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
 			// =============== 
@@ -464,7 +460,7 @@ public class Endpoints
 			
 			String uri = c.redirectUri();
 			
-			if( !data.asString("flow").equals("normal") )
+			if( data.asString("flow").equals("implicit") )
 			{
 				if( uri.indexOf('#') < 0 ) uri += "#";
 				else if( !uri.endsWith("#") && !uri.endsWith("&") ) uri += "&";
@@ -498,7 +494,7 @@ public class Endpoints
 			
 			if( data.asString("response_type").contains("code") )
 			{
-				uri += uri.endsWith("&") ? "" : "&" 
+				uri += (uri.endsWith("&") ? "" : "&" )
 					+ "code=" + code;
 			}
 			
@@ -509,7 +505,7 @@ public class Endpoints
 			{
 				long expire_in = Common.OP_ACCESS_TOKEN_TTL;
 				token = Manager.of(Security.class).generateToken(user, expire_in * 1000L, false, StringUtils.split(scope, " ")).value();
-				uri += uri.endsWith("&") ? "" : "&" 
+				uri += (uri.endsWith("&") ? "" : "&" )
 					+ "access_token=" + token
 					+ "&token_type=bearer"
 					+ "&expires_in=" + expire_in;
@@ -517,7 +513,7 @@ public class Endpoints
 			
 			if( data.asString("response_type").contains("id_token") )
 			{
-				uri += uri.endsWith("&") ? "" : "&" 
+				uri += (uri.endsWith("&") ? "" : "&" )
 					+ "id_token=" + generateIdToken(c, user, data.asString("nonce"), scope, token, data.asString("response_type").contains("code") ? code : null);
 			}
 			
@@ -536,11 +532,11 @@ public class Endpoints
 				.description("The authorization code that was obtained from the authorize flow.")
 				.optional(false)
 				.min(1))
-		.add(new Parameter("state")
-				.summary("The state")
-				.description("The internal state of the flow, opaque value.")
+		.add(new Parameter("granted")
+				.summary("The user consent")
+				.description("The user consent to proceed.")
 				.optional(false)
-				.min(1).max(1).rule(Parameter.DIGIT))
+				.rule(Parameter.BOOLEAN))
 		.build()
 		.<Endpoint.Rest.Type>cast()
 		.url("/oauth/consent")
@@ -558,32 +554,34 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			String code = params.asString("code");
 			if( code.isBlank() )
-				throw new HttpException(413, "Invalid code");
+				throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
 			
 			Data data = Common.Code.get(code);
-			if( data == null ) throw new HttpException(413, "Invalid code");
+			if( data == null ) throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
 			
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(data.asString("client"));
 			if( c == null )
 			{
 				Common.Code.remove(code);
-				throw new HttpException(400, "Invalid client");
+				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "Invalid client"));
 			}
 			
 			user = Registry.of(User.class).get(data.asString("user"));
 			if( user == null )
 			{
 				Common.Code.remove(code);
-				throw new HttpException(403, "Tampered");
+				throw new HttpException(403, Data.map().put("error", "access_denied").put("error_description", "Tampered"));
 			}
 			
 			return Data.map()
 				.put("name", c.name())
-				.put("scope", data.get("scope"));
+				.put("scope", data.get("scope"))
+				.put("epoch", data.get("_time"))
+				.put("ttl", Common.OP_AUTH_CODE_TTL*1000);
 		}
 	}
 		
@@ -609,7 +607,7 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			if( user == User.ANONYMOUS )
 				throw new HttpException(401);
@@ -654,17 +652,21 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			if( Common.Code.count() > Common.OP_AUTH_CODE_MAX )
-				throw new SecurityException("Too many pending requests (" + Common.Code.count() + ")");
-			
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Too many pending requests (" + Common.Code.count() + ")"));
+
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(params.asString("client_id"));
 			if( c == null )
-				throw new SecurityException("Invalid relying party client_id");
+				throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid relying party client_id"));
 			
 			boolean is_openid = params.asString("scope").contains("openid");
 			String response_type = params.asString("response_type");
+			
+			String flow = "normal";
+			if( response_type.equals("token") || response_type.equals("id_token") || response_type.equals("id_token token") ) flow = "implicit";
+			else flow = "hybrid";
 			
 			switch(response_type)
 			{
@@ -673,29 +675,25 @@ public class Endpoints
 				case "code id_token":       // hybrid
 				case "code token":          // hybrid
 				case "code id_token token": // hybrid
-					if( !is_openid ) return redirectError(c, "invalid_scope", "Missing openid scope", params.asString("scope"), true);
+					if( !is_openid ) return redirectError(c, "invalid_scope", "Missing openid scope", params.asString("scope"), flow.equals("implicit"));
 				case "code":                // normal
 				case "token":               // implicit
 					break;
 				default:
-					return redirectError(c, "unsupported_response_type", "Invalid response_type", params.asString("scope"), false);
+					return redirectError(c, "unsupported_response_type", "Invalid response_type", params.asString("scope"), flow.equals("implicit"));
 			}
 			
 			
 			String redirectUri = params.asString("redirect_uri");
 			if( !redirectUri.isBlank() && !redirectUri.equals(c.redirectUri()) )
-				return redirectError(c, "invalid_request", "Invalid redirect_uri", params.asString("scope"), false);
+				return redirectError(c, "invalid_request", "Invalid redirect_uri", params.asString("scope"), flow.equals("implicit"));
 			else
 				redirectUri = c.redirectUri();
 			
 			if( response_type.contains("id_token") && params.isEmpty("nonce") )
-				return redirectError(c, "invalid_request", "Missing nonce", params.asString("scope"), false);
+				return redirectError(c, "invalid_request", "Missing nonce", params.asString("scope"), flow.equals("implicit"));
 			
 			String code = Manager.of(Security.class).randomHash();
-			
-			String flow = "normal";
-			if( response_type.equals("token") || response_type.equals("id_token") || response_type.equals("id_token token") ) flow = "implicit";
-			else flow = "hybrid";
 			
 			Common.Code.put(code, Data.map()
 				.put("scope", params.get("scope"))
@@ -783,7 +781,7 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request) throws Throwable
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			if( params.asString("grant_type").equals("authorization_code") )
 				return authorization_code(params, user, request);
@@ -1093,7 +1091,7 @@ public class Endpoints
 		public Data process(Data params, User.Type user, Message request)
 		{
 			if( !request.metadata().asBool("tls") )
-				throw new SecurityException("This endpoint must be called using a secure TLS connection.");
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			if( params.isEmpty("client_id") || params.isEmpty("client_secret") )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "X1"));
