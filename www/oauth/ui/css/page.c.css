@@ -1,0 +1,23 @@
+
+section.consent { 
+	position: fixed; padding: 10vh 10vw; top: 0; bottom: 0; left: 0; right: 0; text-align: center; 
+	overflow: auto; background: #1C1B21;
+}
+
+#consent_panel { width: 450px; max-height: 400px; min-height: 200px; background-color: #fff; 
+	padding: 45px; box-sizing: border-box; 
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px; 
+	overflow-y: hidden; overflow-x: auto; 
+	color: #000; text-align: left; 
+	position: absolute; left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%);
+}
+#consent_panel::after { content: attr(data-ttl); position: absolute; bottom: 5px; left: 5px; font-size: 0.8em; color: #FB9B60; }
+
+#consent_panel button.raised { display: inline-block; margin: 20px 5px; width: unset; float: right; }
+#consent_panel button.agree { color: #fff; background-color: #147A00; }
+#consent_panel button.agree:before { background-color: #147A00; }
+#consent_panel button.disagree { color: #fff; background-color: #9C0000; }
+#consent_panel button.disagree:before { background-color: #9C0000; }
+#consent_panel p { font-size: 1.3em; font-weight: 700; }
+#consent_panel p.explain { font-size: 1em; font-weight: 300; color: #000; text-align: left; padding: 20px 0; }
+#consent_panel p.error { font-size: 1em; font-weight: 300; color: #f00; text-align: center; padding: 35px 0; }
