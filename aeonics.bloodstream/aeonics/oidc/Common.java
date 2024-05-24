@@ -81,7 +81,6 @@ public class Common
 				Common.Code.local.entrySet().removeIf((t) -> 
 				{
 					if( t == null ) return true;
-					
 					long left = (t.getValue().asLong("_time") + OP_AUTH_CODE_TTL*1000) - now;
 					
 					if( left <= 0 ) return true;

@@ -265,17 +265,17 @@ public class Endpoints
 			}
 			
 			user = User.ANONYMOUS;
-			boolean trusted = false;
 			
-			if( !params.get("credentials").isEmpty("access_token") )
+			if( !params.get("credentials").isEmpty("signin_token") )
 			{
-				Token t = Manager.of(Security.class).authenticate(params.get("credentials").asString("access_token"), false);
-				if( t == null || t.user() == User.ANONYMOUS )
+				Token t = Manager.of(Security.class).authenticate(params.get("credentials").asString("signin_token"), false);
+				if( t == null || t.user() == User.ANONYMOUS || !t.inScope("signin") )
 				{
 					Common.Code.remove(code);
-					return redirectError(c, "access_denied", "Invalid access token", data.asString("state"), data.asString("flow").equals("implicit"));
+					return redirectError(c, "access_denied", "Invalid signin token", data.asString("state"), data.asString("flow").equals("implicit"));
 				}
-				trusted = true;
+				data.put("signin_token", t.value());
+				user = t.user();
 			}
 			else
 			{
@@ -310,7 +310,7 @@ public class Endpoints
 				return redirectError(c, "access_denied", "Missing group membership", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
-			if( user.hasRole(Role.SUPERADMIN) || (!trusted && TOTP.enrolled(user)) )
+			if( user.hasRole(Role.SUPERADMIN) || TOTP.enrolled(user) )
 			{
 				data.put("otp_user", user.id());
 				Common.Code.put(code, data);
@@ -320,6 +320,8 @@ public class Endpoints
 			else
 			{
 				data.put("user", user.id());
+				if( !data.containsKey("signin_token") )
+					data.put("signin_token", Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, false, "signin").value());
 				Common.Code.put(code, data);
 				
 				return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/consent?code=" + code);
@@ -386,6 +388,8 @@ public class Endpoints
 			{
 				// otp success -> redirect to consent
 				data.put("user", user.id());
+				if( !data.containsKey("signin_token") )
+					data.put("signin_token", Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, false, "signin").value());
 				Common.Code.put(code, data);
 				
 				return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/consent?code=" + code);
@@ -545,7 +549,7 @@ public class Endpoints
 	
 	// =============================
 	//
-	// UserInfo & CodeInfo Endpoints
+	// UserInfo & CodeInfo Endpoints & Session endpoint
 	// 
 	// =============================
 		
@@ -577,11 +581,21 @@ public class Endpoints
 				throw new HttpException(403, Data.map().put("error", "access_denied").put("error_description", "Tampered"));
 			}
 			
-			return Data.map()
+			Data info = Data.map()
 				.put("name", c.name())
 				.put("scope", data.get("scope"))
 				.put("epoch", data.get("_time"))
 				.put("ttl", Common.OP_AUTH_CODE_TTL*1000);
+			
+			if( params.asBool("verbose") )
+			{
+				if( data.containsKey("signin_token") )
+					info.put("signin_token", data.get("signin_token"));
+				if( data.containsKey("user") )
+					info.put("user_id", user.id()).put("user_name", user.name());
+			}
+			
+			return info;
 		}
 	}
 		
@@ -596,6 +610,11 @@ public class Endpoints
 			.description("The authorization code that was obtained from the authorize flow.")
 			.optional(false)
 			.min(1))
+		.add(new Parameter("verbose")
+			.summary("Request more output")
+			.description("When set to true, this method will return additional information about the user if available.")
+			.optional(true)
+			.rule(Parameter.BOOLEAN))
 		.build()
 		.<Endpoint.Rest.Type>cast()
 		.url("/oauth/codeinfo")
@@ -639,6 +658,42 @@ public class Endpoints
 		.<Endpoint.Rest.Type>cast()
 		.url("/oauth/userinfo")
 		.method("GET")
+		;
+	
+	private static class session_ extends Endpoint.Rest.Type
+	{
+		public Data process(Data params, User.Type user, Message request)
+		{
+			if( !request.metadata().asBool("tls") )
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
+			
+			Token t = Manager.of(Security.class).authenticate(params.asString("signin_token"), false);
+			if( t == null || t.user() == User.ANONYMOUS || !t.inScope("signin") )
+				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid sign in token."));
+			
+			return Data.map()
+				.put("id", t.user().id())
+				.put("name", t.user().name())
+				.put("expire", t.notAfter())
+				;
+		}
+	}
+		
+	private static final Endpoint.Rest.Type session = new Endpoint.Rest() { }
+		.target(session_.class)
+		.creator(session_::new)
+		.template()
+		.summary("Provides client session information.")
+		.description("Returns information about the client using the provided th session sign-in only token.")
+		.add(new Parameter("signin_token")
+			.summary("The signin token")
+			.description("The signin token.")
+			.optional(false)
+			.min(1))
+		.build()
+		.<Endpoint.Rest.Type>cast()
+		.url("/oauth/session")
+		.method("POST")
 		;
 	
 	// =============================
@@ -846,7 +901,7 @@ public class Endpoints
 			
 			// validate the actual scope
 			String scope = validateScope(c, data.asString("scope"), user);
-			
+
 			long expire_in = Common.OP_ACCESS_TOKEN_TTL;
 			String token = Manager.of(Security.class).generateToken(user, expire_in * 1000L, false, StringUtils.split(scope, " ")).value();
 			String refreshToken = Manager.of(Security.class).randomHash();
@@ -1155,6 +1210,7 @@ public class Endpoints
 		router.addRelation("endpoints", codeinfo);
 		router.addRelation("endpoints", userinfo_get);
 		router.addRelation("endpoints", userinfo_post);
+		router.addRelation("endpoints", session);
 		router.addRelation("endpoints", revoke);
 	}
 }

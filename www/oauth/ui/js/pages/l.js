@@ -102,9 +102,10 @@ var x = new Promise((ok, nok) =>
 					}
 					else
 					{
+						// todo : check code timeout
 						var self = this;
 						var identities = [];
-						tokens.forEach((t) => { identities.push(Ajax.get("/oauth/userinfo", {headers: {Authorization: "Bearer " + t}})); });
+						tokens.forEach((t) => { identities.push(Ajax.post("/oauth/session", {data: {signin_token: t}})); });
 						Promise.allSettled(identities).then((responses) =>
 						{
 							var ids = [];
@@ -119,8 +120,11 @@ var x = new Promise((ok, nok) =>
 								}
 								else
 								{
-									responses[i].value.token = tokens[j];
-									ids.push(responses[i].value);
+									if( !ids.find((i) => i.id == responses[i].value.response.id) )
+									{
+										responses[i].value.response.token = tokens[j];
+										ids.push(responses[i].value.response);
+									}
 								}
 							}
 							
@@ -207,7 +211,7 @@ var x = new Promise((ok, nok) =>
 				rule_3: function(uri)
 				{
 					if( uri && uri != "null" )
-						location.href = uri; // TODO : check this flow: where does this return to ?
+						location.href = uri;
 					else
 						this.rule_3_display();
 				},
@@ -246,7 +250,16 @@ var x = new Promise((ok, nok) =>
 				
 				rule_4: function(token)
 				{
-					// todo : redirect to consent|mfa|post login ?
+					var div = document.getElementById('login_panel');
+					while(div.firstChild) div.firstChild.remove();
+					div.classList.remove('wait');
+					
+					var credentials = JSON.stringify({signin_token: token});
+					div.append(Node.form({id: 'form_form', action: '/oauth/login', method: 'POST', enctype: 'application/x-www-form-urlencoded', style: {display: 'none'}}, [
+						Node.input({type: 'hidden', value: this.code, name: 'code'}),
+						Node.input({type: 'hidden', value: credentials, name: 'credentials'})
+					]));
+					div.lastChild.submit();
 				}
 			}));
 		});

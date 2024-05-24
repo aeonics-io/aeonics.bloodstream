@@ -54,8 +54,24 @@ var x = new Promise((ok, nok) =>
 					var div = document.getElementById('consent_panel');
 					while(div.firstChild) div.firstChild.remove();
 					
-					Ajax.get("/oauth/codeinfo", {data: {code: this.code}}).then((response) =>
+					Ajax.get("/oauth/codeinfo", {data: {code: this.code, verbose: "true"}}).then((response) =>
 					{
+						if( !response.response.signin_token )
+						{
+							var searchParams = new URLSearchParams();
+							searchParams.set("error", 'access_denied');
+							searchParams.set("error_description", 'Invalid sign in token.');
+							location.href = 'error?' + searchParams.toString() + '#e';
+							return;
+						}
+						
+						var tokens = JSON.parse(localStorage.getItem('tokens') || "[]");
+						if( !tokens.includes(response.response.signin_token) )
+						{
+							tokens.push(response.response.signin_token);
+							localStorage.setItem('tokens', JSON.stringify(tokens));
+						}
+						
 						self.code_epoch = response.response.epoch;
 						self.code_ttl = response.response.ttl;
 						self.updateCodeValidity();
