@@ -212,6 +212,7 @@ public class Endpoints
 				.put("version", Boot.VERSION)
 				.put("boot", Boot.BOOT_TIME)
 				.put("jvm", Runtime.version())
+				.put("hardware", Hardware.export())
 				);
 		})
 		.url(ROOT + "system")
