@@ -12,6 +12,8 @@ import aeonics.util.Json;
 
 public class Common
 {
+	private Common() { /* no instances */ }
+	
 	/**
 	 * Issuer Identifier for the Issuer of the response. 
 	 * The iss value is a case-sensitive URL using the https scheme that contains scheme, host, and optionally, 
@@ -137,6 +139,8 @@ public class Common
 	
 	public static class Code
 	{
+		private Code() { /* no instances */ }
+		
 		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
 		
 		public static String path = "code/";
@@ -190,6 +194,8 @@ public class Common
 	
 	public static class Refresh
 	{
+		private Refresh() { /* no instances */ }
+		
 		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
 		
 		public static String path = "refresh/";
@@ -243,6 +249,8 @@ public class Common
 	
 	public static class OTP
 	{
+		private OTP() { /* no instances */ }
+		
 		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
 		
 		public static String path = "otp/";

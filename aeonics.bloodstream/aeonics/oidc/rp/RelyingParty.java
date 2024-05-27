@@ -37,7 +37,8 @@ public class RelyingParty extends Item<RelyingParty.Type>
 					return true;
 			return false;
 		}
-		
+
+		@Override
 		public Data export()
 		{
 			return super.export()
@@ -48,7 +49,8 @@ public class RelyingParty extends Item<RelyingParty.Type>
 	protected Class<? extends Type> defaultTarget() { return RelyingParty.Type.class; }
 	protected Supplier<? extends Type> defaultCreator() { return RelyingParty.Type::new; }
 	protected Class<? extends Item<? super Type>> category() { return RelyingParty.class; }
-	
+
+	@Override
 	public Template<? extends RelyingParty.Type> template()
 	{
 		return super.template()

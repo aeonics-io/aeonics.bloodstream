@@ -13,6 +13,8 @@ import aeonics.template.Parameter;
 
 public class Endpoints
 {
+	private Endpoints() { /* no instances */ }
+	
 	public static void register(Action.Type router)
 	{
 		router.addRelation("endpoints", local);

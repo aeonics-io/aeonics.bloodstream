@@ -128,12 +128,12 @@ public class Main extends Plugin
 	{
 		// bind the config
 		Config c = Manager.of(Config.class);
-		c.watch(Security.class, "oidc.op.issuer", (key, value) -> { Common.OP_ISSUER_URL = value.asString(); });
-		c.watch(Security.class, "oidc.op.access_token.ttl", (key, value) -> { Common.OP_ACCESS_TOKEN_TTL = value.asLong(); });
-		c.watch(Security.class, "oidc.op.id_token.ttl", (key, value) -> { Common.OP_ID_TOKEN_TTL = value.asLong(); });
-		c.watch(Security.class, "oidc.op.refresh_token.ttl", (key, value) -> { Common.OP_REFRESH_TOKEN_TTL = value.asLong(); });
-		c.watch(Security.class, "oidc.op.auth_code.ttl", (key, value) -> { Common.OP_AUTH_CODE_TTL = value.asLong(); });
-		c.watch(Security.class, "oidc.op.auth_code.max", (key, value) -> { Common.OP_AUTH_CODE_MAX = value.asInt(); });
+		c.watch(Security.class, "oidc.op.issuer", (key, value) -> Common.OP_ISSUER_URL = value.asString());
+		c.watch(Security.class, "oidc.op.access_token.ttl", (key, value) -> Common.OP_ACCESS_TOKEN_TTL = value.asLong());
+		c.watch(Security.class, "oidc.op.id_token.ttl", (key, value) -> Common.OP_ID_TOKEN_TTL = value.asLong());
+		c.watch(Security.class, "oidc.op.refresh_token.ttl", (key, value) -> Common.OP_REFRESH_TOKEN_TTL = value.asLong());
+		c.watch(Security.class, "oidc.op.auth_code.ttl", (key, value) -> Common.OP_AUTH_CODE_TTL = value.asLong());
+		c.watch(Security.class, "oidc.op.auth_code.max", (key, value) -> Common.OP_AUTH_CODE_MAX = value.asInt());
 		c.watch(Security.class, "oidc.op.jwt.public", (key, value) ->
 		{
 			if( value.isEmpty() ) { return; }
@@ -174,7 +174,7 @@ public class Main extends Plugin
 					);
 			}
 		});
-		c.watch(Security.class, "oidc.op.storage", (key, value) -> { Common.storage = Registry.of(Storage.class).get(value.asString()); });
+		c.watch(Security.class, "oidc.op.storage", (key, value) -> Common.storage = Registry.of(Storage.class).get(value.asString()));
 		Manager.of(Timeout.class).watch(Common.tracker);
 		
 		// first restrict access

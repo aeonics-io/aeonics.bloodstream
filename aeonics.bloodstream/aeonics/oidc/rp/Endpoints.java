@@ -28,6 +28,8 @@ import aeonics.data.Data;
 
 public class Endpoints 
 {
+	private Endpoints() { /* no instances */ }
+	
 	/**
 	 * Builds a redirect http error response
 	 * @param location the target location

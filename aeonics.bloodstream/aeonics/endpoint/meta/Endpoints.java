@@ -23,7 +23,9 @@ import aeonics.util.Tuple;
 
 public class Endpoints 
 {
-	private static String ROOT = "/api/meta/";
+	private Endpoints() { /* no instances */ }
+	
+	private static final String ROOT = "/api/meta/";
 	
 	public static void register(Action.Type router)
 	{
@@ -206,12 +208,11 @@ public class Endpoints
 		.<Rest.Type>cast()
 		.process(() ->
 		{
-			Data info = Hardware.export().put("system", Data.map()
+			return Hardware.export().put("system", Data.map()
 				.put("version", Boot.VERSION)
 				.put("boot", Boot.BOOT_TIME)
 				.put("jvm", Runtime.version())
 				);
-			return info;
 		})
 		.url(ROOT + "system")
 		.method("GET")
@@ -235,13 +236,12 @@ public class Endpoints
 				for( Data category : factory_categories.process() )
 					factory.put(category.asString(), factory_templates.process(Data.map().put("category", category)));
 				
-				Data info = Data.map()
+				return Data.map()
 					.put("plugins", plugins.process())
 					.put("managers", managers.process())
 					.put("registry", registry)
 					.put("factory", factory)
 					;
-				return info;
 			}
 			catch(Throwable e) { throw new RuntimeException(e); }
 		})

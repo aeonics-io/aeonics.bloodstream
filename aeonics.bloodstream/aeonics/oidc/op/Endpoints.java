@@ -32,6 +32,8 @@ import aeonics.util.Tuple;
 
 public class Endpoints 
 {
+	private Endpoints() { /* no instances */ }
+	
 	/**
 	 * Validates the input scope based on the existing roles available for that registered client
 	 * @param client the registered client
@@ -64,7 +66,7 @@ public class Endpoints
 	 * @param token the token
 	 * @return the jwt
 	 */
-	private static String generateIdToken(RelyingParty.Type client, User.Type user, String nonce, String scope, String token, String code) throws Exception
+	private static String generateIdToken(RelyingParty.Type client, User.Type user, String nonce, String token, String code) throws Exception
 	{
 		Signature signature = Signature.getInstance("SHA256withRSA");
 		signature.initSign(Common.OP_PRIVATE_KEY);
@@ -518,7 +520,7 @@ public class Endpoints
 			if( data.asString("response_type").contains("id_token") )
 			{
 				uri += (uri.endsWith("&") ? "" : "&" )
-					+ "id_token=" + generateIdToken(c, user, data.asString("nonce"), scope, token, data.asString("response_type").contains("code") ? code : null);
+					+ "id_token=" + generateIdToken(c, user, data.asString("nonce"), token, data.asString("response_type").contains("code") ? code : null);
 			}
 			
 			return redirectResponse(uri);
@@ -923,7 +925,7 @@ public class Endpoints
 				;
 			
 			if( data.asString("scope").contains("openid") )
-				response.put("id_token", generateIdToken(c, user, data.asString("nonce"), scope, token, null));
+				response.put("id_token", generateIdToken(c, user, data.asString("nonce"), token, null));
 			
 			return response;
 		}

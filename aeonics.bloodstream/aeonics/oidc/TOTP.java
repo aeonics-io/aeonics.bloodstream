@@ -23,6 +23,8 @@ import aeonics.manager.Security;
 
 public class TOTP 
 {
+	private TOTP() { /* no instances */ }
+	
 	private static final char[] BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".toCharArray();
 	private static String base32Encode(byte[] data)
 	{
