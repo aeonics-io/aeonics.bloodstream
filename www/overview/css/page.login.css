@@ -32,3 +32,5 @@ section.login {
 #login_panel li.account::before { background-image: url('../images/account.svg'); }
 #login_panel li.other::before { background-image: url('../images/other.svg'); }
 #login_panel li.provider::before { background-image: url('../images/provider.svg'); }
+
+#login_panel .warning { font-size: 1em; font-weight: 300; color: #777; text-align: left; padding-bottom: 30px; }

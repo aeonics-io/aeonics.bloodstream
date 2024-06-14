@@ -34,8 +34,8 @@ import aeonics.util.Callback;
 
 public class Main extends Plugin
 {
-	public String summary() { return "Observability v0.1"; }
-	public String description() { return "Provides the system internal observability capabilities via REST endpoints."; }
+	public String summary() { return "Bloodstream v0.1"; }
+	public String description() { return "Aeonics Bloodstream Enterprise Suite"; }
 	
 	public void start()
 	{
@@ -188,6 +188,7 @@ public class Main extends Plugin
 		Action.Type router = Registry.of(Action.class).get(Manager.of(Config.class).get(Router.class, "default").asString());
 		
 		aeonics.endpoint.meta.Endpoints.register(router);
+		aeonics.endpoint.meta.Security.register(router);
 		aeonics.oidc.Endpoints.register(router);
 		aeonics.oidc.op.Endpoints.register(router);
 		aeonics.oidc.rp.Endpoints.register(router);

@@ -71,7 +71,7 @@ public class Endpoints
 			}
 			return list;
 		})
-		.url(ROOT + "registry/entities")
+		.url(ROOT + "registry/{category}/entities")
 		.method("GET")
 		;
 		
@@ -117,7 +117,7 @@ public class Endpoints
 			
 			return t.export(); 
 		})
-		.url(ROOT + "template")
+		.url(ROOT + "template/{category}/{type}")
 		.method("GET")
 		;
 	
@@ -145,7 +145,7 @@ public class Endpoints
 			}
 			return list;
 		})
-		.url(ROOT + "factory/templates")
+		.url(ROOT + "factory/{category}/templates")
 		.method("GET")
 		;
 		

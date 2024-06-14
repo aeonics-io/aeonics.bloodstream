@@ -9,19 +9,24 @@ var x = new Promise((ok, nok) =>
 			/* ======================
 			 * Rules for login:
 			 *
-			 * 0) check local storage
-			 *     0.1) if access token present, go to 3
-			 *     0.2) else go to 1
-			 *
-			 * 1) check if there is a token cookie
-			 *     1.1) if no, display the login button and then go to 2
+			 * 0) check if there is a token cookie
+			 *     0.1) if no, go to 1
 			 *     1.2) if yes it means we are coming back from authentication
 			 *         1.2.1) remove the cookie and set local storage
 			 *         1.2.2) go to 3
 			 *
-			 * 2) get local provider and redirect user to login url. Upon completion it will end up back here, go to 1
+			 * 1) check if there is a token local storage
+			 *     1.1) if yes, go to 3
+			 *     1.2) else go to 2
 			 *
-			 * 3) redirect the user to the home screen
+			 * 2) get local provider and display login form
+			 *     2.1) when click on button, redirect user to login url. Upon completion it will end up back here, go to 0
+			 *
+			 * 3) check if the token is valid
+			 *     3.1) if not, remove it from local storage and go to 2
+			 *     3.2) if yes, check if access is granted
+			 *         3.2.1) if no, go to 2
+			 *         3.2.2) if yes redirect the user to the home screen
 			 *
 			 * ======================
 			 */
@@ -57,39 +62,27 @@ var x = new Promise((ok, nok) =>
 				
 				rule_0: function()
 				{
-					var token = localStorage.getItem('overview_token');
-					if( token && this.checkAccess(token) )
-						this.rule_3(token);
+					var cookie = Cookie.get('token');
+					Cookie.unset('token', '/overview');
+					if( cookie )
+					{
+						localStorage.setItem('overview_token', cookie);
+						this.rule_3(cookie);
+					}
 					else
 						this.rule_1();
 				},
 				
 				rule_1: function()
 				{
-					var cookie = Cookie.get('token');
-					Cookie.unset('token', '/overview');
-					if( cookie && this.checkAccess(cookie) )
-					{
-						localStorage.setItem('overview_token', cookie);
-						this.rule_3(cookie);
-					}
-					else this.rule_1_display();
+					var token = localStorage.getItem('overview_token');
+					if( token )
+						this.rule_3(token);
+					else
+						this.rule_2_display();
 				},
 				
-				rule_1_display: function()
-				{
-					var self = this;
-					var div = document.getElementById('login_panel');
-					while(div.firstChild) div.firstChild.remove();
-					
-					div.append(
-						Node.p(Translator.get("login.required")),
-						Node.button({className: 'raised', click: function(e) { e.stopImmediatePropagation(); e.preventDefault(); self.rule_2(); }}, Translator.get('login.login'))
-					);
-					div.classList.remove('wait');
-				},
-				
-				rule_2: function()
+				rule_2_display: function(username)
 				{
 					var self = this;
 					var div = document.getElementById('login_panel');
@@ -98,7 +91,25 @@ var x = new Promise((ok, nok) =>
 					
 					Ajax.get("/oidc/local").then((response) =>
 					{
-						location.href = response.response.login_redirect;
+						if( !!username )
+						{
+							div.append(
+								Node.p(Translator.get("login.welcome", ad.safeHtml(username))),
+								Node.p({className: 'warning'}, Translator.get("login.no_access"))
+							);
+						}
+						else
+							div.append(Translator.get("login.required"));
+						
+						div.append(
+							Node.button({className: 'raised', click: function(e)
+							{
+								e.stopImmediatePropagation();
+								e.preventDefault();
+								location.href = response.response.login_redirect;
+							}}, Translator.get('login.login'))
+						);
+						div.classList.remove('wait');
 					}, (error) =>
 					{
 						div.append(Node.p({className: 'error'}, Translator.get('login.error.fetch')));
@@ -108,10 +119,37 @@ var x = new Promise((ok, nok) =>
 				
 				rule_3: function(token)
 				{
+					var self = this;
+					var div = document.getElementById('login_panel');
+					div.classList.add('wait');
+					while(div.firstChild) div.firstChild.remove();
+					
 					Ajax.authorization = 'Bearer ' + token;
-					this.dom.classList.remove('wait');
-					this.dom.remove();
-					this.grantor.ok();
+					Ajax.get("/api/security/me").then((result) =>
+					{
+						if( !!result.response.anonymous ) { self.rule_2_display(); return; }
+						
+						var user = result.response.name;
+						Ajax.post("/api/security/check", {data: {scope: 'http', context: JSON.stringify({path: '/api/meta/check'})}}).then((result) =>
+						{
+							if( !!result.response.granted )
+							{
+								self.dom.classList.remove('wait');
+								self.dom.remove();
+								self.grantor.ok();
+							}
+							else
+								self.rule_2_display(user);
+						}, (error) =>
+						{
+							div.append(Node.p({className: 'error'}, Translator.get('login.error.fetch')));
+							div.classList.remove('wait');
+						});
+					}, (error) =>
+					{
+						div.append(Node.p({className: 'error'}, Translator.get('login.error.fetch')));
+						div.classList.remove('wait');
+					});
 				}
 			}));
 		});

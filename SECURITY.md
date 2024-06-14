@@ -5,7 +5,7 @@ Please report security issues by sending an email to [our security team](mailto:
 
 ## Software Bill of Materials (SBOM)
 
-This plugin depends on `aeonics.system` as well as the `aeonics.http` plugin 
+This plugin depends on `aeonics.boot`, `aeonics.core` as well as the `aeonics.http` plugin 
 and any tansient dependencies.
 
 ---

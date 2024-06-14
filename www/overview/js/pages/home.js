@@ -60,7 +60,7 @@ var x = new Promise((ok, nok) =>
 				{
 					Ajax.get('/api/meta/entity/' + node.category + '/' + node.id).then((response) =>
 					{
-						Ajax.get('/api/meta/template', {data: {category: node.category, type: node.subtype}}).then((response) =>
+						Ajax.get('/api/meta/template/' + node.category + '/' + node.subtype).then((response) =>
 						{
 							console.log(response.response);
 							Notify.success("OK");
@@ -107,6 +107,11 @@ var x = new Promise((ok, nok) =>
 				
 				drawObs: function(data)
 				{
+					
+					// pauseAnimation and resumeAnimation
+					// refresh
+					// autoPauseRedraw 
+					
 					// https://github.com/vasturiano/force-graph
 					const graphdata = { nodes: [], links: [] };
 					var self = this;
