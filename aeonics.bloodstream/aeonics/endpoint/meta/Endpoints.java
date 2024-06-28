@@ -1,17 +1,26 @@
 package aeonics.endpoint.meta;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import aeonics.Boot;
 import aeonics.Plugin;
 import aeonics.data.Data;
-import aeonics.entity.Action;
 import aeonics.entity.Entity;
 import aeonics.entity.Registry;
 import aeonics.http.Endpoint;
 import aeonics.http.Endpoint.Rest;
 import aeonics.http.HttpException;
+import aeonics.manager.Config;
+import aeonics.manager.Logger;
 import aeonics.manager.Manager;
+import aeonics.manager.Monitor;
 import aeonics.template.Factory;
 import aeonics.template.Parameter;
 import aeonics.template.Relationship;
@@ -21,30 +30,17 @@ import aeonics.util.Json;
 import aeonics.util.StringUtils;
 import aeonics.util.Tuple;
 
+@SuppressWarnings("unused")
 public class Endpoints 
 {
 	private Endpoints() { /* no instances */ }
 	
 	private static final String ROOT = "/api/meta/";
 	
-	public static void register(Action.Type router)
+	public static void register()
 	{
-		router.addRelation("endpoints", registry_entities);
-		router.addRelation("endpoints", registry_categories);
-		
-		router.addRelation("endpoints", template);
-		router.addRelation("endpoints", factory_templates);
-		router.addRelation("endpoints", factory_categories);
-		
-		router.addRelation("endpoints", plugins);
-		router.addRelation("endpoints", managers);
-		router.addRelation("endpoints", system);
-		router.addRelation("endpoints", overview);
-		
-		router.addRelation("endpoints", entity_get);
-		router.addRelation("endpoints", entity_remove);
-		router.addRelation("endpoints", entity_add);
-		router.addRelation("endpoints", entity_update);
+		// calling this method will force initialization of all private static members
+		// all endpoints will be added to the registry automatically
 	}
 	
 	private static final Endpoint.Rest.Type registry_entities = new Endpoint.Rest() { }
@@ -54,6 +50,7 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The entity category")
 			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -63,9 +60,10 @@ public class Endpoints
 			for( Entity e : Registry.of(parameters.asString("category")) )
 			{
 				Data related = Data.list();
-				for( Tuple<List<Data>, Relationship> t : e.relationships().values() )
-					for( Data d : t.a )
-						related.add(d.asString("id"));
+				for( String relation : e.relationships() )
+					for( Tuple<Entity, Data> t : e.relations(relation) )
+						if( t.a != null )
+							related.add(t.a.id());
 				
 				list.add(Data.map().put("id", e.id()).put("name", e.name()).put("type", e.type()).put("relations", related));
 			}
@@ -99,10 +97,12 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The template category")
 			.description("The template category.")
+			.format(Parameter.Format.TEXT)
 			)
 		.add(new Parameter("type").optional(false).min(1).max(100)
 			.summary("The template entity type")
 			.description("The template entity type.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -128,6 +128,7 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The template category")
 			.description("The template category.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -174,6 +175,7 @@ public class Endpoints
 		.<Rest.Type>cast()
 		.process(() ->
 		{
+			// todo : return plugin summary and description
 			Data list = Data.list().add(Boot.class.getModule().getName());
 			for( String p : Plugin.all() )
 				list.add(p);
@@ -213,6 +215,7 @@ public class Endpoints
 				.put("boot", Boot.BOOT_TIME)
 				.put("jvm", Runtime.version())
 				.put("hardware", Hardware.export())
+				.put("time", System.currentTimeMillis())
 				);
 		})
 		.url(ROOT + "system")
@@ -257,10 +260,12 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The entity category")
 			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
 			)
-		.add(new Parameter("id").optional(false).rule(Parameter.ID)
+		.add(new Parameter("id").optional(false)
 			.summary("The entity id")
 			.description("The entity id.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -286,10 +291,12 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The entity category")
 			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
 			)
-		.add(new Parameter("id").optional(false).rule(Parameter.ID)
+		.add(new Parameter("id").optional(false)
 			.summary("The entity id")
 			.description("The entity id.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -314,14 +321,18 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The entity category")
 			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
 			)
 		.add(new Parameter("type").optional(false).min(1).max(100)
 			.summary("The entity type")
 			.description("The entity type.")
+			.format(Parameter.Format.TEXT)
 			)
 		.add(new Parameter("data").optional(false)
 			.summary("The entity data")
 			.description("The entity data. It should always be a json object.")
+			.rule(Parameter.Rule.JSON_MAP)
+			.format(Parameter.Format.JSON)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -352,14 +363,18 @@ public class Endpoints
 		.add(new Parameter("category").optional(false).min(1).max(100)
 			.summary("The entity category")
 			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
 			)
-		.add(new Parameter("id").optional(false).rule(Parameter.ID)
+		.add(new Parameter("id").optional(false)
 			.summary("The entity id")
 			.description("The entity id.")
+			.format(Parameter.Format.TEXT)
 			)
 		.add(new Parameter("data").optional(false)
 			.summary("The entity data")
 			.description("The entity data. It should always be a json object.")
+			.rule(Parameter.Rule.JSON_MAP)
+			.format(Parameter.Format.JSON)
 			)
 		.build()
 		.<Rest.Type>cast()
@@ -382,4 +397,151 @@ public class Endpoints
 		})
 		.url(ROOT + "entity/{category}/{id}")
 		.method("PUT");
+		
+	private static final Endpoint.Rest.Type entity_ghost = new Endpoint.Rest() { }
+		.template()
+		.summary("Find ghost entities")
+		.description("A ghost entity is an entity that is loosely referenced but that does not exist in the registry. This endpoint lists all entities that reference ghosts.")
+		.build()
+		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			Data ghosts = Data.list();
+			for( Registry<?> r : Registry.all() )
+			{
+				for( Entity e : r )
+				{
+					for( String relation : e.relationships() )
+					{
+						for( Tuple<Entity, Data> t : e.relations(relation) )
+						{
+							if( t.a == null )
+							{
+								ghosts.add(Data.map()
+									.put("category", e.category())
+									.put("id", e.id())
+									.put("name", e.name())
+									.put("relationship", relation)
+									.put("ghost", t.b)
+									);
+							}
+						}
+					}
+				}
+			}
+			
+			return ghosts;
+		})
+		.url(ROOT + "entity/ghosts")
+		.method("GET")
+		;
+		
+	private static class UsageEndpoint extends Endpoint.Rest.Type
+	{
+		public UsageEndpoint()
+		{
+			Manager.of(Config.class).watch(Monitor.class, "enabled", (key, value) ->
+			{
+				boolean enabled = value.asBool();
+				if( enabled )
+				{
+					getThreadCPU(); // force a reset now
+					from = System.currentTimeMillis();
+				}
+				
+				if( mx.isThreadCpuTimeSupported() )
+				{
+					mx.setThreadCpuTimeEnabled(enabled);
+					Manager.of(Logger.class).config(Monitor.class, "Thread activity monitoring enabled: " + enabled);
+				}
+				if( mx.isThreadContentionMonitoringSupported() )
+				{
+					mx.setThreadContentionMonitoringEnabled(enabled);
+					Manager.of(Logger.class).config(Monitor.class, "Thread contention monitoring enabled: " + enabled);
+				}
+			});
+		}
+		
+		@Override
+		public synchronized Data process(Data parameters)
+		{
+			to = System.currentTimeMillis();
+			Data usage = Data.map().put("_from", from).put("_to", to).put("threads", getThreadCPU());
+			from = to;
+			return usage;
+		}
+		
+		private ThreadMXBean mx = ManagementFactory.getThreadMXBean();
+		private Map<Long, long[]> _previousThreadInfo = new HashMap<>();
+		private long from = 0;
+		private long to = 0;
+		private synchronized Data getThreadCPU()
+		{
+			List<Long> ids = Arrays.stream(mx.getAllThreadIds()).boxed().collect(Collectors.toList());
+			_previousThreadInfo.keySet().retainAll(ids);
+			
+			Data lvl1 = Data.map();
+			
+			for( long threadId : ids )
+			{
+				ThreadInfo info = mx.getThreadInfo(threadId);
+				
+				if( !lvl1.containsKey(info.getThreadName()) )
+					lvl1.put(info.getThreadName(), Data.map());
+				Data lvl2 = lvl1.get(info.getThreadName());
+				
+				if( !lvl2.containsKey(""+threadId) )
+					lvl2.put(""+threadId, Data.map());
+				Data lvl3 = lvl2.get(""+threadId);
+				
+				// [0] = cpu time
+				// [1] = contention count
+				// [2] = contention time
+				long[] previous = _previousThreadInfo.computeIfAbsent(threadId, (key) -> new long[] { 0, 0, 0 });
+				
+				if( mx.isThreadCpuTimeSupported() && mx.isThreadCpuTimeEnabled() )
+				{
+					previous[0] = mx.getThreadCpuTime(threadId) - previous[0];
+					lvl3.put("cpu", Data.map()
+						.put("_count", 1)
+						.put("_total", previous[0]));
+				}
+				
+				if( mx.isThreadContentionMonitoringSupported() && mx.isThreadContentionMonitoringEnabled() )
+				{
+					previous[1] = info.getBlockedCount() - previous[1];
+					previous[2] = info.getBlockedTime() - previous[2];
+					lvl3.put("blocked", Data.map()
+						.put("_count", previous[1])
+						.put("_total", previous[2]));
+				}
+			}
+			
+			return lvl1;
+		}
+	}
+	
+	public static final Endpoint.Rest.Type usage = new Endpoint.Rest() { }
+		.target(UsageEndpoint.class)
+		.creator(UsageEndpoint::new)
+		.template()
+		.summary("Fetch usage data")
+		.description("This endpoint returns thread usage data since last call. The cpu time is measured in ns and the blocked time is measured in ms.")
+		.build()
+		.<Rest.Type>cast()
+		.url(ROOT + "usage")
+		.method("GET");
+	
+	public static final Endpoint.Rest.Type monitoring = new Endpoint.Rest() { }
+		.template()
+		.summary("Fetch monitoring data")
+		.description("This endpoint returns all available monitoring data for the last completed time frame.")
+		.build()
+		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			return Manager.of(Monitor.class).report();
+		})
+		.url(ROOT + "monitoring")
+		.method("GET");
 }

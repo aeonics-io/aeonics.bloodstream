@@ -97,6 +97,7 @@ const ae = {
 	safeHtml: function(text)
 	{
 		if( !text ) return '';
+		if( typeof text !== 'string' ) text = '' + text;
 		
 		return text.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')

@@ -12,13 +12,11 @@ import java.util.Base64;
 
 import aeonics.Plugin;
 import aeonics.data.Data;
-import aeonics.entity.Action;
 import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
 import aeonics.entity.security.Rule;
 import aeonics.entity.security.User;
-import aeonics.http.Router;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
@@ -61,20 +59,25 @@ public class Main extends Plugin
 		c.declare(Security.class, new Parameter("otp.period")
 			.summary("OTP time window")
 			.description("The OTP time window in seconds.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(30)));
 		c.declare(Security.class, new Parameter("otp.digits")
 			.summary("OTP number of digits")
 			.description("The number of OTP code digits.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(6)));
 		c.declare(Security.class, new Parameter("otp.algorithm")
 			.summary("OTP algorithm")
 			.description("The name of the hash algorithm to use in OTP.")
+			.values("SHA1")
+			.format(Parameter.Format.SELECT)
 			.defaultValue(Data.of("SHA1")));
 		c.declare(Security.class, new Parameter("otp.issuer")
 			.summary("OTP issuer name")
 			.description("The name of the OTP issuer to be displayed by MFA apps.")
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.of("Aeonics Bloodstream Enterprise Suite")));
 		
 		// ===========================
@@ -83,44 +86,53 @@ public class Main extends Plugin
 		c.declare(Security.class, new Parameter("oidc.op.issuer")
 			.summary("OIDC OP issuer url")
 			.description("The url of this OIDC OP instance.")
-			.rule(Parameter.URL)
+			.rule(Parameter.Rule.URL)
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.of("https://localhost")));
 		c.declare(Security.class, new Parameter("oidc.op.access_token.ttl")
 			.summary("OIDC OP access token validity")
 			.description("The validity period in seconds for access tokens issued by this OIDC OP.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(86400)));
 		c.declare(Security.class, new Parameter("oidc.op.id_token.ttl")
 			.summary("OIDC OP id token validity")
 			.description("The validity period in seconds for id tokens issued by this OIDC OP.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(300)));
 		c.declare(Security.class, new Parameter("oidc.op.refresh_token.ttl")
 			.summary("OIDC OP refresh token validity")
 			.description("The validity period in seconds for refresh tokens issued by this OIDC OP.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(2592000)));
 		c.declare(Security.class, new Parameter("oidc.op.auth_code.ttl")
 			.summary("OIDC OP authentication code validity")
 			.description("The validity period in seconds for the authentication code in this OIDC OP. This means that the user must complete authentication within this time window.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(180)));
 		c.declare(Security.class, new Parameter("oidc.op.auth_code.max")
 			.summary("OIDC OP maximum concurrent authentication flows")
 			.description("The maximum number of concurrent authentication flows in this OIDC OP. This limit is set to avoid spam.")
-			.rule(Parameter.DIGIT)
+			.rule(Parameter.Rule.DIGIT)
+			.format(Parameter.Format.NUMBER)
 			.defaultValue(Data.of(5000)));
 		c.declare(Security.class, new Parameter("oidc.op.jwt.public")
 			.summary("OIDC OP JWT public key")
 			.description("The public key used by this OIDC OP to verify the JWT signature. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.jwt.private")
 			.summary("OIDC OP JWT private key")
 			.description("The private key used by this OIDC OP to sign the JWT. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.storage")
 			.summary("OIDC OP storage")
 			.description("The name or id of the storage for this OIDC OP. If the storage does not exist, a local temporary (ouf-of-storage) location is used instead.")
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.empty()));
 	}
 	
@@ -184,15 +196,12 @@ public class Main extends Plugin
 			.addRelation("rules", new Rule.MatchContext().template().build(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
 			.addRelation("rules", new Rule.Not().template().build().addRelation("rule", new Rule.Role().template().build(Data.map().put("role", "Administrator")))));
 		
-		// then register endpoints
-		Action.Type router = Registry.of(Action.class).get(Manager.of(Config.class).get(Router.class, "default").asString());
-		
-		aeonics.endpoint.meta.Endpoints.register(router);
-		aeonics.endpoint.meta.Security.register(router);
-		aeonics.oidc.Endpoints.register(router);
-		aeonics.oidc.op.Endpoints.register(router);
-		aeonics.oidc.rp.Endpoints.register(router);
-		aeonics.oidc.TOTP.register(router);
+		aeonics.endpoint.meta.Endpoints.register();
+		aeonics.endpoint.meta.Security.register();
+		aeonics.oidc.Endpoints.register();
+		aeonics.oidc.op.Endpoints.register();
+		aeonics.oidc.rp.Endpoints.register();
+		aeonics.oidc.TOTP.register();
 	}
 	
 	private static void afterRun()

@@ -248,13 +248,16 @@ public class OidcProvider extends Provider
 			.description("Delegates the authentication to an OIDC Identity Provider. Users must be provisionned in the system to match successfully.")
 			.add(new Parameter("wellknown")
 				.summary("Well known OpenID Configuration URL")
-				.description("The full URL to the /.well-known/openid-configuration file."))
+				.description("The full URL to the /.well-known/openid-configuration file.")
+				.format(Parameter.Format.TEXT))
 			.add(new Parameter("client_id")
 				.summary("Client ID")
-				.description("The client ID provided by the OIDC Provider."))
+				.description("The client ID provided by the OIDC Provider.")
+				.format(Parameter.Format.TEXT))
 			.add(new Parameter("client_secret")
 				.summary("Client secret")
-				.description("The client secret provided by the OIDC Provider."))
+				.description("The client secret provided by the OIDC Provider.")
+				.format(Parameter.Format.PASSWORD))
 			;
 	}
 }

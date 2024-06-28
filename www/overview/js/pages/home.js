@@ -15,7 +15,6 @@ var x = new Promise((ok, nok) =>
 					this.highlightNodes = new Set();
 					this.highlightLinks = new Set();
 					this.hoverNode = null;
-					this.clickMode = 'highlight';
 					
 					this.load();
 					
@@ -28,51 +27,430 @@ var x = new Promise((ok, nok) =>
 					
 					this.dom.append(
 						Node.div({id: 'graph'}),
-						Node.div({id: 'modeswitcher', click: function() { self.clickMode = 'info'; }}, "AAAAAAAAAAA"),
-						);
+						Node.div({id: 'infopanel'},
+						[
+							Node.aside({click: function(e) { this.parentNode.classList.remove('open'); }, title: Translator.get('close')}, 'close'),
+							Node.div({className: 'content'})
+						])
+					);
 					this.getData();
+				},
+				
+				highlightNode: function(node)
+				{
+					var self = this;
+					this.highlightNodes.clear();
+					this.highlightLinks.clear();
+					if (node)
+					{
+						this.highlightNodes.add(node);
+						node.neighbors.forEach(neighbor => self.highlightNodes.add(neighbor));
+						node.links.forEach(link => self.highlightLinks.add(link));
+					}
+					this.hoverNode = node || null;
 				},
 				
 				nodeClick: function(node)
 				{
-					var self = this;
+					if( typeof node === 'string' )
+						node = this.data.nodes.find((n) => n.id == node);
 					
-					if( this.clickMode == 'highlight' )
-					{
-						self.highlightNodes.clear();
-						self.highlightLinks.clear();
-						if (node)
-						{
-							self.highlightNodes.add(node);
-							node.neighbors.forEach(neighbor => self.highlightNodes.add(neighbor));
-							node.links.forEach(link => self.highlightLinks.add(link));
-						}
-						self.hoverNode = node || null;
-					}
-					else if( this.clickMode == 'info' )
-					{
-						if( node && node.type == 'e' )
-							self.showInfo(node);
-					}
+					this.highlightNode(node);
+					if( !node ) return;
+					
+					if( node.type == 'e' )
+						this.showInfo(node);
+					else if( node.type == 'r1' )
+						this.listRegistry(node.name);
+					else if( node.type == 'f1' )
+						this.listFactory(node.name);
+					else if( node.type == 'p1' )
+						this.listPlugin(node.name);
 				},
+				
+				// =================================
+				//
+				// ENTITY INFO
+				//
+				// =================================
 				
 				showInfo: function(node)
 				{
+					var self = this;
+					
+					var p = document.getElementById('infopanel');
+					p.scrollTop = 0;
+					p.classList.add('open');
+					p.classList.add('wait');
+					
 					Ajax.get('/api/meta/entity/' + node.category + '/' + node.id).then((response) =>
 					{
+						const entity = response.response;
 						Ajax.get('/api/meta/template/' + node.category + '/' + node.subtype).then((response) =>
 						{
-							console.log(response.response);
-							Notify.success("OK");
+							const template = response.response;
+							p.classList.remove('wait');
+							var i = p.querySelector('.content');
+							while( i.firstChild ) i.lastChild.remove();
+							
+							i.append(
+								Node.h1(ae.safeHtml(entity.__name||'-no name-')),
+								self.getEntityInfo(entity),
+								self.getTemplateInfo(template),
+								self.getConfigInfo(entity, template),
+								self.getRelationInfo(entity, template)
+							);
 						}, (error) =>
 						{
+							p.classList.remove('open');
 							Notify.error(Translator.get('fetch.error'));
 						});
 					}, (error) =>
 					{
+						p.classList.remove('open');
 						Notify.error(Translator.get('fetch.error'));
 					});
 				},
+				
+				getEntityInfo: function(entity)
+				{
+					var self = this;
+					return Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.technical')),
+						Node.div(Node.div({className: 'detail'}, [
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.entity.id')),
+								Node.span({className: 'value'}, ae.safeHtml(entity.__id))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.entity.category')),
+								Node.span({className: 'value'}, ae.safeHtml(entity.__category)),
+								Node.span({className: 'icon ref', 
+									dataset: {id: 'registry:'+entity.__category}, 
+									title: Translator.get('all'), 
+									click: function() { self.nodeClick(this.dataset.id); }}, 'more')
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.entity.type')),
+								Node.span({className: 'value'}, ae.safeHtml(entity.__type))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.entity.class')),
+								Node.span({className: 'value'}, ae.safeHtml(entity.__class))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.entity.internal')),
+								Node.span({className: 'value'}, Translator.get(entity.__internal ? 'yes': 'no'))
+							])
+						]))
+					]);
+				},
+				
+				getTemplateInfo: function(template)
+				{
+					var self = this;
+					return Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.template')),
+						Node.div(Node.div({className: 'detail'}, [
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.summary')),
+								Node.span({className: 'text'}, ae.safeHtml(template.summary))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.description')),
+								Node.span({className: 'text'}, ae.safeHtml(template.description))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.category')),
+								Node.span({className: 'value'}, ae.safeHtml(template.category)),
+								Node.span({className: 'icon ref', 
+									dataset: {id: 'factory:'+template.category}, 
+									title: Translator.get('all'), 
+									click: function() { self.nodeClick(this.dataset.id); }}, 'more')
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.type')),
+								Node.span({className: 'value'}, ae.safeHtml(template.type))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.type_plugin')),
+								Node.span({className: 'value'}, ae.safeHtml(template.__type_plugin))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.target')),
+								Node.span({className: 'value'}, ae.safeHtml(template.target))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.target_plugin')),
+								Node.span({className: 'value'}, ae.safeHtml(template.__target_plugin))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.class')),
+								Node.span({className: 'value'}, ae.safeHtml(template.__class))
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.template.template_plugin')),
+								Node.span({className: 'value'}, ae.safeHtml(template.__plugin))
+							])
+						]))
+					]);
+				},
+				
+				getConfigInfo: function(entity, template)
+				{
+					const parameters = Object.values(template.parameters);
+					const configs = Object.entries(template.configs);
+					
+					var self = this;
+					var content = null;
+					if( parameters.length == 0 && configs.length == 0 )
+						content = Node.p(Translator.get('info.config.empty'));
+					else
+					{
+						content = parameters.map((p) => self.getParameterInfo(p, entity, null))
+							.concat(configs.map((c) => self.getParameterInfo(c[1], entity, c[0])));
+					}
+					
+					return Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.config')),
+						Node.div(Node.div({className: 'detail'}, content))
+					]);
+				},
+				
+				getParameterInfo: function(param, entity, config)
+				{
+					return Node.div([
+						Node.fieldset({dataset: {config: config}}, [
+							Node.label({htmlFor: '__' + param.name}, ae.safeHtml(param.name)),
+							Node.input({type: 'text', readOnly: true, value: entity[param.name]||'', id: '__' + param.name}),
+							Node.span({className: 'icon edit', title: Translator.get('edit')}, 'edit'),
+							Node.span({className: 'icon info', title: Translator.get('info'), click: function() { this.parentNode.nextSibling.classList.toggle('open'); }}, 'info')
+						]),
+						Node.div({className: 'group'}, [
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.summary')),
+								Node.span({className: 'text'}, ae.safeHtml(param.summary)),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.description')),
+								Node.span({className: 'text'}, ae.safeHtml(param.description)),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.config')),
+								Node.span({className: 'value'}, !!config ? Translator.get('info.config.global', ae.safeHtml(config)) : Translator.get('info.config.local')),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.format')),
+								Node.span({className: 'value'}, ae.safeHtml(param.format)),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.optional')),
+								Node.span({className: 'value'}, Translator.get(param.optional ? 'yes': 'no')),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.minmax')),
+								Node.span({className: 'value'}, ae.safeHtml(param.min + " / " + param.max)),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.default')),
+								Node.span({className: 'value'}, ae.safeHtml(JSON.stringify(param.defaultValue))),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.bindable')),
+								Node.span({className: 'value'}, Translator.get(param.bindable ? 'yes': 'no')),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.values')),
+								Node.span({className: 'value'}, param.values.length > 0 ? ae.safeHtml(JSON.stringify(param.values)) : ''),
+							]),
+							Node.p([
+								Node.span({className: 'title'}, Translator.get('info.config.rule')),
+								Node.span({className: 'value'}, Translator.get(param.rule ? 'yes': 'no'))
+							])
+						])
+					]);
+				},
+				
+				getRelationInfo: function(entity, template)
+				{
+					console.log(entity);
+					console.log(template);
+					var self = this;
+					
+					return Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.relationship')),
+						Node.div(Node.div({className: 'detail'}, [
+							"TODO"
+						]))
+					]);
+				},
+				
+				// =================================
+				//
+				// LISTS
+				//
+				// =================================
+				
+				listRegistry: function(category)
+				{
+					var self = this;
+					
+					var p = document.getElementById('infopanel');
+					p.scrollTop = 0;
+					var i = p.querySelector('.content');
+					while( i.firstChild ) i.lastChild.remove();
+					
+					i.append(
+						Node.h1(ae.safeHtml(category||'-no name-')),
+						Node.div({className: 'search'}, [
+							Node.input({type: 'search', input: function()
+							{
+								var value = this.value;
+								var words = (value||'').split(/\s+/g).map(w => new RegExp((w||'').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i'));
+								
+								[].slice.call(this.parentNode.nextSibling.children).forEach(li =>
+								{
+									if( !value || value.length == 0 ) { li.classList.remove('hidden'); return; }
+									
+									for (var w = 0; w < words.length; w++)
+									{
+										if( !words[w].test(li.textContent) )
+										{
+											li.classList.add('hidden');
+											return;
+										}
+									}
+									li.classList.remove('hidden');
+								});
+							}}),
+							Node.span({className: 'icon'}, 'search')
+						]),
+						Node.ul(this.data.nodes
+							.filter((n) => n.type == 'e' && n.category == category)
+							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
+							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+						)
+					);
+					
+					p.classList.remove('wait');
+					p.classList.add('open');
+				},
+				
+				listFactory: function(category)
+				{
+					var self = this;
+					
+					var p = document.getElementById('infopanel');
+					p.scrollTop = 0;
+					var i = p.querySelector('.content');
+					while( i.firstChild ) i.lastChild.remove();
+					
+					// keep only unique type values
+					var types = [...new Set(this.data.nodes
+						.filter((n) => n.type == 'e' && n.category == category)
+						.map((n) => n.subtype))];
+					
+					var sections = types.sort().map((t) => Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, ae.safeHtml(t)),
+						Node.div(Node.div({className: 'detail'}, Node.ul(
+							this.data.nodes
+								.filter((n) => n.type == 'e' && n.subtype == t)
+								.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
+								.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+						)))
+					]));
+					
+					i.append(
+						Node.h1(ae.safeHtml(category||'-no name-')),
+						Node.div({className: 'search'}, [
+							Node.input({type: 'search', input: function()
+							{
+								var value = this.value;
+								var words = (value||'').split(/\s+/g).map(w => new RegExp((w||'').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i'));
+								
+								this.parentNode.parentNode.querySelectorAll('li').forEach(li =>
+								{
+									if( !value || value.length == 0 ) { li.classList.remove('hidden'); return; }
+									
+									for (var w = 0; w < words.length; w++)
+									{
+										if( !words[w].test(li.textContent) )
+										{
+											li.classList.add('hidden');
+											return;
+										}
+									}
+									li.classList.remove('hidden');
+								});
+								
+								this.parentNode.parentNode.querySelectorAll('section').forEach(s =>
+								{
+									if( s.querySelector("li:not(.hidden)") )
+										s.classList.remove('hidden');
+									else
+										s.classList.add('hidden');
+								});
+							}}),
+							Node.span({className: 'icon'}, 'search')
+						])
+					);
+					i.append(...sections);
+					
+					p.classList.remove('wait');
+					p.classList.add('open');
+				},
+				
+				listPlugin: function(name)
+				{
+					var self = this;
+					
+					var p = document.getElementById('infopanel');
+					p.scrollTop = 0;
+					var i = p.querySelector('.content');
+					while( i.firstChild ) i.lastChild.remove();
+					
+					var lis = this.data.links
+						.filter((l) => l.source.id == 'plugin:' + name)
+						.map((l) => Node.li({dataset: {id: l.target.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(l.target.name)))
+						.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; });
+					
+					i.append(
+						Node.h1(ae.safeHtml(name||'-no name-')),
+						Node.div({className: 'search'}, [
+							Node.input({type: 'search', input: function()
+							{
+								var value = this.value;
+								var words = (value||'').split(/\s+/g).map(w => new RegExp((w||'').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i'));
+								
+								[].slice.call(this.parentNode.nextSibling.children).forEach(li =>
+								{
+									if( !value || value.length == 0 ) { li.classList.remove('hidden'); return; }
+									
+									for (var w = 0; w < words.length; w++)
+									{
+										if( !words[w].test(li.textContent) )
+										{
+											li.classList.add('hidden');
+											return;
+										}
+									}
+									li.classList.remove('hidden');
+								});
+							}}),
+							Node.span({className: 'icon'}, 'search')
+						]),
+						Node.ul(lis)
+					);
+					
+					p.classList.remove('wait');
+					p.classList.add('open');
+				},
+				
+				// =================================
+				//
+				// GRAPH
+				//
+				// =================================
 				
 				getData: function()
 				{
@@ -107,13 +485,13 @@ var x = new Promise((ok, nok) =>
 				
 				drawObs: function(data)
 				{
-					
 					// pauseAnimation and resumeAnimation
 					// refresh
 					// autoPauseRedraw 
 					
 					// https://github.com/vasturiano/force-graph
-					const graphdata = { nodes: [], links: [] };
+					this.data = { nodes: [], links: [] };
+					var graphdata = this.data;
 					var self = this;
 					
 					// ===========================
@@ -201,6 +579,8 @@ var x = new Promise((ok, nok) =>
 							{
 								if( f.plugin == p )
 								{
+									if( !data.registry[key] )
+										return;
 									data.registry[key].forEach(r =>
 									{
 										if( r.type == f.type )
@@ -316,7 +696,7 @@ var x = new Promise((ok, nok) =>
 						.nodePointerAreaPaint((node, color, ctx) => {
 							var size = 5;
 							if( imgs[node.type] ) size = 30;
-							else size = 8;
+							else size = 10;
 							
 							ctx.fillStyle = color;
 							ctx.fillRect(node.x - size / 2, node.y - size / 2, size, size);

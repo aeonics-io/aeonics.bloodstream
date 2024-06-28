@@ -1,7 +1,6 @@
 package aeonics.oidc;
 
 import aeonics.data.Data;
-import aeonics.entity.Action;
 import aeonics.entity.Registry;
 import aeonics.entity.security.Provider;
 import aeonics.http.Endpoint;
@@ -11,15 +10,17 @@ import aeonics.manager.Manager;
 import aeonics.manager.Security;
 import aeonics.template.Parameter;
 
+@SuppressWarnings("unused")
 public class Endpoints
 {
 	private Endpoints() { /* no instances */ }
 	
-	public static void register(Action.Type router)
+	public static void register()
 	{
-		router.addRelation("endpoints", local);
-		router.addRelation("endpoints", providers);
+		// calling this method will force initialization of all private static members
+		// all endpoints will be added to the registry automatically
 	}
+	
 	
 	private static final Endpoint.Rest.Type local = new Endpoint.Rest() { }
 		.template()
@@ -46,6 +47,7 @@ public class Endpoints
 		.add(new Parameter("login").optional(true).min(1).max(100)
 			.summary("The user login")
 			.description("The user login.")
+			.format(Parameter.Format.TEXT)
 			)
 		.build()
 		.<Rest.Type>cast()

@@ -1,7 +1,6 @@
 package aeonics.endpoint.meta;
 
 import aeonics.data.Data;
-import aeonics.entity.Action;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
 import aeonics.http.HttpException;
@@ -10,15 +9,15 @@ import aeonics.template.Parameter;
 import aeonics.util.Json;
 import aeonics.http.Endpoint.Rest;
 
+@SuppressWarnings("unused")
 public class Security 
 {
 	private Security() { /* no instances */ }
 	
-	public static void register(Action.Type router)
+	public static void register()
 	{
-		router.addRelation("endpoints", me);
-		router.addRelation("endpoints", check);
-		router.addRelation("endpoints", logout);
+		// calling this method will force initialization of all private static members
+		// all endpoints will be added to the registry automatically
 	}
 	
 	private static final Endpoint.Rest.Type me = new Endpoint.Rest() { }
@@ -62,12 +61,14 @@ public class Security
 			.summary("Scope of the security context")
 			.description("Usually the scope matches a user role. However, there might be other application-specific scopes applicable.")
 			.optional(true)
+			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.of("topic")))
 		.add(new Parameter("context")
 			.summary("Specific security context")
 			.description("The security context is a key-value pair of settings and parameters that are specific for each scope.")
 			.optional(true)
-			.rule(Parameter.JSON_MAP)
+			.rule(Parameter.Rule.JSON_MAP)
+			.format(Parameter.Format.JSON)
 			.defaultValue(Data.map()))
 		.build()
 		.<Rest.Type>cast()

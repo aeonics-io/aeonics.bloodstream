@@ -9,7 +9,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import aeonics.data.Data;
-import aeonics.entity.Action;
 import aeonics.entity.Registry;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
@@ -21,6 +20,7 @@ import aeonics.manager.Logger;
 import aeonics.manager.Manager;
 import aeonics.manager.Security;
 
+@SuppressWarnings("unused")
 public class TOTP 
 {
 	private TOTP() { /* no instances */ }
@@ -73,7 +73,8 @@ public class TOTP
 		.add(new Parameter("code")
 			.summary("Authentication code")
 			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to enroll the user with TOTP.")
-			.optional(true))
+			.optional(true)
+			.format(Parameter.Format.TEXT))
 		.build()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
@@ -137,7 +138,8 @@ public class TOTP
 		.add(new Parameter("otp")
 			.summary("OTP")
 			.description("The OTP is required to be able to opt out of OTP as a proof of ownership.")
-			.optional(false))
+			.optional(false)
+			.format(Parameter.Format.TEXT))
 		.build()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
@@ -164,7 +166,8 @@ public class TOTP
 		.add(new Parameter("code")
 			.summary("Authentication code")
 			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to check if the target user has enrolled with TOTP.")
-			.optional(true))
+			.optional(true)
+			.format(Parameter.Format.TEXT))
 		.build()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
@@ -191,11 +194,10 @@ public class TOTP
 		.method("GET")
 		;
 	
-	public static void register(Action.Type router)
+	public static void register()
 	{
-		router.addRelation("endpoints", register);
-		router.addRelation("endpoints", unregister);
-		router.addRelation("endpoints", exists);
+		// calling this method will force initialization of all private static members
+		// all endpoints will be added to the registry automatically
 	}
 	
 	/**
@@ -220,28 +222,31 @@ public class TOTP
 	 */
 	public static boolean check(User.Type user, String otp) 
 	{
-		// TODO : if the code matched, then mark it so it cannot be used anymore
-		// -> keep only the last successful match
-		// this would prevent replay attacks in the same time window.
-		
-		try
+		synchronized(user)
 		{
-			if( user == User.ANONYMOUS || user == User.SYSTEM ) return false;
-			
-			Data info = Common.OTP.get(user.id());
-			if( info == null || info.isEmpty() ) return false;
-			
-			long now = System.currentTimeMillis();
-			byte[] secret = secretFromUserAndSalt(user, info.asLong("salt"));
-			
-			if( checkAt(info, secret, otp, now) ) return true;
-			if( checkAt(info, secret, otp, now - (info.asLong("period") * 1000L)) ) return true;
-			return false;
-		}
-		catch(Throwable e)
-		{
-			Manager.of(Logger.class).warning(TOTP.class, e);
-			return false;
+			try
+			{
+				if( user == User.ANONYMOUS || user == User.SYSTEM ) return false;
+				
+				Data info = Common.OTP.get(user.id());
+				if( info == null || info.isEmpty() || info.asString("latest").equals(otp) ) return false;
+				
+				long now = System.currentTimeMillis();
+				byte[] secret = secretFromUserAndSalt(user, info.asLong("salt"));
+				
+				if( !checkAt(info, secret, otp, now) && !checkAt(info, secret, otp, now - (info.asLong("period") * 1000L)) ) return false;
+				
+				// from here, code did match.
+				// keep the last successful match to prevent replay attacks
+				info.put("latest", otp);
+				Common.OTP.put(user.id(), info);
+				return true;
+			}
+			catch(Throwable e)
+			{
+				Manager.of(Logger.class).warning(TOTP.class, e);
+				return false;
+			}
 		}
 	}
 	

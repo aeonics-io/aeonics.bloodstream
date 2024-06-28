@@ -1,2 +1,117 @@
 
-#modeswitcher { position: fixed; top: 0; left: 0; padding: 20px; background-color: #fff; color: #000; }
+#infopanel { 
+	position: fixed; overflow: auto;
+	top: 0; left: 101vw; bottom: 0;
+	padding: 2rem;
+	width: 50vw;
+	background-color: #26252D;
+	border-left: 1px solid #302E38;
+	transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#infopanel aside {
+	position: absolute; top: 1rem; right: 1rem;
+	color: #ffffffaa; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1;
+	font-size: 1.5rem;
+}
+#infopanel aside:hover { color: #fff; }
+#infopanel.open { left: 50vw; }
+
+#infopanel h1 {
+	display: block; text-align: center; margin-bottom: 2rem;
+}
+
+#infopanel h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+#infopanel section { 
+	background: #1C1B21;
+	margin-bottom: 0.5rem;
+}
+#infopanel section h2::before {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	content: '\e5cc';
+	rotate: z 0deg;
+	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	display: inline-block; margin: 1rem; 
+}
+#infopanel section.open h2::before {
+	rotate: z 90deg;
+}
+#infopanel section > div { height: 0; overflow: hidden; }
+#infopanel section.open > div { height: auto; overflow: auto; }
+
+#infopanel section .detail { padding: 1rem 1rem 2rem 1rem; }
+#infopanel section .detail p { padding: 0.5rem 0; display: flex; }
+#infopanel section .detail .title, #infopanel section .detail .value, #infopanel section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+#infopanel section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; }
+#infopanel section .detail .value { color: var(--blue); font-family: monospace; flex: 1; }
+#infopanel section .detail .text { color: var(--orange); flex: 1; }
+#infopanel section .detail .icon {
+	display: inline-block; flex-shrink: 0; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1rem; text-transform: none !important;
+}
+#infopanel section .detail .icon:hover { color: var(--blue) !important; }
+
+#infopanel fieldset { padding: 0.5rem 0; display: flex; border: 0; }
+#infopanel fieldset label { display: inline-block; width: 10rem; color: var(--orange); flex-shrink: 0; font-size: 0.8rem; padding-top: 0.3rem; }
+#infopanel fieldset input { 
+	display: inline-block; flex: 1;
+	margin: 0; padding: 0.3rem 0.5rem;
+	border: 1px solid #ffffff40;
+	border-right: 0;
+	font-size: 0.8rem;
+	background: #ffffff10;
+	color: #fff;
+	font-family: monospace;
+}
+#infopanel fieldset .icon {
+	display: inline-block; flex-shrink: 0; padding: 0.3rem 0.5rem; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1rem; text-transform: none !important;
+}
+#infopanel fieldset .icon.edit {
+	border: 1px solid #ffffff40; background: #ffffff10;
+	border-left: 0; color: #ffffffa0;
+}
+#infopanel fieldset .icon.info {
+	color: #ffffffa0;
+}
+#infopanel fieldset .icon:hover { color: var(--blue) !important; }
+#infopanel .group { 
+	margin-left: 10rem;
+	padding: 0 1rem;
+	border: 1px solid #ffffff40;
+	background: #ffffff10;
+	margin-right: 2rem;
+	border-top: 0;
+	margin-top: -0.5rem;
+	max-height: 0rem;
+	transition: max-height 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	overflow: hidden;
+}
+#infopanel .group.open { max-height: 50rem; overflow: auto; }
+
+#infopanel ul { list-style: none; margin: 2rem 0; padding: 0; }
+#infopanel .detail ul { margin: 0; }
+#infopanel ul li { 
+	display: block; cursor: pointer; 
+	margin: 0.5em 0;
+	padding: 1em;
+	background-color: #ffffff10;
+	font-size: 0.8rem;
+	border: 1px solid #ffffff40;
+}
+#infopanel ul li:hover { color: var(--blue); border: 1px solid var(--blue); }
+#infopanel .hidden { display: none; }
+
+#infopanel .search { text-align: right; white-space: nowrap; margin-bottom: 1rem; }
+#infopanel .search input { text-align: left; width: 8rem; display: inline-block;
+	color: #fff;
+	background: transparent;
+	margin: 0;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+}
+#infopanel .search .icon {
+	display: inline-block; padding: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+}
