@@ -21,8 +21,10 @@ import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
 import aeonics.manager.Manager;
+import aeonics.manager.Monitor;
 import aeonics.manager.Security;
 import aeonics.manager.Timeout;
+import aeonics.monitoring.Monitoring;
 import aeonics.oidc.Common;
 import aeonics.oidc.op.OidcProvider;
 import aeonics.oidc.rp.RelyingParty;
@@ -202,7 +204,13 @@ public class Main extends Plugin
 		aeonics.oidc.op.Endpoints.register();
 		aeonics.oidc.rp.Endpoints.register();
 		aeonics.oidc.TOTP.register();
+		
+		Storage.Type monitor = new Storage.File().template().build(Data.map().put("root", "stats")).name("Monitor statistics");
+		c.set(Monitor.class, "storage", Data.of(monitor.id()));
+		m = new Monitoring();
+		m.setup();
 	}
+	private static Monitoring m;
 	
 	private static void afterRun()
 	{

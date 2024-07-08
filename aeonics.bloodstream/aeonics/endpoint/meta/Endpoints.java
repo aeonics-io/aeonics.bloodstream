@@ -3,6 +3,8 @@ package aeonics.endpoint.meta;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +16,12 @@ import aeonics.Plugin;
 import aeonics.data.Data;
 import aeonics.entity.Entity;
 import aeonics.entity.Registry;
+import aeonics.entity.Storage;
 import aeonics.http.Endpoint;
 import aeonics.http.Endpoint.Rest;
 import aeonics.http.HttpException;
 import aeonics.manager.Config;
+import aeonics.manager.Executor;
 import aeonics.manager.Logger;
 import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
@@ -216,6 +220,7 @@ public class Endpoints
 				.put("jvm", Runtime.version())
 				.put("hardware", Hardware.export())
 				.put("time", System.currentTimeMillis())
+				.put("tasks", Manager.of(Executor.class).export())
 				);
 		})
 		.url(ROOT + "system")
@@ -435,100 +440,50 @@ public class Endpoints
 		.url(ROOT + "entity/ghosts")
 		.method("GET")
 		;
-		
-	private static class UsageEndpoint extends Endpoint.Rest.Type
-	{
-		public UsageEndpoint()
-		{
-			Manager.of(Config.class).watch(Monitor.class, "enabled", (key, value) ->
-			{
-				boolean enabled = value.asBool();
-				if( enabled )
-				{
-					getThreadCPU(); // force a reset now
-					from = System.currentTimeMillis();
-				}
-				
-				if( mx.isThreadCpuTimeSupported() )
-				{
-					mx.setThreadCpuTimeEnabled(enabled);
-					Manager.of(Logger.class).config(Monitor.class, "Thread activity monitoring enabled: " + enabled);
-				}
-				if( mx.isThreadContentionMonitoringSupported() )
-				{
-					mx.setThreadContentionMonitoringEnabled(enabled);
-					Manager.of(Logger.class).config(Monitor.class, "Thread contention monitoring enabled: " + enabled);
-				}
-			});
-		}
-		
-		@Override
-		public synchronized Data process(Data parameters)
-		{
-			to = System.currentTimeMillis();
-			Data usage = Data.map().put("_from", from).put("_to", to).put("threads", getThreadCPU());
-			from = to;
-			return usage;
-		}
-		
-		private ThreadMXBean mx = ManagementFactory.getThreadMXBean();
-		private Map<Long, long[]> _previousThreadInfo = new HashMap<>();
-		private long from = 0;
-		private long to = 0;
-		private synchronized Data getThreadCPU()
-		{
-			List<Long> ids = Arrays.stream(mx.getAllThreadIds()).boxed().collect(Collectors.toList());
-			_previousThreadInfo.keySet().retainAll(ids);
-			
-			Data lvl1 = Data.map();
-			
-			for( long threadId : ids )
-			{
-				ThreadInfo info = mx.getThreadInfo(threadId);
-				
-				if( !lvl1.containsKey(info.getThreadName()) )
-					lvl1.put(info.getThreadName(), Data.map());
-				Data lvl2 = lvl1.get(info.getThreadName());
-				
-				if( !lvl2.containsKey(""+threadId) )
-					lvl2.put(""+threadId, Data.map());
-				Data lvl3 = lvl2.get(""+threadId);
-				
-				// [0] = cpu time
-				// [1] = contention count
-				// [2] = contention time
-				long[] previous = _previousThreadInfo.computeIfAbsent(threadId, (key) -> new long[] { 0, 0, 0 });
-				
-				if( mx.isThreadCpuTimeSupported() && mx.isThreadCpuTimeEnabled() )
-				{
-					previous[0] = mx.getThreadCpuTime(threadId) - previous[0];
-					lvl3.put("cpu", Data.map()
-						.put("_count", 1)
-						.put("_total", previous[0]));
-				}
-				
-				if( mx.isThreadContentionMonitoringSupported() && mx.isThreadContentionMonitoringEnabled() )
-				{
-					previous[1] = info.getBlockedCount() - previous[1];
-					previous[2] = info.getBlockedTime() - previous[2];
-					lvl3.put("blocked", Data.map()
-						.put("_count", previous[1])
-						.put("_total", previous[2]));
-				}
-			}
-			
-			return lvl1;
-		}
-	}
 	
 	public static final Endpoint.Rest.Type usage = new Endpoint.Rest() { }
-		.target(UsageEndpoint.class)
-		.creator(UsageEndpoint::new)
 		.template()
 		.summary("Fetch usage data")
-		.description("This endpoint returns thread usage data since last call. The cpu time is measured in ns and the blocked time is measured in ms.")
+		.description("This endpoint returns thread usage data since last call. The time is measured in ns.")
+		.add(new Parameter("granularity")
+			.summary("Monitoring data granularity")
+			.description("Monitoring data is aggregated every 10 seconds on a hourly basis, every hour on a daily basis and every day on a yearly basis."
+					+ " When requesting hourly or daily data, only the current hour or day is returned. When requesting the yearly aggregate, you may choose the"
+					+ " desired year using the 'year' parameter.")
+			.optional(false)
+			.values("hour", "day", "year")
+			.format(Parameter.Format.TEXT))
+		.add(new Parameter("year")
+			.summary("Year")
+			.description("Specify which aggregated year data should be returned. If not specified, the current year is returned.")
+			.optional(true)
+			.format(Parameter.Format.NUMBER)
+			)
 		.build()
 		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			Storage.Type s = Registry.of(Storage.class).get(Manager.of(Config.class).get(Monitor.class, "storage").asString());
+			
+			String data = null;
+			if( parameters.asString("granularity").equals("hour") )
+				data = s.getString(".hour");
+			else if( parameters.asString("granularity").equals("day") )
+				data = s.getString(".day");
+			else if( parameters.asString("granularity").equals("year") )
+			{
+				if( parameters.containsKey("year") )
+					data = s.getString(parameters.asInt("year") + ".json");
+				else
+					data = s.getString(ZonedDateTime.now().getYear() + ".json");
+			}
+			
+			return Data.map()
+				.put("isHttpResponse", true)
+				.put("code", 200)
+				.put("body", data == null ? "{}" : data)
+				.put("mime", "application/json");
+		})
 		.url(ROOT + "usage")
 		.method("GET");
 	

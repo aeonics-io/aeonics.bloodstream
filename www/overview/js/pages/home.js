@@ -21,6 +21,16 @@ var x = new Promise((ok, nok) =>
 					return Promise.resolve();
 				},
 				
+				hide: function()
+				{
+					this.data = null;
+					if( this._graph )
+						this._graph.pauseAnimation().graphData({ nodes: [], links: [] });
+					this._graph = null;
+					while(this.dom.firstChild) this.dom.firstChild.remove();
+					return Promise.resolve(); 
+				},
+				
 				load: function()
 				{
 					var self = this;
@@ -96,7 +106,13 @@ var x = new Promise((ok, nok) =>
 							i.append(
 								Node.h1(ae.safeHtml(entity.__name||'-no name-')),
 								self.getEntityInfo(entity),
-								self.getTemplateInfo(template),
+								self.getTemplateInfo(template)
+							);
+							
+							if( template.hasOwnProperty('inputs') || template.hasOwnProperty('outputs') )
+								i.append(self.getChannelInfo(template.inputs, template.outputs));
+							
+							i.append(
 								self.getConfigInfo(entity, template),
 								self.getRelationInfo(entity, template)
 							);
@@ -132,7 +148,11 @@ var x = new Promise((ok, nok) =>
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.type')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.__type))
+								Node.span({className: 'value'}, ae.safeHtml(entity.__type)),
+								Node.span({className: 'icon ref', 
+									dataset: {subtype: entity.__type}, 
+									title: Translator.get('all'), 
+									click: function() { self.listSubtype(this.dataset.subtype); }}, 'more')
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.class')),
@@ -196,6 +216,36 @@ var x = new Promise((ok, nok) =>
 					]);
 				},
 				
+				getChannelInfo: function(inputs, outputs)
+				{
+					var self = this;
+					debugger;
+					if( !inputs ) inputs = {};
+					if( !outputs ) outputs = {};
+					
+					return Node.section({className: 'open'}, [
+						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.channels')),
+						Node.div(Node.div({className: 'detail'}, Object.values(inputs).forEach((i) => { i.direction = 'input'; }).concat(Object.values(outputs).forEach((i) => { i.direction = 'output'; }))
+							.sort((a, b) => { a.name > b.name ? 1 : -1; })
+							.map((c) => Node.div({className: 'sublevel'}, [
+								Node.h3(ae.safeHtml(c.name)),
+								Node.p([
+									Node.span({className: 'title'}, Translator.get('info.template.summary')),
+									Node.span({className: 'text'}, ae.safeHtml(template.summary))
+								]),
+								Node.p([
+									Node.span({className: 'title'}, Translator.get('info.template.description')),
+									Node.span({className: 'text'}, ae.safeHtml(template.description))
+								]),
+								Node.p([
+									Node.span({className: 'title'}, Translator.get('info.channel.direction')),
+									Node.span({className: 'value'}, Translator.get('info.channel.direction.'+c.direction))
+								])
+							]))
+						))
+					]);
+				},
+				
 				getConfigInfo: function(entity, template)
 				{
 					const parameters = Object.values(template.parameters);
@@ -223,7 +273,10 @@ var x = new Promise((ok, nok) =>
 						Node.fieldset({dataset: {config: config}}, [
 							Node.label({htmlFor: '__' + param.name}, ae.safeHtml(param.name)),
 							Node.input({type: 'text', readOnly: true, value: entity[param.name]||'', id: '__' + param.name}),
-							Node.span({className: 'icon edit', title: Translator.get('edit')}, 'edit'),
+							/*
+								TODO : edit parameter/config value
+								Node.span({className: 'icon edit', title: Translator.get('edit')}, 'edit'),
+							*/
 							Node.span({className: 'icon info', title: Translator.get('info'), click: function() { this.parentNode.nextSibling.classList.toggle('open'); }}, 'info')
 						]),
 						Node.div({className: 'group'}, [
@@ -273,15 +326,67 @@ var x = new Promise((ok, nok) =>
 				
 				getRelationInfo: function(entity, template)
 				{
-					console.log(entity);
-					console.log(template);
 					var self = this;
+					
+					var content = this.data.links
+						.filter((l) => l.target.id == entity.__id && l.source.type == 'e')
+						.map((l) => Node.p([
+							Node.span({className: 'title'}, Translator.get('info.link.target')),
+							Node.span({className: 'value'}, Translator.get('info.link.target2', ae.safeHtml(l.source.name), ae.safeHtml(l.source.subtype))),
+							Node.span({className: 'icon ref', 
+								dataset: {id: l.source.id}, 
+								title: Translator.get('info'), 
+								click: function() { self.nodeClick(this.dataset.id); }}, 'link')
+						]));
+						
+					Object.values(template.relations).sort((a, b) => { return a.name > b.name ? 1 : -1; }).forEach((r) =>
+					{
+						var node = self.getRelationDetail(r, entity[r.name]);
+						if( node ) content.push(node);
+					});
+					
+					if( content.length == 0 )
+						content = Node.p(Translator.get('info.link.empty'));
 					
 					return Node.section({className: 'open'}, [
 						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.relationship')),
-						Node.div(Node.div({className: 'detail'}, [
-							"TODO"
-						]))
+						Node.div(Node.div({className: 'detail'}, content))
+					]);
+				},
+				
+				getRelationDetail: function(rel, ref)
+				{
+					var self = this;
+					var refs = [];
+					
+					ref.forEach((r) =>
+					{
+						var e = this.data.nodes.find((x) => x.id == r.id);
+						if( !e ) return;
+						
+						refs.push(Node.p([
+							Node.span({className: 'value'}, Translator.get('info.link.target2', ae.safeHtml(e.name), ae.safeHtml(e.subtype))),
+							/*
+							TODO : display the relation parameters (values and definition) for each link
+							Node.span({className: 'icon ref', 
+								dataset: {id: r.id}, 
+								title: Translator.get('info'), 
+								click: function() { self.nodeClick(this.dataset.id); }}, 'tune'),
+							*/
+							Node.span({className: 'icon ref', 
+								dataset: {id: r.id}, 
+								title: Translator.get('info'), 
+								click: function() { self.nodeClick(this.dataset.id); }}, 'link')
+						]));
+					});
+					
+					/*
+						TODO : display the relation subtype
+					*/
+					
+					return Node.p([
+						Node.span({className: 'title orange'}, ae.safeHtml(rel.name)),
+						Node.div({classList: 'many'}, refs)
 					]);
 				},
 				
@@ -327,6 +432,51 @@ var x = new Promise((ok, nok) =>
 						]),
 						Node.ul(this.data.nodes
 							.filter((n) => n.type == 'e' && n.category == category)
+							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
+							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+						)
+					);
+					
+					p.classList.remove('wait');
+					p.classList.add('open');
+				},
+				
+				listSubtype: function(type)
+				{
+					var self = this;
+					
+					var p = document.getElementById('infopanel');
+					p.scrollTop = 0;
+					var i = p.querySelector('.content');
+					while( i.firstChild ) i.lastChild.remove();
+					
+					i.append(
+						Node.h1(ae.safeHtml(type||'-no name-')),
+						Node.div({className: 'search'}, [
+							Node.input({type: 'search', input: function()
+							{
+								var value = this.value;
+								var words = (value||'').split(/\s+/g).map(w => new RegExp((w||'').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i'));
+								
+								[].slice.call(this.parentNode.nextSibling.children).forEach(li =>
+								{
+									if( !value || value.length == 0 ) { li.classList.remove('hidden'); return; }
+									
+									for (var w = 0; w < words.length; w++)
+									{
+										if( !words[w].test(li.textContent) )
+										{
+											li.classList.add('hidden');
+											return;
+										}
+									}
+									li.classList.remove('hidden');
+								});
+							}}),
+							Node.span({className: 'icon'}, 'search')
+						]),
+						Node.ul(this.data.nodes
+							.filter((n) => n.type == 'e' && n.subtype == type)
 							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
 							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
 						)
@@ -624,7 +774,7 @@ var x = new Promise((ok, nok) =>
 					// GRAPH
 					// ===========================
 					
-					const Graph = ForceGraph()
+					this._graph = ForceGraph()
 						(document.getElementById('graph'))
 						.linkDirectionalParticles(link => link.relate ? 2 : 0)
 						.onNodeDragEnd(node => 

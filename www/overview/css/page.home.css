@@ -42,23 +42,33 @@
 
 #infopanel section .detail { padding: 1rem 1rem 2rem 1rem; }
 #infopanel section .detail p { padding: 0.5rem 0; display: flex; }
+#infopanel section .detail .many p { padding: 0; }
+#infopanel section .detail .many p + p { margin-top: 0.5rem; }
+#infopanel section .detail .many { flex: 1; }
 #infopanel section .detail .title, #infopanel section .detail .value, #infopanel section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
-#infopanel section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; }
+#infopanel section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+#infopanel section .detail .title.orange { color: var(--orange); }
 #infopanel section .detail .value { color: var(--blue); font-family: monospace; flex: 1; }
 #infopanel section .detail .text { color: var(--orange); flex: 1; }
 #infopanel section .detail .icon {
-	display: inline-block; flex-shrink: 0; cursor: pointer;
+	display: inline-block; flex-shrink: 0; cursor: pointer; color: #fff;
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1rem; text-transform: none !important;
 }
+#infopanel section .detail .icon + .icon { margin-left: 0.5rem; }
+
 #infopanel section .detail .icon:hover { color: var(--blue) !important; }
 
 #infopanel fieldset { padding: 0.5rem 0; display: flex; border: 0; }
-#infopanel fieldset label { display: inline-block; width: 10rem; color: var(--orange); flex-shrink: 0; font-size: 0.8rem; padding-top: 0.3rem; }
+#infopanel fieldset label { 
+	display: inline-block; width: 10rem; color: var(--orange); 
+	flex-shrink: 0; font-size: 0.8rem; padding-top: 0.3rem;
+	overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem;
+}
 #infopanel fieldset input { 
 	display: inline-block; flex: 1;
 	margin: 0; padding: 0.3rem 0.5rem;
 	border: 1px solid #ffffff40;
-	border-right: 0;
+	/*border-right: 0;*/
 	font-size: 0.8rem;
 	background: #ffffff10;
 	color: #fff;

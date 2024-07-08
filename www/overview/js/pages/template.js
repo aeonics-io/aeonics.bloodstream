@@ -23,6 +23,10 @@ var x = new Promise((ok, nok) =>
 						Node.li({className: location.hash == '#home' || location.hash == '' || location.hash == '#' ? 'selected' : '', dataset: {link: 'home'}}, [
 							Node.span({className: 'icon'}, 'gps_fixed'), 
 							Translator.get('menu.navigate')
+						]),
+						Node.li({className: location.hash == '#stats' ? 'selected' : '', dataset: {link: 'stats'}}, [
+							Node.span({className: 'icon'}, 'equalizer'), 
+							Translator.get('menu.statistics')
 						])
 					])),
 					container

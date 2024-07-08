@@ -18,10 +18,14 @@ export default {
 	'fetch.error': "Communication with the server failed.",
 	
 	'menu.navigate': "Navigate",
-	'menu.query': "Query",
+	'menu.statistics': "Statistics",
 	
 	'info.technical': "Identification",
 	'info.template': "Entity type",
+	'info.channels': "Data channels",
+	'info.channel.direction': "Direction",
+	'info.channel.direction.input': "input",
+	'info.channel.direction.output': "output",
 	'info.config': "Configuration",
 	'info.relationship': "Relationships",
 	'info.entity.id': "Unique ID",
@@ -51,6 +55,25 @@ export default {
 	'info.config.config': "Scope",
 	'info.config.global': "global: <em>{}</em>",
 	'info.config.local': "local",
+	'info.link.target': "Referenced by",
+	'info.link.target2': "{} ({})",
+	'info.link.empty': "This entity is not explicitly related to any other.",
+	
+	'stats.hourly': "System activity this hour",
+	'stats.daily': "System activity today",
+	'stats.yearly': "System activity this year",
+	'stats.series.cpu': "Active",
+	'stats.series.blocked': "Blocked",
+	'stats.series.waiting': "Idle",
+	'stats.fact.hourly': "Total CPU time last hour<span>{}ms</span>",
+	'stats.fact.daily': "Total CPU time today<span>{}s</span>",
+	'stats.fact.yearly': "Total CPU time this year<span>{}h</span>",
+	'stats.fact.uptime': "System uptime<span>{}:{}:{}</span>",
+	'stats.fact.memoryheap': "Memory usage (heap)<span>{}MB</span>",
+	'stats.fact.memorynonheap': "Memory usage (non-heap)<span>{}MB</span>",
+	'stats.fact.memorycommitted': "Memory usage (process size)<span>{}MB</span>",
+	'stats.fact.pending': "Tasks pending<span>{}</span>",
+	'stats.fact.tasks': "Tasks executed since boot<span>{}</span>",
 	
 	'': ""
 };
