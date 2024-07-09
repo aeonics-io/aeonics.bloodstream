@@ -1,0 +1,39 @@
+
+:root {
+	font-size: clamp(16px, 1.1vw, 40px);
+}
+
+main#main_container {
+	position: fixed; z-index: 1;
+	top: 0; left: 0; bottom: 0; right: 0;
+	padding: 0rem 0rem 0rem 5rem;
+}
+
+#layout {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+nav {
+	position: fixed; z-index: 2;
+	top: 0; left: 0; bottom: 0;
+	padding: 2rem 0;
+	width: 5rem;
+	background-color: #26252D;
+	border-right: 1px solid #302E38;
+	transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+nav:hover { width: 12rem; }
+nav:hover li { color: #fff; }
+
+nav ol { list-style: none; margin: 0; padding: 0; }
+nav li { 
+	display: block; margin: 0; padding: 0.8rem 1.7rem; cursor: pointer; overflow: hidden; 
+	color: transparent; transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	white-space: nowrap;
+}
+nav li.selected { background: var(--orange) !important; }
+nav li:hover { background: #42404F; }
+nav li .icon { display: inline-block; margin-right: 1rem; color: #fff; font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important; }
+nav li { color: transparent; }

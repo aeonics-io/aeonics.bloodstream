@@ -41,6 +41,30 @@ var x = new Promise((ok, nok) =>
 						[
 							Node.aside({click: function(e) { this.parentNode.classList.remove('open'); }, title: Translator.get('close')}, 'close'),
 							Node.div({className: 'content'})
+						]),
+						Node.div({id: 'nodeSearch'},
+						[
+							Node.input({type: 'search', input: function()
+							{
+								var value = this.value;
+								var words = (value||'').split(/\s+/g).map(w => new RegExp((w||'').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i'));
+								
+								self.data.nodes.forEach((n) =>
+								{
+									if( !value || value.length == 0 ) { n.visible = true; return; }
+									
+									for( var w = 0; w < words.length; w++ )
+									{
+										if( !words[w].test(n.name) && !words[w].test(n.id) )
+										{
+											n.visible = false;
+											return;
+										}
+									}
+									n.visible = true;
+								});
+							}}),
+							Node.span({className: 'icon'}, 'search')
 						])
 					);
 					this.getData();
@@ -53,6 +77,7 @@ var x = new Promise((ok, nok) =>
 					this.highlightLinks.clear();
 					if (node)
 					{
+						node.visible = true;
 						this.highlightNodes.add(node);
 						node.neighbors.forEach(neighbor => self.highlightNodes.add(neighbor));
 						node.links.forEach(link => self.highlightLinks.add(link));
@@ -219,23 +244,25 @@ var x = new Promise((ok, nok) =>
 				getChannelInfo: function(inputs, outputs)
 				{
 					var self = this;
-					debugger;
+					
 					if( !inputs ) inputs = {};
+					Object.values(inputs).forEach((i) => { i.direction = 'input'; });
 					if( !outputs ) outputs = {};
+					Object.values(outputs).forEach((i) => { i.direction = 'output'; });
 					
 					return Node.section({className: 'open'}, [
 						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.channels')),
-						Node.div(Node.div({className: 'detail'}, Object.values(inputs).forEach((i) => { i.direction = 'input'; }).concat(Object.values(outputs).forEach((i) => { i.direction = 'output'; }))
+						Node.div(Node.div({className: 'detail'}, Object.values(inputs).concat(Object.values(outputs))
 							.sort((a, b) => { a.name > b.name ? 1 : -1; })
 							.map((c) => Node.div({className: 'sublevel'}, [
 								Node.h3(ae.safeHtml(c.name)),
 								Node.p([
 									Node.span({className: 'title'}, Translator.get('info.template.summary')),
-									Node.span({className: 'text'}, ae.safeHtml(template.summary))
+									Node.span({className: 'text'}, ae.safeHtml(c.summary))
 								]),
 								Node.p([
 									Node.span({className: 'title'}, Translator.get('info.template.description')),
-									Node.span({className: 'text'}, ae.safeHtml(template.description))
+									Node.span({className: 'text'}, ae.safeHtml(c.description))
 								]),
 								Node.p([
 									Node.span({className: 'title'}, Translator.get('info.channel.direction')),

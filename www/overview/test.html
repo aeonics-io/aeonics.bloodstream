@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/ae.app.css" />
+	<link rel="stylesheet" href="css/ae.layout.css" />
+</head>
+<body>
+<nav>
+	<ol onclick="if( event.target.closest('nav li') ) { event.target.closest('nav').querySelectorAll('li').forEach(e => e.classList.remove('selected')); event.target.closest('nav li').classList.add('selected'); }">
+		<li><span class="icon">gps_fixed</span>Navigate</li>
+		<li><span class="icon">search</span>Query</li>
+	</ol>
+</nav>
+<main id="main_container">
+	<section class="page">
+		<p>hello world</p>
+	</section>
+</main>
+</body>
+</html>

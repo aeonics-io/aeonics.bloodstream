@@ -1,0 +1,61 @@
+
+section.statistics {
+	display: flex;
+	height: 100vh;
+}
+
+#panel_graph {
+	flex: 1;
+	overflow: auto;
+}
+#panel_graph > div {
+	height: 20rem; padding: 1.5rem; display: flex; flex-direction: column;
+	padding-right: 0;
+}
+
+#panel_facts {
+	flex-shrink: 0;
+	width: 15rem;
+	overflow: auto;
+	padding: 1rem;
+}
+
+section.statistics button.raised.icon {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	display: inline-block; width: unset; width: unset; padding: 0.3rem 0.8rem; min-width: unset;
+}
+
+#hourly {
+}
+#daily {
+}
+#yearly {
+}
+
+#panel_graph h2 { text-align: center; }
+#panel_graph .series { flex: 0; font-size: 0.8rem; }
+#panel_graph .series input { display: inline-block; width: unset; }
+#panel_graph .series label { display: inline-block; padding-left: 0.5rem; margin-right: 2rem; }
+
+#panel_graph .graph { display: flex; flex: 1; overflow: hidden; padding-right: 1rem; }
+#panel_graph .graph .canvas { flex: 1; }
+#panel_graph .graph .threads { overflow: auto; width: 15rem; }
+#panel_graph .graph .threads p { margin: 0; padding: 0; font-size: 0.8rem; white-space: nowrap; }
+#panel_graph .graph .threads p:hover { background-color: #ffffff20; }
+#panel_graph .graph .threads input { display: inline-block; width: unset; margin: 0.2rem; }
+#panel_graph .graph .threads label { display: inline-block; padding: 0 0.5rem; white-space: wrap; max-width: 12rem; vertical-align: top; }
+
+#panel_facts ul { list-style: none; padding: 0; margin: 0; }
+#panel_facts li:empty { display: none; }
+#panel_facts li { display: block; padding: 0.5rem; margin-bottom: 1rem; border-radius: 5px; text-align: center; font-size: 0.8rem; }
+#panel_facts li span { font-size: 1.2rem; display: block; font-weight: bold; }
+#panel_facts li#fact_hourly { background-color: #D21D50c0; }
+#panel_facts li#fact_daily { background-color: #D21D50c0; }
+#panel_facts li#fact_yearly { background-color: #D21D50c0; }
+#panel_facts li#fact_uptime { background-color: #36B0FBc0; }
+#panel_facts li#fact_memoryheap { background-color: #29C64Bc0; }
+#panel_facts li#fact_memorynonheap { background-color: #29C64Bc0; }
+#panel_facts li#fact_memorycommitted { background-color: #29C64Bc0; }
+#panel_facts li#fact_tasks { background-color: #FB8136c0; }
+#panel_facts li#fact_pending { background-color: #FB8136c0; }
+
