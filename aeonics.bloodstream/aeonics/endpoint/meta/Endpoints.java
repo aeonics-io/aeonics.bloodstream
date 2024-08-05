@@ -218,12 +218,40 @@ public class Endpoints
 				.put("version", Boot.VERSION)
 				.put("boot", Boot.BOOT_TIME)
 				.put("jvm", Runtime.version())
-				.put("hardware", Hardware.export())
 				.put("time", System.currentTimeMillis())
-				.put("tasks", Manager.of(Executor.class).export())
 				);
 		})
 		.url(ROOT + "system")
+		.method("GET")
+		;
+		
+	private static final Endpoint.Rest.Type probes = new Endpoint.Rest() { }
+		.template()
+		.summary("Fetch system probes")
+		.description("This endpoint returns the information provided by registered probes on the system. If a probe name is provided, only that one is returned.")
+		.add(new Parameter("name").optional(true)
+			.summary("Probe name")
+			.description("If defined, this parameter specifies which probe to include in the response. If not defined, then all probes are returned.")
+			.format(Parameter.Format.TEXT)
+			)
+		.build()
+		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			if( !parameters.isEmpty("name") )
+			{
+				Monitor.Probe probe = Monitor.probe(parameters.asString("name"));
+				return probe == null ? Data.map() : Data.map().put(parameters.asString("name"), probe.get());
+			}
+			else
+			{
+				Data probes = Data.map();
+				for( Map.Entry<String, Monitor.Probe> p : Monitor.probes() )
+					probes.put(p.getKey(), p.getValue().get());
+				return probes;
+			}
+		})
+		.url(ROOT + "probe")
 		.method("GET")
 		;
 		

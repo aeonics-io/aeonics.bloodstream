@@ -13,6 +13,8 @@ var x = new Promise((ok, nok) =>
 				this.dom.classList.add('statistics');
 				
 				this.init();
+				var self = this;
+				this.__refreshSystemInterval = setInterval(function() { self.initSystem(); }, 1000);
 				return Promise.resolve();
 			},
 			
@@ -27,6 +29,13 @@ var x = new Promise((ok, nok) =>
 				if( this.graph_yearly ) { this.graph_yearly.destroy(); this.graph_yearly = null; }
 				
 				while(this.dom.firstChild) this.dom.firstChild.remove();
+				
+				if( this.__refreshSystemInterval )
+				{
+					clearInterval(this.__refreshSystemInterval);
+					this.__refreshSystemInterval = null;
+				}
+				
 				return Promise.resolve(); 
 			},
 			
@@ -43,21 +52,22 @@ var x = new Promise((ok, nok) =>
 					]),
 					Node.div({id: 'panel_facts'}, Node.ul(
 					[
+						Node.li({id: 'fact_cpu'}),
 						Node.li({id: 'fact_hourly'}),
-						Node.li({id: 'fact_daily'}),
-						Node.li({id: 'fact_yearly'}),
 						Node.li({id: 'fact_uptime'}),
 						Node.li({id: 'fact_memoryheap'}),
 						Node.li({id: 'fact_memorynonheap'}),
 						Node.li({id: 'fact_memorycommitted'}),
 						Node.li({id: 'fact_tasks'}),
-						Node.li({id: 'fact_pending'})
+						Node.li({id: 'fact_pending'}),
+						Node.li({id: 'fact_avgtime'})
 					]))
 				);
 				
 				this.initHourly();
 				this.initDaily();
 				this.initYearly();
+				this.initSystem();
 			},
 			
 			initSystem: function()
@@ -71,16 +81,52 @@ var x = new Promise((ok, nok) =>
 					const hrs = Math.floor(uptime / 3600);
 					const mins = Math.floor((uptime % 3600) / 60);
 					const secs = Math.floor(uptime % 60);
-					self.dom.querySelector('#fact_uptime').innerHTML = Translator.get('stats.fact.uptime', hrs, mins, secs);
+					self.dom.querySelector('#fact_uptime').innerHTML = Translator.get('stats.fact.uptime', pad(hrs), pad(mins), pad(secs));
+				}, (error) =>
+				{
+					Notify.error(Translator.get('fetch.error'));
+				});
+				
+				Ajax.get('/api/meta/probe').then((result) =>
+				{
+					const pad = (num) => String(num).padStart(2, '0');
+					const timeunit = (ns) => {
+						if( ns < 1000 ) return Math.round(ns) + "ns";
+						ns /= 1000;
+						if( ns < 1000 ) return Math.round(ns) + "µs";
+						ns /= 1000;
+						if( ns < 1000 ) return Math.round(ns) + "ms";
+						ns /= 1000;
+						if( ns < 60 ) return Math.round(ns) + "s";
+						ns /= 60;
+						if( ns < 60 ) return Math.round(ns) + "min";
+						ns /= 60;
+						return Math.round(ns) + "h";
+					};
 					
-					var pending = result.response.system.tasks.normal.pending + result.response.system.tasks.background.pending + result.response.system.tasks.priority.pending;
-					var tasks = (result.response.system.tasks.normal.submitted + result.response.system.tasks.background.submitted + result.response.system.tasks.priority.submitted) - pending;
+					var pending = result.response.tasks.normal.pending + result.response.tasks.background.pending + result.response.tasks.priority.pending + result.response.tasks.io.pending;
+					var tasks = (result.response.tasks.normal.submitted + result.response.tasks.background.submitted + result.response.tasks.priority.submitted + result.response.tasks.io.submitted) - pending;
 					self.dom.querySelector('#fact_pending').innerHTML = Translator.get('stats.fact.pending', pending);
 					self.dom.querySelector('#fact_tasks').innerHTML = Translator.get('stats.fact.tasks', tasks);
 					
-					self.dom.querySelector('#fact_memoryheap').innerHTML = Translator.get('stats.fact.memoryheap', Math.round(result.response.ram.heap.used / (1024*1024)));
-					self.dom.querySelector('#fact_memorynonheap').innerHTML = Translator.get('stats.fact.memorynonheap', Math.round(result.response.ram.nonheap.used / (1024*1024)));
-					self.dom.querySelector('#fact_memorycommitted').innerHTML = Translator.get('stats.fact.memorycommitted', Math.round(result.response.ram.physical.process / (1024*1024)));
+					var speed = (
+						result.response.tasks.normal.time + 
+						result.response.tasks.background.time + 
+						result.response.tasks.priority.time + 
+						result.response.tasks.io.time
+						) / (
+						result.response.tasks.normal.completed + 
+						result.response.tasks.background.completed + 
+						result.response.tasks.priority.completed + 
+						result.response.tasks.io.completed
+						);
+					self.dom.querySelector('#fact_avgtime').innerHTML = Translator.get('stats.fact.avgtime', timeunit(speed));
+					
+					self.dom.querySelector('#fact_cpu').innerHTML = Translator.get('stats.fact.currentcpu', Math.min(100, Math.max(0, Math.round(result.response.hardware.cpu.process)*100)));
+					
+					self.dom.querySelector('#fact_memoryheap').innerHTML = Translator.get('stats.fact.memoryheap', Math.round(result.response.hardware.ram.heap.used / (1024*1024)));
+					self.dom.querySelector('#fact_memorynonheap').innerHTML = Translator.get('stats.fact.memorynonheap', Math.round(result.response.hardware.ram.nonheap.used / (1024*1024)));
+					self.dom.querySelector('#fact_memorycommitted').innerHTML = Translator.get('stats.fact.memorycommitted', Math.round(result.response.hardware.ram.physical.process / (1024*1024)));
 				}, (error) =>
 				{
 					Notify.error(Translator.get('fetch.error'));
@@ -120,7 +166,7 @@ var x = new Promise((ok, nok) =>
 					var sum = 0;
 					Object.values(self.data_hourly).forEach((m) =>
 					{
-						for( const [key, value] of Object.entries(m) )
+						for( const [key, value] of Object.entries(m.threads) )
 						{
 							if( !threads.find((e) => e.id == key) )
 							{
@@ -171,12 +217,13 @@ var x = new Promise((ok, nok) =>
 							},
 							layout: { padding: 5 },
 							responsive: true,
+							interaction: { mode: 'index', intersect: false },
 							maintainAspectRatio: false,
 							resizeDelay: 250,
 							scales: {
 								x: {
 									title: { 
-										text: 'Time',
+										text: Translator.get('time'),
 										display: true
 									},
 									ticks: {
@@ -184,9 +231,14 @@ var x = new Promise((ok, nok) =>
 									}
 								},
 								y: {
-									title: {text: '% Time', display: true},
+									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100
+									min: 0, max: 100, position: 'left'
+								},
+								y1: {
+									title: {text: Translator.get('scale_network'), display: true},
+									type: 'linear', min: 0, max: 1000,
+									position: 'right', grid: { drawOnChartArea: false }
 								}
 							}
 						}
@@ -204,8 +256,6 @@ var x = new Promise((ok, nok) =>
 					dom.classList.remove('wait');
 					Notify.error(Translator.get('fetch.error'));
 				});
-				
-				this.initSystem();
 			},
 			
 			filterHourly: function()
@@ -215,6 +265,9 @@ var x = new Promise((ok, nok) =>
 				
 				var metric = dom.querySelector('input[type="radio"]:checked').value + "_time";
 				
+				var ingress = [];
+				var egress = [];
+				
 				var datasets = [...dom.querySelectorAll('input[type="checkbox"]:checked')].map((i) =>
 				{
 					const data = [];
@@ -222,8 +275,17 @@ var x = new Promise((ok, nok) =>
 					{
 						for( var s = 0; s < 6; s++ )
 						{
-							var d = self.data_hourly['m' + ('0' + m).substr(-2) + 's' + s + '0'] || {};
-							d = d[i.value] || null;
+							var d = self.data_hourly['m' + ('0' + m).substr(-2) + 's' + s + '0'] || {threads: {}, network: {}};
+
+							var r = d.network.read || null;
+							if( !r ) ingress.push(r);
+							else ingress.push(parseInt(r)/1024/1024);
+
+							var w = d.network.write || null;
+							if( !w ) egress.push(w);
+							else egress.push(parseInt(w)/1024/1024);
+							
+							d = d.threads[i.value] || null;
 							if( !d ) { data.push(null); continue; }
 							d = parseInt(d[metric]);
 							if( d < 0 ) { data.push(null); continue; }
@@ -231,8 +293,11 @@ var x = new Promise((ok, nok) =>
 						}
 					}
 					
-					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color};
+					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color, yAxisID: 'y'};
 				});
+				
+				datasets.push({ label: "Network Ingress", data: ingress, borderColor: "#FB8136", yAxisID: 'y1'});
+				datasets.push({ label: "Network Egress", data: egress, borderColor: "#36B0FB", yAxisID: 'y1'});
 				
 				self.graph_hourly.data.datasets = datasets;
 				self.graph_hourly.update();
@@ -271,7 +336,7 @@ var x = new Promise((ok, nok) =>
 					var sum = 0;
 					Object.values(self.data_daily).forEach((m) =>
 					{
-						for( const [key, value] of Object.entries(m) )
+						for( const [key, value] of Object.entries(m.threads) )
 						{
 							if( !threads.find((e) => e.id == key) )
 							{
@@ -320,12 +385,13 @@ var x = new Promise((ok, nok) =>
 							},
 							layout: { padding: 5 },
 							responsive: true,
+							interaction: { mode: 'index', intersect: false },
 							maintainAspectRatio: false,
 							resizeDelay: 250,
 							scales: {
 								x: {
 									title: { 
-										text: 'Time',
+										text: Translator.get('time'),
 										display: true
 									},
 									ticks: {
@@ -333,9 +399,14 @@ var x = new Promise((ok, nok) =>
 									}
 								},
 								y: {
-									title: {text: '% Time', display: true},
+									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100
+									min: 0, max: 100, position: 'left'
+								},
+								y1: {
+									title: {text: Translator.get('scale_network'), display: false},
+									type: 'linear', min: 0, max: 1000,
+									position: 'right', grid: { drawOnChartArea: false }
 								}
 							}
 						}
@@ -343,9 +414,6 @@ var x = new Promise((ok, nok) =>
 					
 					// filter
 					self.filterDaily();
-					
-					// facts
-					self.dom.querySelector('#fact_daily').innerHTML = Translator.get('stats.fact.daily', Math.round(sum / 1000000000));
 					
 					dom.classList.remove('wait');
 				}, (error) =>
@@ -362,21 +430,36 @@ var x = new Promise((ok, nok) =>
 				
 				var metric = dom.querySelector('input[type="radio"]:checked').value + "_time";
 				
+				var ingress = [];
+				var egress = [];
+				
 				var datasets = [...dom.querySelectorAll('input[type="checkbox"]:checked')].map((i) =>
 				{
 					const data = [];
 					for( var h = 0; h < 24; h++ )
 					{
-						var d = self.data_daily['h' + ('0' + h).substr(-2)] || {};
-						d = d[i.value] || null;
+						var d = self.data_daily['h' + ('0' + h).substr(-2)] || {threads: {}, network: {}};
+
+						var r = d.network.read || null;
+						if( !r ) ingress.push(r);
+						else ingress.push(parseInt(r.avg)/1024/1024);
+
+						var w = d.network.write || null;
+						if( !w ) egress.push(w);
+						else egress.push(parseInt(w.avg)/1024/1024);
+							
+						d = d.threads[i.value] || null;
 						if( !d ) { data.push(null); continue; }
 						d = parseInt(d[metric].avg);
 						if( d < 0 ) { data.push(null); continue; }
 						data.push(Math.min(100, d/100000000));
 					}
 					
-					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color};
+					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color, yAxisID: 'y'};
 				});
+				
+				datasets.push({ label: "Network Ingress", data: ingress, borderColor: "#FB8136", yAxisID: 'y1'});
+				datasets.push({ label: "Network Egress", data: egress, borderColor: "#36B0FB", yAxisID: 'y1'});
 				
 				self.graph_daily.data.datasets = datasets;
 				self.graph_daily.update();
@@ -415,7 +498,7 @@ var x = new Promise((ok, nok) =>
 					var sum = 0;
 					Object.values(self.data_yearly).forEach((m) =>
 					{
-						for( const [key, value] of Object.entries(m) )
+						for( const [key, value] of Object.entries(m.threads) )
 						{
 							if( !threads.find((e) => e.id == key) )
 							{
@@ -466,11 +549,12 @@ var x = new Promise((ok, nok) =>
 							layout: { padding: 5 },
 							responsive: true,
 							maintainAspectRatio: false,
+							interaction: { mode: 'index', intersect: false },
 							resizeDelay: 250,
 							scales: {
 								x: {
 									title: { 
-										text: 'Time',
+										text: Translator.get('time'),
 										display: true
 									},
 									ticks: {
@@ -478,9 +562,14 @@ var x = new Promise((ok, nok) =>
 									}
 								},
 								y: {
-									title: {text: '% Time', display: true},
+									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100
+									min: 0, max: 100, position: 'left'
+								},
+								y1: {
+									title: {text: Translator.get('scale_network'), display: true},
+									type: 'linear', min: 0, max: 1000,
+									position: 'right', grid: { drawOnChartArea: false }
 								}
 							}
 						}
@@ -488,9 +577,6 @@ var x = new Promise((ok, nok) =>
 					
 					// filter
 					self.filterYearly();
-					
-					// facts
-					self.dom.querySelector('#fact_yearly').innerHTML = Translator.get('stats.fact.yearly', Math.round(sum / 3600000000000));
 					
 					dom.classList.remove('wait');
 				}, (error) =>
@@ -507,22 +593,37 @@ var x = new Promise((ok, nok) =>
 				
 				var metric = dom.querySelector('input[type="radio"]:checked').value + "_time";
 				
+				var ingress = [];
+				var egress = [];
+				
 				var end = new Date(new Date().getFullYear()+1, 0, 1);
 				var datasets = [...dom.querySelectorAll('input[type="checkbox"]:checked')].map((i) =>
 				{
 					const data = [];
 					for( var t = new Date(new Date().getFullYear(), 0, 1); t < end; t.setDate(t.getDate() + 1))
 					{
-						var d = self.data_yearly['m' + ('0' + (t.getMonth()+1)).substr(-2) + 'd' + ('0' + t.getDate()).substr(-2)] || {};
-						d = d[i.value] || null;
+						var d = self.data_yearly['m' + ('0' + (t.getMonth()+1)).substr(-2) + 'd' + ('0' + t.getDate()).substr(-2)] || {threads: {}, network: {}};
+
+						var r = d.network.read || null;
+						if( !r ) ingress.push(r);
+						else ingress.push(parseInt(r.avg)/1024/1024);
+
+						var w = d.network.write || null;
+						if( !w ) egress.push(w);
+						else egress.push(parseInt(w.avg)/1024/1024);
+						
+						d = d.threads[i.value] || null;
 						if( !d ) { data.push(null); continue; }
 						d = parseInt(d[metric].avg);
 						if( d < 0 ) { data.push(null); continue; }
 						data.push(Math.min(100, d/100000000));
 					}
 					
-					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color};
+					return { label: i.nextSibling.textContent, data: data, borderColor: i.dataset.color, yAxisID: 'y'};
 				});
+				
+				datasets.push({ label: "Network Ingress", data: ingress, borderColor: "#FB8136", yAxisID: 'y1'});
+				datasets.push({ label: "Network Egress", data: egress, borderColor: "#36B0FB", yAxisID: 'y1'});
 				
 				self.graph_yearly.data.datasets = datasets;
 				self.graph_yearly.update();

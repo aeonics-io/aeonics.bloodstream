@@ -9,7 +9,7 @@ section.statistics {
 	overflow: auto;
 }
 #panel_graph > div {
-	height: 20rem; padding: 1.5rem; display: flex; flex-direction: column;
+	height: 30rem; padding: 1.5rem; display: flex; flex-direction: column;
 	padding-right: 0;
 }
 
@@ -49,6 +49,7 @@ section.statistics button.raised.icon {
 #panel_facts li:empty { display: none; }
 #panel_facts li { display: block; padding: 0.5rem; margin-bottom: 1rem; border-radius: 5px; text-align: center; font-size: 0.8rem; }
 #panel_facts li span { font-size: 1.2rem; display: block; font-weight: bold; }
+#panel_facts li#fact_cpu { background-color: #D21D50c0; }
 #panel_facts li#fact_hourly { background-color: #D21D50c0; }
 #panel_facts li#fact_daily { background-color: #D21D50c0; }
 #panel_facts li#fact_yearly { background-color: #D21D50c0; }
@@ -58,4 +59,5 @@ section.statistics button.raised.icon {
 #panel_facts li#fact_memorycommitted { background-color: #29C64Bc0; }
 #panel_facts li#fact_tasks { background-color: #FB8136c0; }
 #panel_facts li#fact_pending { background-color: #FB8136c0; }
+#panel_facts li#fact_avgtime { background-color: #FB8136c0; }
 

@@ -44,9 +44,17 @@ class Node
 	static pre(a, c) { 		return Node.create('pre', a, c); }
 	static code(a, c) { 	return Node.create('code', a, c); }
 	
+	static svg(a, c) { 		return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'svg'), a, c); }
+	static circle(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'circle'), a, c); }
+	static path(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'path'), a, c); }
+	static defs(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'defs'), a, c); }
+	static linearGradient(a, c) { 		return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'), a, c); }
+	static stop(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'stop'), a, c); }
+	static text(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'text'), a, c); }
+	
 	static create(tag, attributes, content)
 	{
-		var n = document.createElement(tag);
+		var n = tag instanceof HTMLElement || tag instanceof SVGElement ? tag : document.createElement(tag);
 		
 		// reorder attributes and content
 		if( typeof attributes == 'string' || attributes instanceof HTMLElement || Array.isArray(attributes) )
@@ -79,7 +87,10 @@ class Node
 				else if( key == 'style' )
 					Object.keys(attributes.style).forEach((k) => { n.style[k] = attributes.style[k]; });
 				else
-					n[key] = attributes[key];
+				{
+					if( n instanceof SVGElement ) n.setAttribute(key, attributes[key]);
+					else n[key] = attributes[key];
+				}
 			});
 		}
 		

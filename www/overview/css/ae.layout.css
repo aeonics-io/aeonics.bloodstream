@@ -18,13 +18,13 @@ nav {
 	position: fixed; z-index: 2;
 	top: 0; left: 0; bottom: 0;
 	padding: 2rem 0;
-	width: 5rem;
+	max-width: 5rem;
 	background-color: #26252D;
 	border-right: 1px solid #302E38;
-	transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	transition: max-width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-nav:hover { width: 12rem; }
+nav:hover { max-width: 30rem; }
 nav:hover li { color: #fff; }
 
 nav ol { list-style: none; margin: 0; padding: 0; }

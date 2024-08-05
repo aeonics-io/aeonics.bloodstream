@@ -1,0 +1,83 @@
+
+section.esg {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+}
+
+circle {
+	transition: stroke-dashoffset 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+section.esg .card {
+	display: inline-block; padding: 1rem;
+}
+section.esg .card p {
+	font-size: 0.8rem; padding-bottom: 0.8rem;
+	text-align: center;
+}
+section.esg .card > div {
+	display: flex; border-radius: 0.5rem;
+	background-color: var(--orange);
+	font-size: 1.2rem;
+}
+section.esg .card > div.negative { background-color: #D21D50; }
+section.esg .card > div.positive { background-color: #29C64B; }
+section.esg .card > div.blue { background-color: var(--blue); }
+section.esg .card .icon {
+	background-color: #00000000;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	padding: 0.5rem 1rem;
+	flex: 0 0;
+}
+section.esg .card .value { 
+	background-color: #00000030;
+	display: inline-block; padding: 0.5rem 1rem;
+	flex: 1 1; white-space: nowrap;
+}
+section.esg .card .value + .value {
+	margin-left: 1px;
+}
+
+section.esg .block {
+	padding: 2rem 3rem; background-color: #ffffff10; border-radius: 0.5rem;
+	margin-bottom: 2rem;
+}
+
+section.esg .block > div {
+	text-align: center; padding-top: 2rem;
+}
+
+.esg_gauge {
+	text-align: center;
+	width: 12rem;
+	margin-right: 1rem;
+	display: inline-block;
+}
+
+#esg_assumptions {
+	position: fixed; overflow: auto;
+	top: 0; right: -27rem; bottom: 0;
+	padding: 2rem;
+	width: 25vw;
+	background-color: #26252D;
+	border-left: 1px solid #302E38;
+	transition: right 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#esg_assumptions.open { right: 0; }
+#esg_assumptions aside {
+	position: absolute; top: 1rem; right: 1rem;
+	color: #ffffffaa; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1;
+	font-size: 1.5rem;
+}
+#esg_assumptions aside:hover { color: #fff; }
+
+aside.settings {
+	position: absolute; top: 1rem; right: 1rem;
+	color: #ffffffaa; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1;
+	font-size: 1.5rem;
+}
+aside.settings:hover { color: #fff; }

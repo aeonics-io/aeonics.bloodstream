@@ -210,6 +210,7 @@ public class Main extends Plugin
 		m = new Monitoring();
 		m.setup();
 	}
+	
 	private static Monitoring m;
 	
 	private static void afterRun()

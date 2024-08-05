@@ -27,6 +27,14 @@ var x = new Promise((ok, nok) =>
 						Node.li({className: location.hash == '#stats' ? 'selected' : '', dataset: {link: 'stats'}}, [
 							Node.span({className: 'icon'}, 'equalizer'), 
 							Translator.get('menu.statistics')
+						]),
+						Node.li({className: location.hash == '#esg' ? 'selected' : '', dataset: {link: 'esg'}}, [
+							Node.span({className: 'icon'}, 'power'), 
+							Translator.get('menu.esg')
+						]),
+						Node.li({className: location.hash == '#security' ? 'selected' : '', dataset: {link: 'security'}}, [
+							Node.span({className: 'icon'}, 'security'), 
+							Translator.get('menu.security')
 						])
 					])),
 					container
