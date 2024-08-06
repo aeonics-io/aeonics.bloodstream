@@ -83,6 +83,7 @@ export default {
 	
 	'esg.title.uptime': "Since last reboot",
 	'esg.uptime': "System uptime",
+	'esg.data_density': "Processing intensity<br />(%)",
 	'esg.data_ingress': "Network ingress",
 	'esg.data_egress': "Network egress",
 	'esg.connected': "Established network connections",

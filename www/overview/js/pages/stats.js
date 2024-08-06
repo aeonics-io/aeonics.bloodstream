@@ -228,12 +228,14 @@ var x = new Promise((ok, nok) =>
 									},
 									ticks: {
 										display: true,
-									}
+									},
+									grid: { display: false }
 								},
 								y: {
 									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100, position: 'left'
+									min: 0, max: 100, position: 'left',
+									grid: { color: '#333' }
 								},
 								y1: {
 									title: {text: Translator.get('scale_network'), display: true},
@@ -396,12 +398,14 @@ var x = new Promise((ok, nok) =>
 									},
 									ticks: {
 										display: true,
-									}
+									},
+									grid: { display: false }
 								},
 								y: {
 									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100, position: 'left'
+									min: 0, max: 100, position: 'left',
+									grid: { color: '#333' }
 								},
 								y1: {
 									title: {text: Translator.get('scale_network'), display: false},
@@ -559,12 +563,14 @@ var x = new Promise((ok, nok) =>
 									},
 									ticks: {
 										display: true,
-									}
+									},
+									grid: { display: false }
 								},
 								y: {
 									title: {text: Translator.get('time_ratio'), display: true},
 									type: 'linear',
-									min: 0, max: 100, position: 'left'
+									min: 0, max: 100, position: 'left',
+									grid: { color: '#333' }
 								},
 								y1: {
 									title: {text: Translator.get('scale_network'), display: true},

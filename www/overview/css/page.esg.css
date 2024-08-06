@@ -48,6 +48,10 @@ section.esg .block > div {
 	text-align: center; padding-top: 2rem;
 }
 
+section.esg .tabcontent {
+	text-align: center; padding-top: 2rem;
+}
+
 .esg_gauge {
 	text-align: center;
 	width: 12rem;
