@@ -38,7 +38,7 @@ export default {
 	'mfa.error.fetch': "The required information could not be fetched at this time. Please try again or contact your system administrator.",
 	'mfa.register': "Multifactor registration",
 	'mfa.register.detail': "You are required to enroll in multifactor authentication. You you can use any standard authenticator app for smartphone or other apps or devices that support the TOTP standard.<br /><br />When you are ready, click the following button to generate the QR-Code.",
-	'mfa.register.warning': "This operation can only be done once and cannot be undone. Please confirm that you are ready to scan the QR-Code.",
+	'mfa.register.fail': "Multifactor registration failed",
 	'mfa.enroll': "Enroll",
 	'mfa.ready': "I am ready",
 	'mfa.qrcode': "Scan this QR-Code with your authenticator app:",

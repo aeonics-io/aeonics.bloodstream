@@ -6,7 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import aeonics.data.Data;
+import aeonics.entity.Registry;
 import aeonics.entity.Storage;
+import aeonics.manager.Config;
+import aeonics.manager.Manager;
+import aeonics.manager.Security;
 import aeonics.manager.Timeout.Tracker;
 import aeonics.util.Json;
 
@@ -57,9 +61,13 @@ public class Common
 	public static RSAPublicKey OP_PUBLIC_KEY = null;
 	
 	/**
-	 * the storage to store all the tokens and code
+	 * Returns the storage to store all the tokens and code
+	 * @return the storage to store all the tokens and code
 	 */
-	public static Storage.Type storage = null;
+	private static Storage.Type storage()
+	{
+		return Registry.of(Storage.class).get(Manager.of(Config.class).get(Security.class, "oidc.op.storage").asString());
+	}
 	
 	/**
 	 * the timeout tracker
@@ -78,6 +86,7 @@ public class Common
 			final Long now = System.currentTimeMillis();
 			AtomicLong min = new AtomicLong(Math.min(OP_REFRESH_TOKEN_TTL*1000, OP_AUTH_CODE_TTL*1000));
 			
+			Storage.Type storage = storage();
 			if( storage == null )
 			{
 				Common.Code.local.entrySet().removeIf((t) -> 
@@ -147,19 +156,19 @@ public class Common
 		
 		public static void put(String code, Data state)
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				s.put(path + code, state);
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + code, state);
 			else
 				local.put(code, state);
 		}
 		
 		public static Data get(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null || m.length == 0 ) return null;
 				return Json.decode(new String(m));
 			}
@@ -169,13 +178,13 @@ public class Common
 		
 		public static Data remove(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null ) return null;
 				
-				s.remove(path + code);
+				storage.remove(path + code);
 				return Json.decode(new String(m));
 			}
 			else
@@ -184,9 +193,9 @@ public class Common
 		
 		public static int count()
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				return s.tree(path).size();
+			Storage.Type storage = storage();
+			if( storage != null )
+				return storage.tree(path).size();
 			else
 				return local.size();
 		}
@@ -202,19 +211,19 @@ public class Common
 		
 		public static void put(String code, Data state)
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				s.put(path + code, state);
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + code, state);
 			else
 				local.put(code, state);
 		}
 		
 		public static Data get(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null || m.length == 0 ) return null;
 				return Json.decode(new String(m));
 			}
@@ -224,13 +233,13 @@ public class Common
 		
 		public static Data remove(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null ) return null;
 				
-				s.remove(path + code);
+				storage.remove(path + code);
 				return Json.decode(new String(m));
 			}
 			else
@@ -239,9 +248,9 @@ public class Common
 		
 		public static int count()
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				return s.tree(path).size();
+			Storage.Type storage = storage();
+			if( storage != null )
+				return storage.tree(path).size();
 			else
 				return local.size();
 		}
@@ -257,19 +266,19 @@ public class Common
 		
 		public static void put(String code, Data state)
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				s.put(path + code, state);
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + code, state);
 			else
 				local.put(code, state);
 		}
 		
 		public static Data get(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null || m.length == 0 ) return null;
 				return Json.decode(new String(m));
 			}
@@ -279,13 +288,13 @@ public class Common
 		
 		public static Data remove(String code)
 		{
-			Storage.Type s = storage;
-			if( s != null )
+			Storage.Type storage = storage();
+			if( storage != null )
 			{
-				byte[] m = s.get(path + code);
+				byte[] m = storage.get(path + code);
 				if( m == null ) return null;
 				
-				s.remove(path + code);
+				storage.remove(path + code);
 				return Json.decode(new String(m));
 			}
 			else
@@ -294,9 +303,9 @@ public class Common
 		
 		public static int count()
 		{
-			Storage.Type s = storage;
-			if( s != null )
-				return s.tree(path).size();
+			Storage.Type storage = storage();
+			if( storage != null )
+				return storage.tree(path).size();
 			else
 				return local.size();
 		}

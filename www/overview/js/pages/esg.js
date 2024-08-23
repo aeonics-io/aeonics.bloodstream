@@ -2,7 +2,7 @@
 let ae = globalThis.ae;
 var x = new Promise((ok, nok) =>
 {
-	ae.require('Page', 'Node', 'Ajax', 'Translator', 'Notify', 'page.esg.css').then(([Page, Node, Ajax, Translator, Notify]) =>
+	ae.require('Page', 'Node', 'Ajax', 'Translator', 'Notify', 'Modal', 'page.esg.css').then(([Page, Node, Ajax, Translator, Notify, Modal]) =>
 	{
 		var page = new Page();
 		Object.assign(page, 
@@ -27,23 +27,24 @@ var x = new Promise((ok, nok) =>
 				this.dom.classList.add('wait');
 				
 				this.dom.append(
-					Node.aside({className: 'settings', click: function(e) { document.getElementById('esg_assumptions').classList.add('open'); }, title: Translator.get('settings')}, 'settings'),
+					Node.aside({className: 'settings'}, [
+						Node.span({click: function(e) { self.disclaimer(); }, title: Translator.get('info')}, 'info'),
+						Node.span({click: function(e) { document.getElementById('esg_assumptions').classList.add('open'); }, title: Translator.get('settings')}, 'settings')
+					]),
 					Node.div({id: 'esg_assumptions'}, [
 						Node.aside({click: function(e) { this.parentNode.classList.remove('open'); }, title: Translator.get('close')}, 'close'),
 						Node.label(Translator.get('esg.settings.cpu')),
-						Node.input({type: 'number', id: 'esg_i_tdp', min: 1, max: 1000, step: 1, value: 80, change: function() { self.refresh(); }}),
+						Node.input({type: 'number', id: 'esg_i_tdp', min: 1, max: 1000, step: 1, value: 150, change: function() { self.refresh(); }}),
 						Node.label(Translator.get('esg.settings.pue')),
 						Node.input({type: 'number', id: 'esg_i_pue', min: 1, max: 10, step: 0.01, value: 1.58, change: function() { self.refresh(); }}),
 						Node.label(Translator.get('esg.settings.energy')),
-						Node.input({type: 'number', id: 'esg_i_eci', min: 1, max: 10000, step: 1, value: 300, change: function() { self.refresh(); }}),
+						Node.input({type: 'number', id: 'esg_i_eci', min: 1, max: 10000, step: 1, value: 334, change: function() { self.refresh(); }}),
 						Node.label(Translator.get('esg.settings.cores')),
 						Node.input({type: 'number', id: 'esg_i_pcpu', min: 1, max: 256, step: 1, value: 0, change: function() { self.refresh(); }}),
 						Node.label(Translator.get('esg.settings.network')),
 						Node.input({type: 'number', id: 'esg_i_net', min: 1, max: 256, step: 0.01, value: 9.27, change: function() { self.refresh(); }}),
-						Node.label(Translator.get('esg.settings.cpuratio')),
-						Node.input({type: 'number', id: 'esg_i_cpur', min: 1, max: 100, step: 1, value: 32, change: function() { self.refresh(); }}),
-						Node.label(Translator.get('esg.settings.lifecycleratio')),
-						Node.input({type: 'number', id: 'esg_i_lr', min: 1, max: 100, step: 1, value: 17, change: function() { self.refresh(); }})
+						Node.label(Translator.get('esg.settings.idleratio')),
+						Node.input({type: 'number', id: 'esg_i_idle', min: 1, max: 100, step: 1, value: 28, change: function() { self.refresh(); }}),
 					]),
 					Node.div({className: 'block'}, [
 						Node.h2(Translator.get('esg.title.uptime')),
@@ -78,6 +79,11 @@ var x = new Promise((ok, nok) =>
 				{
 					Notify.error(Translator.get('fetch.error'));
 				});
+			},
+			
+			disclaimer: function()
+			{
+				Modal.alert(Translator.get('esg.disclaimer'));
 			},
 			
 			switchTab: function(node)
@@ -234,10 +240,10 @@ var x = new Promise((ok, nok) =>
 					uptime_sec *= 10; // monitoring is taken in 10s interval
 					
 					var net = parseFloat(document.getElementById('esg_i_net').value);
-					var network_co2e = network_bytes / (1024*1024*1024) * net;
+					var network_co2e = network_bytes / (1024*1024*1024) * (net * 1.012);
 					const [ratio, min_gco2e, cpu_gco2e, max_gco2e] = self.computeCO2e(uptime_sec, cpu_time);
-					var lr = parseFloat(document.getElementById('esg_i_lr').value) / 100;
-					var lifecycle_co2e = (max_gco2e + network_co2e) * lr;
+					var lr = (100 - (7800 / (parseFloat(document.getElementById('esg_i_eci').value) + 85))) / 100;
+					var lifecycle_co2e = (max_gco2e / parseFloat(document.getElementById('esg_i_pue').value) * (1-lr)) + (network_co2e * net * 0.013);
 					
 					self.setGauge('esg_hourly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
@@ -322,10 +328,10 @@ var x = new Promise((ok, nok) =>
 					network_bytes += self._hourly[2];
 					
 					var net = parseFloat(document.getElementById('esg_i_net').value);
-					var network_co2e = network_bytes / (1024*1024*1024) * net;
+					var network_co2e = network_bytes / (1024*1024*1024) * (net * 1.012);
 					const [ratio, min_gco2e, cpu_gco2e, max_gco2e] = self.computeCO2e(uptime_sec, cpu_time);
-					var lr = parseFloat(document.getElementById('esg_i_lr').value) / 100;
-					var lifecycle_co2e = (max_gco2e + network_co2e) * lr;
+					var lr = (100 - (7800 / (parseFloat(document.getElementById('esg_i_eci').value) + 85))) / 100;
+					var lifecycle_co2e = (max_gco2e / parseFloat(document.getElementById('esg_i_pue').value) * (1-lr)) + (network_co2e * net * 0.013);
 					
 					self.setGauge('esg_daily_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
@@ -458,15 +464,15 @@ var x = new Promise((ok, nok) =>
 					uptime_sec *= 10; // monitoring is taken in 10s interval
 					
 					// we should add the current day data
-					uptime_sec += self._daily[0];
+					uptime_sec = 31536000;//+= self._daily[0];
 					cpu_time += self._daily[1];
 					network_bytes += self._daily[2];
 					
 					var net = parseFloat(document.getElementById('esg_i_net').value);
-					var network_co2e = network_bytes / (1024*1024*1024) * net;
+					var network_co2e = network_bytes / (1024*1024*1024) * (net * 1.012);
 					var [ratio, min_gco2e, cpu_gco2e, max_gco2e] = self.computeCO2e(uptime_sec, cpu_time);
-					var lr = parseFloat(document.getElementById('esg_i_lr').value) / 100;
-					var lifecycle_co2e = (max_gco2e + network_co2e) * lr;
+					var lr = (100 - (7800 / (parseFloat(document.getElementById('esg_i_eci').value) + 85))) / 100;
+					var lifecycle_co2e = (max_gco2e / parseFloat(document.getElementById('esg_i_pue').value) * (1-lr)) + (network_co2e * net * 0.013);
 					
 					self.setGauge('esg_monthly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
@@ -498,10 +504,10 @@ var x = new Promise((ok, nok) =>
 					network_bytes += self._daily[2];
 					
 					net = parseFloat(document.getElementById('esg_i_net').value);
-					network_co2e = network_bytes / (1024*1024*1024) * net;
+					network_co2e = network_bytes / (1024*1024*1024) * (net * 1.012);
 					[ratio, min_gco2e, cpu_gco2e, max_gco2e] = self.computeCO2e(uptime_sec, cpu_time);
-					lr = parseFloat(document.getElementById('esg_i_lr').value) / 100;
-					lifecycle_co2e = (max_gco2e + network_co2e) * lr;
+					lr = (100 - (7800 / (parseFloat(document.getElementById('esg_i_eci').value) + 85))) / 100;
+					lifecycle_co2e = (max_gco2e / parseFloat(document.getElementById('esg_i_pue').value) * (1-lr)) + (network_co2e * net * 0.013);
 					
 					self.setGauge('esg_yearly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
@@ -528,10 +534,10 @@ var x = new Promise((ok, nok) =>
 				var pue = parseFloat(document.getElementById('esg_i_pue').value);
 				var eci = parseFloat(document.getElementById('esg_i_eci').value);
 				var pcpu = parseFloat(document.getElementById('esg_i_pcpu').value);
-				var cpur = parseFloat(document.getElementById('esg_i_cpur').value) / 100;
+				var cpur = 1 - (parseFloat(document.getElementById('esg_i_idle').value) / 100);
 				
-				var max_per_sec = tdp / (1 - cpur) * pue / 1000 * eci / 3600;
-				var min_per_sec = max_per_sec * cpur;
+				var min_per_sec = (1 - cpur) * (tdp / cpur) * pue * (eci / 1000 / 3600);
+				var max_per_sec = min_per_sec + (tdp * pue * (eci / 1000 / 3600));
 				var cpu_pct_per_sec = (max_per_sec - min_per_sec) / 100;
 				
 				var cpu_sec = (time / 1000000000 / cores) * (cores / pcpu);

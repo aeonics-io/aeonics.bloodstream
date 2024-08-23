@@ -1,14 +1,25 @@
 package aeonics.endpoint.meta;
 
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.lang.module.ModuleDescriptor.*;
+import java.lang.module.ModuleReference;
+import java.lang.module.ResolvedModule;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import aeonics.Boot;
@@ -32,7 +43,7 @@ import aeonics.template.Template;
 import aeonics.util.Hardware;
 import aeonics.util.Json;
 import aeonics.util.StringUtils;
-import aeonics.util.Tuple;
+import aeonics.util.Tuples.Tuple;
 
 @SuppressWarnings("unused")
 public class Endpoints 
@@ -179,10 +190,9 @@ public class Endpoints
 		.<Rest.Type>cast()
 		.process(() ->
 		{
-			// todo : return plugin summary and description
-			Data list = Data.list().add(Boot.class.getModule().getName());
-			for( String p : Plugin.all() )
-				list.add(p);
+			Data list = Data.list();
+			for( Plugin p : Plugin.all() )
+				list.add(Data.map().put("name", p.name()).put("summary", p.summary()).put("description", p.description()));
 			return list;
 		})
 		.url(ROOT + "plugins")
@@ -526,5 +536,58 @@ public class Endpoints
 			return Manager.of(Monitor.class).report();
 		})
 		.url(ROOT + "monitoring")
+		.method("GET");
+		
+	public static final Endpoint.Rest.Type integrity = new Endpoint.Rest() { }
+		.template()
+		.summary("Provides system integrity information")
+		.description("This endpoint returns information about all plugins in the system.")
+		.build()
+		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			Data list = Data.map();
+			
+			List<Module> modules = new ArrayList<>(aeonics.Plugin.getModuleLayer().modules());
+			modules.add(aeonics.Boot.class.getModule());
+			
+			modules.forEach((m) -> {
+				Data p = Data.map();
+				list.put(m.getName(), p);
+				
+				p.put("packages", m.getPackages());
+				p.put("uses", m.getDescriptor().uses());
+				p.put("provides", m.getDescriptor().provides().stream().map(Provides::toString).collect(Collectors.toList()));
+				p.put("opens", m.getDescriptor().opens().stream().map(Opens::toString).collect(Collectors.toList()));
+				p.put("exports", m.getDescriptor().exports().stream().map(Exports::toString).collect(Collectors.toList()));
+				p.put("requires", m.getDescriptor().requires().stream().map(Requires::toString).collect(Collectors.toList()));
+				
+				ResolvedModule r = m.getLayer().configuration().findModule(m.getName()).orElse(null);
+				URI location = r == null ? null : r.reference().location().orElse(null);
+				if( r == null )
+				{
+					p.put("file", null).put("hash", null).put("modified", null).put("size", null);
+				}
+				else
+				{
+					Path file = Paths.get(location);
+					p.put("file", file.getFileName().toString());
+					try { p.put("modified", Files.getLastModifiedTime(file).toMillis()); }
+					catch(Exception e) { p.put("modified", null); }
+					try( InputStream is = Files.newInputStream(file) ) { p.put("hash", Manager.of(aeonics.manager.Security.class).hash(is)); }
+					catch(Exception e) { p.put("hash", null); }
+					try { p.put("size", Files.size(file)); }
+					catch(Exception e) { p.put("size", null); }
+				}
+			});
+			
+			Data details = plugins.process();
+			for( Data p : details )
+				if( list.containsKey(p.asString("name")) )
+					list.get(p.asString("name")).put("summary", p.get("summary")).put("description", p.get("description"));
+			
+			return list;
+		})
+		.url(ROOT + "integrity")
 		.method("GET");
 }

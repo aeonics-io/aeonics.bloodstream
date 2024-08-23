@@ -55,7 +55,7 @@ public class Monitoring
 			
 			if( enabled.get() )
 			{
-				Monitor.add("usage", () ->
+				Monitor.addProbe("usage", () ->
 				{
 					List<Long> ids = Arrays.stream(mx.getAllThreadIds()).boxed().collect(Collectors.toList());
 					Data lvl1 = Data.map();
@@ -88,7 +88,7 @@ public class Monitoring
 			}
 			else
 			{
-				Monitor.remove("usage");
+				Monitor.removeProbe("usage");
 			}
 		});
 		

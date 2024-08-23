@@ -2,7 +2,7 @@
 let ae = globalThis.ae;
 var x = new Promise((ok, nok) =>
 {
-	ae.require('Page', 'Node', 'Translator', 'Ajax', 'Modal', 'qrcode', 'page.m.css').then(([Page, Node, Translator, Ajax, Modal, QRCode]) =>
+	ae.require('Page', 'Node', 'Translator', 'Ajax', 'Modal', 'Notify', 'qrcode', 'page.m.css', 'ae.notify.css').then(([Page, Node, Translator, Ajax, Modal, Notify, QRCode]) =>
 	{
 		Translator.load('default').then(() =>
 		{
@@ -117,25 +117,38 @@ var x = new Promise((ok, nok) =>
 						{
 							e.stopImmediatePropagation();
 							e.preventDefault();
+							div.classList.add('wait');
 							
-							Modal.confirm(Translator.get('mfa.register.warning'), [Translator.get('mfa.ready'), Translator.get('cancel')]).then((index) =>
+							Ajax.post("/oauth/otp/generate", {data: {code: self.code}}).then((response) =>
 							{
-								div.classList.add('wait');
-								
-								Ajax.post("/oauth/otp/register", {data: {code: self.code}}).then((response) =>
+								var input = Node.input({type: 'text', placeholder: Translator.get('mfa.otp')});
+								Modal.alert([
+									Translator.get('mfa.qrcode'),
+									Node.p({className: "qr"}, QRCode({msg: response.response.url, pad: 6, dim: 256, pal: ['#000', '#fff'], ecb: 0, ecl: 'M'})),
+									input
+								]).then(() =>
 								{
-									Modal.alert([
-										Translator.get('mfa.qrcode'),
-										Node.p({className: "qr"}, QRCode({msg: response.response.url, pad: 6, dim: 256, pal: ['#000', '#fff'], ecb: 0, ecl: 'M'}))
-									]).then(() => { self.rule_2(); });
-								}, (error) =>
-								{
-									var searchParams = new URLSearchParams();
-									searchParams.set("error", error.response.error||'server_error');
-									searchParams.set("error_description", error.response.error_description||'Unspecified error.');
-									location.href = 'error?' + searchParams.toString() + '#e';
+									Ajax.post("/oauth/otp/register", {data: {code: self.code, 
+										check: input.value, 
+										period: response.response.period, 
+										digits: response.response.digits, 
+										algorithm: response.response.algorithm, 
+										secret: response.response.secret}}).then(() =>
+									{
+										self.rule_2();
+									}, (error) =>
+									{
+										Notify.error(Translator.get('mfa.register.fail'));
+										self.rule_1_display();
+									});
 								});
-							}, () => {});
+							}, (error) =>
+							{
+								var searchParams = new URLSearchParams();
+								searchParams.set("error", error.response.error||'server_error');
+								searchParams.set("error_description", error.response.error_description||'Unspecified error.');
+								location.href = 'error?' + searchParams.toString() + '#e';
+							});
 						}}, Translator.get('mfa.enroll'))
 					);
 					div.classList.remove('wait');
@@ -149,7 +162,7 @@ var x = new Promise((ok, nok) =>
 					
 					div.append(
 						Node.p(Translator.get("mfa.auth")),
-						Node.input({type: 'text', id: 'form_otp', placeholder: Translator.get('mfa.otp')}),
+						Node.input({type: 'text', id: 'form_otp', placeholder: Translator.get('mfa.otp'), keydown: function(e) { if(this.value.length > 0 && (e.key === 'Enter' || e.keyCode === 13)) this.nextSibling.click(); }}),
 						Node.button({className: 'raised', click: function(e)
 						{
 							e.stopImmediatePropagation();

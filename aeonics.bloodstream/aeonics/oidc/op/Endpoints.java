@@ -27,7 +27,7 @@ import aeonics.template.Parameter;
 import aeonics.template.Template;
 import aeonics.util.Json;
 import aeonics.util.StringUtils;
-import aeonics.util.Tuple;
+import aeonics.util.Tuples.Tuple;
 
 @SuppressWarnings("unused")
 public class Endpoints 

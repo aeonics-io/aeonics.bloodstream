@@ -1,0 +1,76 @@
+
+section.security {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+}
+
+section.security h1 { display: block; text-align: center; margin: 2rem; }
+section.security h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+section.security section { 
+	background: #ffffff10;
+	margin-bottom: 0.5rem;
+}
+section.security section h2::before {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	content: '\e5cc';
+	rotate: z 0deg;
+	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	display: inline-block; margin: 1rem; 
+}
+section.security section.open h2::before {
+	rotate: z 90deg;
+}
+section.security section > div { height: 0; overflow: hidden; }
+section.security section.open > div { height: auto; overflow: auto; }
+
+section.security section .detail { padding: 1rem 1rem 2rem 1rem; }
+section.security section .detail p { padding: 0.5rem 0; display: flex; }
+section.security section .detail .title, section.security section .detail .value, section.security section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+section.security section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+section.security section .detail .text { color: var(--orange); flex: 1; }
+section.security section .detail .value { color: var(--blue); font-family: monospace; flex: 1; }
+section.security section .detail .value .tag { 
+	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
+	margin-right: 0.5rem; color: #ccc;
+}
+
+div.score { display: inline-block; width: 20rem; }
+div.score p { text-align: center; margin-bottom: 2rem; }
+div.score > .selected { border: 2px solid #fff; }
+div.score > div { margin: 0.3rem; font-size: 0.8rem; border: 2px solid transparent; border-radius: 2rem; overflow: hidden; }
+div.score > div span { display: inline-block; }
+div.score > div span:nth-child(1) { padding: 0.2rem 0.3rem; width: 10ch; }
+div.score > div span:nth-child(2) { padding: 0.2rem 0.3rem; text-align: right; font-weight: bold; }
+div.score > .selected span:nth-child(3) { padding-left: 2rem; }
+div.score > .selected span:nth-child(3)::before {
+	content: '\e5c4';
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1rem; text-transform: none !important;
+	display: inline-block; vertical-align: -0.2rem;
+}
+div.score .A span:nth-child(1) { background-color: #00a650a0; }
+div.score .B span:nth-child(1) { background-color: #50b646a0; }
+div.score .C span:nth-child(1) { background-color: #bcd631a0; }
+div.score .D span:nth-child(1) { background-color: #fdf100a0; }
+div.score .E span:nth-child(1) { background-color: #fcb712a0; }
+div.score .F span:nth-child(1) { background-color: #f26f20a0; }
+div.score .G span:nth-child(1) { background-color: #ed1b24a0; }
+div.score .A span:nth-child(2) { background-color: #00a650; width: 1rem; }
+div.score .B span:nth-child(2) { background-color: #50b646; width: 2.5rem; }
+div.score .C span:nth-child(2) { background-color: #bcd631; width: 4rem; }
+div.score .D span:nth-child(2) { background-color: #fdf100; width: 5.5rem; }
+div.score .E span:nth-child(2) { background-color: #fcb712; width: 7rem; }
+div.score .F span:nth-child(2) { background-color: #f26f20; width: 8.5rem; }
+div.score .G span:nth-child(2) { background-color: #ed1b24; width: 10rem; }
+
+section.security .tabcontent {
+	display: flex; gap: 2rem; padding: 2rem;
+}
+section.security .tabcontent .score {
+	flex: 0 0 20rem;
+}
+section.security .tabcontent p {
+	flex: 1 1; align-self: center; padding-left: 4rem; text-align: justify;
+}
+
+section.security > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }

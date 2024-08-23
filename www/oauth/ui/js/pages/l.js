@@ -228,7 +228,7 @@ var x = new Promise((ok, nok) =>
 						Node.p({className: 'onbehalf'}, Translator.get("login.provider", ae.safeHtml(this.providerName))),
 						Node.p({className: 'back', click: function() { self.rule_2(); }}, Translator.get('login.choose.provider')),
 						Node.input({type: 'text', id: 'form_login', placeholder: Translator.get('login.username')}),
-						Node.input({type: 'password', id: 'form_password', placeholder: Translator.get('login.password')}),
+						Node.input({type: 'password', id: 'form_password', placeholder: Translator.get('login.password'), keydown: function(e) { if(this.value.length > 0 && (e.key === 'Enter' || e.keyCode === 13)) this.nextSibling.click(); }}),
 						Node.button({className: 'raised', click: function(e)
 						{
 							e.stopImmediatePropagation();

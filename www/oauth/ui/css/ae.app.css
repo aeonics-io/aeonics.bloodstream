@@ -1,4 +1,5 @@
 @font-face { font-family: 'averta'; font-weight: 300; font-style: normal; src: url('../fonts/300.otf') format('opentype'); }
+@font-face { font-family: 'material'; src: url('../fonts/material.woff') format('woff'); }
 
 :root {
 	--black: #1C1B21;

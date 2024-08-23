@@ -745,23 +745,23 @@ var x = new Promise((ok, nok) =>
 					node_list = [];
 					data.plugins.forEach(p =>
 					{
-						var node = {id: 'plugin:'+p, name: p, color: '#29C64B', visible: true, type: 'p1'};
+						var node = {id: 'plugin:'+p.name, name: p.name, color: '#29C64B', visible: true, type: 'p1'};
 						node_list.push(node);
 						graphdata.nodes.push(node);
-						graphdata.links.push({source: 'plugin', target: 'plugin:'+p, color: '#29C64B80'});
+						graphdata.links.push({source: 'plugin', target: 'plugin:'+p.name, color: '#29C64B80'});
 						
 						for( const [key, value] of Object.entries(data.factory) )
 						{
 							value.forEach(f =>
 							{
-								if( f.plugin == p )
+								if( f.plugin == p.name )
 								{
 									if( !data.registry[key] )
 										return;
 									data.registry[key].forEach(r =>
 									{
 										if( r.type == f.type )
-											graphdata.links.push({source: 'plugin:'+p, target: r.id, creator: true, color: '#29C64B40'});
+											graphdata.links.push({source: 'plugin:'+p.name, target: r.id, creator: true, color: '#29C64B40'});
 									});
 								}
 							});

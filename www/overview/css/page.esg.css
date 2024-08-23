@@ -60,7 +60,7 @@ section.esg .tabcontent {
 }
 
 #esg_assumptions {
-	position: fixed; overflow: auto;
+	position: fixed; overflow: auto; z-index: 2;
 	top: 0; right: -27rem; bottom: 0;
 	padding: 2rem;
 	width: 25vw;
@@ -84,4 +84,5 @@ aside.settings {
 	font-family: material !important; font-feature-settings: "liga" 1;
 	font-size: 1.5rem;
 }
-aside.settings:hover { color: #fff; }
+aside.settings span { display: inline-block; margin-left: 1rem; }
+aside.settings span:hover { color: #fff; }

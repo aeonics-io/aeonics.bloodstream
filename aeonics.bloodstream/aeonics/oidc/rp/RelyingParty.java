@@ -14,7 +14,7 @@ import aeonics.template.Item;
 import aeonics.template.Parameter;
 import aeonics.template.Relationship;
 import aeonics.template.Template;
-import aeonics.util.Tuple;
+import aeonics.util.Tuples.Tuple;
 
 public class RelyingParty extends Item<RelyingParty.Type>
 {

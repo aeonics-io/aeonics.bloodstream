@@ -17,12 +17,15 @@ import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
 import aeonics.entity.security.Rule;
 import aeonics.entity.security.User;
+import aeonics.http.Endpoint;
+import aeonics.http.Endpoint.Rest;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
 import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
 import aeonics.manager.Security;
+import aeonics.manager.Snapshot;
 import aeonics.manager.Timeout;
 import aeonics.monitoring.Monitoring;
 import aeonics.oidc.Common;
@@ -39,10 +42,10 @@ public class Main extends Plugin
 	
 	public void start()
 	{
-		Manager.of(Lifecycle.class).on(Phase.LOAD, Callback.once(() -> onLoad()));
-		Manager.of(Lifecycle.class).on(Phase.CONFIG, Callback.once(() -> onConfig()));
-		Manager.of(Lifecycle.class).on(Phase.RUN, Callback.once(() -> onRun()));
-		Manager.of(Lifecycle.class).after(Phase.RUN, Callback.once(() -> afterRun()));
+		Lifecycle.on(Phase.LOAD, Callback.once(() -> onLoad()));
+		Lifecycle.on(Phase.CONFIG, Callback.once(() -> onConfig()));
+		Lifecycle.on(Phase.RUN, Callback.once(() -> onRun()));
+		Lifecycle.after(Phase.RUN, Callback.once(() -> afterRun()));
 	}
 	
 	private static void onLoad()
@@ -136,6 +139,20 @@ public class Main extends Plugin
 			.description("The name or id of the storage for this OIDC OP. If the storage does not exist, a local temporary (ouf-of-storage) location is used instead.")
 			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.empty()));
+		
+		Monitor.addProbe("registry", () ->
+		{
+			int categories = 0;
+			int entities = 0;
+			
+			for( Registry<?> r : Registry.all() )
+			{
+				categories++;
+				entities += r.size();
+			}
+				
+			return Data.map().put("categories", categories).put("entities", entities);
+		});
 	}
 	
 	private static void onRun()
@@ -188,15 +205,27 @@ public class Main extends Plugin
 					);
 			}
 		});
-		c.watch(Security.class, "oidc.op.storage", (key, value) -> Common.storage = Registry.of(Storage.class).get(value.asString()));
 		Manager.of(Timeout.class).watch(Common.tracker);
 		
-		// first restrict access
-		Policy.Type policy = new Policy.Deny().template().build(Data.map().put("scope", "http"));
-		policy.name("Deny /api/meta to non administrators");
-		policy.addRelation("rule", new Rule.And().template().build()
-			.addRelation("rules", new Rule.MatchContext().template().build(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
-			.addRelation("rules", new Rule.Not().template().build().addRelation("rule", new Rule.Role().template().build(Data.map().put("role", "Administrator")))));
+		if( !c.get(Security.class, "otp.initialized").asBool() )
+		{
+			// restrict access to /api/meta
+			Policy.Type policy = new Policy.Deny().template().build(Data.map().put("scope", "http"));
+			policy.name("Deny /api/meta to non administrators");
+			policy.addRelation("rule", new Rule.And().template().build()
+				.addRelation("rules", new Rule.MatchContext().template().build(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
+				.addRelation("rules", new Rule.Not().template().build().addRelation("rule", new Rule.Role().template().build(Data.map().put("role", "Administrator")))));
+			
+			// set and save the monitoring storage
+			Storage.Type monitor = new Storage.File().template().build(Data.map().put("root", "stats")).name("Monitor statistics");
+			c.set(Monitor.class, "storage", Data.of(monitor.id()));
+			
+			// set and save the security storage
+			Storage.Type securityStorage = new Storage.File().template().build(Data.map().put("root", "security")).name("Security storage");
+			c.set(Security.class, "oidc.op.storage", Data.of(securityStorage.id()));
+			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
+			c.set(Security.class, "otp.initialized", Data.of(true));
+		}
 		
 		aeonics.endpoint.meta.Endpoints.register();
 		aeonics.endpoint.meta.Security.register();
@@ -205,8 +234,6 @@ public class Main extends Plugin
 		aeonics.oidc.rp.Endpoints.register();
 		aeonics.oidc.TOTP.register();
 		
-		Storage.Type monitor = new Storage.File().template().build(Data.map().put("root", "stats")).name("Monitor statistics");
-		c.set(Monitor.class, "storage", Data.of(monitor.id()));
 		m = new Monitoring();
 		m.setup();
 	}
@@ -217,17 +244,17 @@ public class Main extends Plugin
 	{
 		// default oidc client and rp
 		RelyingParty.Type rp = new RelyingParty().template().build(Data.map()
-			.put("__internal", true)
 			.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
 			.addRelation("groups", "Administrators")
 			.name("Local Provider")
+			.internal(true)
 			.<RelyingParty.Type>cast();
 		OidcProvider.Type provider = new OidcProvider().template().build(Data.map()
-			.put("__internal", true)
 			.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
 			.put("client_id", rp.clientId())
 			.put("client_secret", rp.clientSecret()))
 			.name("Local Authentication")
+			.internal(true)
 			.<OidcProvider.Type>cast();
 		provider.join(Data.map()
 			.put("iss", provider.issuer())
@@ -236,5 +263,21 @@ public class Main extends Plugin
 			.put("exp", System.currentTimeMillis()/1000 + 3600),
 			Registry.of(User.class).get("admin"));
 		Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
+		
+		// TEST
+		new Endpoint.Rest() { }
+			.template()
+			.summary("snapshot")
+			.build()
+			.<Rest.Type>cast()
+			.process(() ->
+			{
+				String name = Manager.of(Snapshot.class).create("test").await();
+				
+				return Data.map().put("name", name);
+			})
+			.url("/api/snapshot")
+			.method("GET")
+			;
 	}
 }
