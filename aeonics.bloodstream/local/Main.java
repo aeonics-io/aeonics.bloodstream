@@ -17,15 +17,12 @@ import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
 import aeonics.entity.security.Rule;
 import aeonics.entity.security.User;
-import aeonics.http.Endpoint;
-import aeonics.http.Endpoint.Rest;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
 import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
 import aeonics.manager.Security;
-import aeonics.manager.Snapshot;
 import aeonics.manager.Timeout;
 import aeonics.monitoring.Monitoring;
 import aeonics.oidc.Common;
@@ -58,6 +55,12 @@ public class Main extends Plugin
 	{
 		Config c = Manager.of(Config.class);
 		
+		c.declare(Monitor.class, new Parameter("storage")
+				.summary("Monitor data storage")
+				.description("The name or ID of the storage entity where monitoring data will be persisted. This is normally set by the system on startup, but it can be changed afterwards.")
+				.format(Parameter.Format.TEXT)
+				.optional(false));
+		
 		// ===========================
 		// TOPT stuff
 		
@@ -84,6 +87,14 @@ public class Main extends Plugin
 			.description("The name of the OTP issuer to be displayed by MFA apps.")
 			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.of("Aeonics Bloodstream Enterprise Suite")));
+		c.declare(Security.class, new Parameter("otp.initialized")
+			.summary("Default OTP has been initialized")
+			.description("This parameter defines if the default MFA has already been initialized (true) or if it should done when starting the run phase (false)."
+				+ " This is normally set by the system to detect an initial snapshot.")
+			.format(Parameter.Format.BOOLEAN)
+			.rule(Parameter.Rule.BOOLEAN)
+			.optional(true)
+			.defaultValue(Data.of(false)));
 		
 		// ===========================
 		// OP stuff
@@ -139,6 +150,12 @@ public class Main extends Plugin
 			.description("The name or id of the storage for this OIDC OP. If the storage does not exist, a local temporary (ouf-of-storage) location is used instead.")
 			.format(Parameter.Format.TEXT)
 			.defaultValue(Data.empty()));
+		c.declare(Security.class, new Parameter("local.provider")
+			.summary("Local OIDC identity provider")
+			.description("The ID of the local OIDC OP. This paramater is set automatically by the system on startup and should not be changed.")
+			.format(Parameter.Format.TEXT)
+			.rule(Parameter.Rule.ID)
+			.optional(false));
 		
 		Monitor.addProbe("registry", () ->
 		{
@@ -227,8 +244,10 @@ public class Main extends Plugin
 			c.set(Security.class, "otp.initialized", Data.of(true));
 		}
 		
+		aeonics.endpoint.meta.Configuration.register();
 		aeonics.endpoint.meta.Endpoints.register();
 		aeonics.endpoint.meta.Security.register();
+		aeonics.endpoint.meta.Snapshots.register();
 		aeonics.oidc.Endpoints.register();
 		aeonics.oidc.op.Endpoints.register();
 		aeonics.oidc.rp.Endpoints.register();
@@ -263,21 +282,5 @@ public class Main extends Plugin
 			.put("exp", System.currentTimeMillis()/1000 + 3600),
 			Registry.of(User.class).get("admin"));
 		Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
-		
-		// TEST
-		new Endpoint.Rest() { }
-			.template()
-			.summary("snapshot")
-			.build()
-			.<Rest.Type>cast()
-			.process(() ->
-			{
-				String name = Manager.of(Snapshot.class).create("test").await();
-				
-				return Data.map().put("name", name);
-			})
-			.url("/api/snapshot")
-			.method("GET")
-			;
 	}
 }

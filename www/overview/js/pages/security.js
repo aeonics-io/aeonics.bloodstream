@@ -2,7 +2,7 @@
 let ae = globalThis.ae;
 var x = new Promise((ok, nok) =>
 {
-	ae.require('Page', 'Node', 'Ajax', 'Translator', 'Notify', 'page.security.css', 'page.security.css').then(([Page, Node, Ajax, Translator, Notify]) =>
+	ae.require('Page', 'Node', 'Ajax', 'Translator', 'Notify', 'page.security.css').then(([Page, Node, Ajax, Translator, Notify]) =>
 	{
 		var page = new Page();
 		Object.assign(page, 

@@ -529,7 +529,7 @@ public class Monitoring
 		Monitor.Probe p = Monitor.probe("usage");
 		if( p == null ) return Data.map();
 		Data currentThreadInfo = Data.map();
-		try { currentThreadInfo = p.get(); } catch(Throwable t) { return Data.map(); }
+		try { currentThreadInfo = p.get(); } catch(Exception t) { return Data.map(); }
 		
 		Data lvl1 = Data.map();
 		for( long threadId : ids )
@@ -582,7 +582,7 @@ public class Monitoring
 		Monitor.Probe p = Monitor.probe("network");
 		if( p == null ) return Data.map();
 		Data currentNetworkInfo = Data.map();
-		try { currentNetworkInfo = p.get(); } catch(Throwable t) { return Data.map(); }
+		try { currentNetworkInfo = p.get(); } catch(Exception t) { return Data.map(); }
 		
 		Data network = Data.map();
 		

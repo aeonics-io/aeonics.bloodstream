@@ -854,7 +854,7 @@ public class Endpoints
 	
 	private static class token_ extends Endpoint.Rest.Type
 	{
-		public Data process(Data params, User.Type user, Message request) throws Throwable
+		public Data process(Data params, User.Type user, Message request) throws Exception
 		{
 			if( !request.metadata().asBool("tls") )
 				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
@@ -875,7 +875,7 @@ public class Endpoints
 		 * 4.1.3.  Access Token Request
 		 * with PKCE : https://www.rfc-editor.org/rfc/rfc7636#section-4.6
 		 */
-		public Data authorization_code(Data params, User.Type user, Message request) throws Throwable
+		public Data authorization_code(Data params, User.Type user, Message request) throws Exception
 		{
 			String code = params.asString("code");
 			String redirectUri = params.asString("redirect_uri");

@@ -8,6 +8,8 @@ var x = new Promise((ok, nok) =>
 		{
 			static post(url, options) { if( !options ) options = {}; options.method = 'POST'; return Ajax.fetch(url, options); }
 			static get(url, options) { if( !options ) options = {}; options.method = 'GET'; return Ajax.fetch(url, options); }
+			static put(url, options) { if( !options ) options = {}; options.method = 'PUT'; return Ajax.fetch(url, options); }
+			static delete(url, options) { if( !options ) options = {}; options.method = 'DELETE'; return Ajax.fetch(url, options); }
 			static fetch(url, options)
 			{
 				if( !url || !options ) throw new RangeError('Invalid url or options for Ajax request');

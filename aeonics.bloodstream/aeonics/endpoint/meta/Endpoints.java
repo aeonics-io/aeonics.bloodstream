@@ -290,7 +290,7 @@ public class Endpoints
 					.put("factory", factory)
 					;
 			}
-			catch(Throwable e) { throw new RuntimeException(e); }
+			catch(Exception e) { throw new RuntimeException(e); }
 		})
 		.url(ROOT + "overview")
 		.method("GET")

@@ -82,7 +82,7 @@ public class TOTP
 		return result;
 	}
 	
-	private static byte[] generateSecret() throws Throwable
+	private static byte[] generateSecret() throws Exception
 	{
 		byte[] hash = Manager.of(Security.class).randomHash().getBytes();
 		byte[] secret = new byte[6];
@@ -351,7 +351,7 @@ public class TOTP
 				Common.OTP.put(user.id(), info);
 				return true;
 			}
-			catch(Throwable e)
+			catch(Exception e)
 			{
 				Manager.of(Logger.class).warning(TOTP.class, e);
 				return false;

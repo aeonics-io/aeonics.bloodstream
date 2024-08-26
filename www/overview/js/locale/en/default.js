@@ -5,6 +5,7 @@ export default {
 	'yes': "Yes",
 	'no': "No",
 	'close': "Close",
+	'remove': "Remove",
 	'edit': "Edit",
 	'info': "Details",
 	'all': "View all",
@@ -25,6 +26,7 @@ export default {
 	'menu.statistics': "Statistics",
 	'menu.esg': "Carbon footprint",
 	'menu.security': "Security",
+	'menu.config': "Configuration",
 	
 	'info.technical': "Identification",
 	'info.template': "Entity type",
@@ -173,6 +175,20 @@ export default {
 		+ "depth of the implementation. Keeping this number low is important because it implies a smaller attack surface, as fewer active components are at risk of "
 		+ "exploitation during runtime. A lower number of entities usually imply limited exposure, improved resiliency, and reduced threat propagation which is important "
 		+ "in the scope of <em>NIST SP 800-207</em> or when approaching <em>ZTA</em> (Zero Trust Architecture).",
+	
+	'config.title': "Systemwide Configuration",
+	'config.snapshot.explain': "Systemwide configuration parameters are not specific to a particular entity instance. They apply globally "
+		+ "and all modules may react to changes in real time. "
+		+ "<br />However, changes <em>will not be persisted</em> after reboot unless you perform a system snapshot.<br /><br />",
+	'config.undocumented': "Undocumented",
+	'config.undocumented.explain': "Undocumented configuration parameters are usually imported from command line or environment parameters. "
+		+ "You may change or remove the value but it may not produce any effect.",
+	'config.remove.confirm': "Are you sure you want to completely remove parameter <em>{}</em> ?",
+	'config.remove.ok': "Parameter removed",
+	'config.remove.error': "Could not remove parameter",
+	'config.edit.ok': "Parameter modified",
+	'config.edit.error': "Could not modify parameter",
+	'config.info.none': "No definition for this parameter",
 	
 	'': ""
 };

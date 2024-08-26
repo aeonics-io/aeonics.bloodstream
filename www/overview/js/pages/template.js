@@ -35,6 +35,10 @@ var x = new Promise((ok, nok) =>
 						Node.li({className: location.hash == '#security' ? 'selected' : '', dataset: {link: 'security'}}, [
 							Node.span({className: 'icon'}, 'security'), 
 							Translator.get('menu.security')
+						]),
+						Node.li({className: location.hash == '#config' ? 'selected' : '', dataset: {link: 'config'}}, [
+							Node.span({className: 'icon'}, 'tune'), 
+							Translator.get('menu.config')
 						])
 					])),
 					container
