@@ -26,7 +26,7 @@ public class Endpoints
 		.template()
 		.summary("Returns the id of the local identity provider")
 		.description("This endpoint returns the id of the local identity provider.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -49,7 +49,7 @@ public class Endpoints
 			.description("The user login.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{

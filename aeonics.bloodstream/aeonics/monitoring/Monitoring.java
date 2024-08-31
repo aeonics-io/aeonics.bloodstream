@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import aeonics.Boot;
 import aeonics.data.Data;
+import aeonics.entity.Probe;
 import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.manager.Config;
@@ -55,40 +56,46 @@ public class Monitoring
 			
 			if( enabled.get() )
 			{
-				Monitor.addProbe("usage", () ->
-				{
-					List<Long> ids = Arrays.stream(mx.getAllThreadIds()).boxed().collect(Collectors.toList());
-					Data lvl1 = Data.map();
-					
-					for( long threadId : ids )
+				new Probe() {}
+					.template()
+					.summary("Usage")
+					.description("This probe returns the cpu, waiting and blocking times in nanoseconds for all threads in the system.")
+					.create()
+					.source(() ->
 					{
-						ThreadInfo info = mx.getThreadInfo(threadId);
-						if( info == null ) continue;
+						List<Long> ids = Arrays.stream(mx.getAllThreadIds()).boxed().collect(Collectors.toList());
+						Data lvl1 = Data.map();
 						
-						if( !lvl1.containsKey(""+threadId) )
-							lvl1.put(""+threadId, Data.map().put("name", info.getThreadName()));
-						Data lvl2 = lvl1.get(""+threadId);
-						
-						if( mx.isThreadCpuTimeSupported() && mx.isThreadCpuTimeEnabled() )
+						for( long threadId : ids )
 						{
-							lvl2.put("cpu_time", mx.getThreadCpuTime(threadId));
+							ThreadInfo info = mx.getThreadInfo(threadId);
+							if( info == null ) continue;
+							
+							if( !lvl1.containsKey(""+threadId) )
+								lvl1.put(""+threadId, Data.map().put("name", info.getThreadName()));
+							Data lvl2 = lvl1.get(""+threadId);
+							
+							if( mx.isThreadCpuTimeSupported() && mx.isThreadCpuTimeEnabled() )
+							{
+								lvl2.put("cpu_time", mx.getThreadCpuTime(threadId));
+							}
+							
+							if( mx.isThreadContentionMonitoringSupported() && mx.isThreadContentionMonitoringEnabled() )
+							{
+								lvl2.put("blocked_count", info.getBlockedCount());
+								lvl2.put("blocked_time", info.getBlockedTime() * 1_000_000);
+								lvl2.put("waited_count", info.getWaitedCount());
+								lvl2.put("waited_time", info.getWaitedTime() * 1_000_000);
+							}
 						}
 						
-						if( mx.isThreadContentionMonitoringSupported() && mx.isThreadContentionMonitoringEnabled() )
-						{
-							lvl2.put("blocked_count", info.getBlockedCount());
-							lvl2.put("blocked_time", info.getBlockedTime() * 1_000_000);
-							lvl2.put("waited_count", info.getWaitedCount());
-							lvl2.put("waited_time", info.getWaitedTime() * 1_000_000);
-						}
-					}
-					
-					return lvl1;
-				});
+						return lvl1;
+					})
+					.name("usage");
 			}
 			else
 			{
-				Monitor.removeProbe("usage");
+				Registry.of(Probe.class).remove("usage");
 			}
 		});
 		
@@ -526,10 +533,10 @@ public class Monitoring
 		group.enumerate(threads, true);
 		List<Long> ids = Arrays.stream(threads).mapToLong(t -> t.getId()).boxed().collect(Collectors.toList());
 		
-		Monitor.Probe p = Monitor.probe("usage");
+		Probe.Type p = Registry.of(Probe.class).get("usage");
 		if( p == null ) return Data.map();
 		Data currentThreadInfo = Data.map();
-		try { currentThreadInfo = p.get(); } catch(Exception t) { return Data.map(); }
+		try { currentThreadInfo = p.report(); } catch(Exception t) { return Data.map(); }
 		
 		Data lvl1 = Data.map();
 		for( long threadId : ids )
@@ -579,10 +586,10 @@ public class Monitoring
 	 */
 	private synchronized Data getNetworkUsage()
 	{
-		Monitor.Probe p = Monitor.probe("network");
+		Probe.Type p = Registry.of(Probe.class).get("network");
 		if( p == null ) return Data.map();
 		Data currentNetworkInfo = Data.map();
-		try { currentNetworkInfo = p.get(); } catch(Exception t) { return Data.map(); }
+		try { currentNetworkInfo = p.report(); } catch(Exception t) { return Data.map(); }
 		
 		Data network = Data.map();
 		

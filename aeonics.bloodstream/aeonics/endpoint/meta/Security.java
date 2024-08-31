@@ -24,7 +24,7 @@ public class Security
 		.template()
 		.summary("Retrieves current user's information.")
 		.description("This endpoint returns the identity of the authenticated user.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -41,7 +41,7 @@ public class Security
 		.template()
 		.summary("Logout and invalidate the current token.")
 		.description("This endpoint logs out the user by invalidating the current associated tokens.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
@@ -62,7 +62,7 @@ public class Security
 			.description("Usually the scope matches a user role. However, there might be other application-specific scopes applicable.")
 			.optional(true)
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.of("topic")))
+			.defaultValue("topic"))
 		.add(new Parameter("context")
 			.summary("Specific security context")
 			.description("The security context is a key-value pair of settings and parameters that are specific for each scope.")
@@ -70,7 +70,7 @@ public class Security
 			.rule(Parameter.Rule.JSON_MAP)
 			.format(Parameter.Format.JSON)
 			.defaultValue(Data.map()))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{

@@ -26,6 +26,7 @@ import aeonics.Boot;
 import aeonics.Plugin;
 import aeonics.data.Data;
 import aeonics.entity.Entity;
+import aeonics.entity.Probe;
 import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.http.Endpoint;
@@ -67,7 +68,7 @@ public class Endpoints
 			.description("The entity category.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -92,7 +93,7 @@ public class Endpoints
 		.template()
 		.summary("Lists registry categories")
 		.description("This endpoint returns the name of all registry categories.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -119,7 +120,7 @@ public class Endpoints
 			.description("The template entity type.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -145,7 +146,7 @@ public class Endpoints
 			.description("The template category.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -169,7 +170,7 @@ public class Endpoints
 		.template()
 		.summary("Lists factory categories")
 		.description("This endpoint returns the name of all factory categories.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -186,7 +187,7 @@ public class Endpoints
 		.template()
 		.summary("Lists plugins")
 		.description("This endpoint returns the name of all plugins and shared libraries.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -203,7 +204,7 @@ public class Endpoints
 		.template()
 		.summary("Lists managers")
 		.description("This endpoint returns the list of all registered managers.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -220,7 +221,7 @@ public class Endpoints
 		.template()
 		.summary("Lists system metrics")
 		.description("This endpoint returns various system and hardware metrics.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -244,20 +245,20 @@ public class Endpoints
 			.description("If defined, this parameter specifies which probe to include in the response. If not defined, then all probes are returned.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
 			if( !parameters.isEmpty("name") )
 			{
-				Monitor.Probe probe = Monitor.probe(parameters.asString("name"));
-				return probe == null ? Data.map() : Data.map().put(parameters.asString("name"), probe.get());
+				Probe.Type probe = Registry.of(Probe.class).get(parameters.asString("name"));
+				return probe == null ? Data.map() : Data.map().put(parameters.asString("name"), probe.report());
 			}
 			else
 			{
 				Data probes = Data.map();
-				for( Map.Entry<String, Monitor.Probe> p : Monitor.probes() )
-					probes.put(p.getKey(), p.getValue().get());
+				for( Probe.Type p : Registry.of(Probe.class) )
+					probes.put(p.name(), p.report());
 				return probes;
 			}
 		})
@@ -269,7 +270,7 @@ public class Endpoints
 		.template()
 		.summary("Full system overview")
 		.description("Returns a full system overview including the plugins, managers, registry and factory.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process(() ->
 		{
@@ -310,7 +311,7 @@ public class Endpoints
 			.description("The entity id.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -341,7 +342,7 @@ public class Endpoints
 			.description("The entity id.")
 			.format(Parameter.Format.TEXT)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -377,7 +378,7 @@ public class Endpoints
 			.rule(Parameter.Rule.JSON_MAP)
 			.format(Parameter.Format.JSON)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -393,7 +394,7 @@ public class Endpoints
 			if( t == null )
 				throw new HttpException(413, "Unknown entity template");
 			
-			Entity e = Registry.add(t.build(parameters.get("data")));
+			Entity e = t.create(parameters.get("data"));
 			return Data.map().put("id", e.id());
 		})
 		.url(ROOT + "entity/{category}/{type}")
@@ -419,7 +420,7 @@ public class Endpoints
 			.rule(Parameter.Rule.JSON_MAP)
 			.format(Parameter.Format.JSON)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -435,7 +436,7 @@ public class Endpoints
 			if( !parameters.isMap("data") )
 				throw new HttpException(413, "Input data must be a json object");
 			
-			Factory.of(e).modify(parameters.get("data"), e);
+			Factory.of(e).update(parameters.get("data"), e);
 			return null; 
 		})
 		.url(ROOT + "entity/{category}/{id}")
@@ -445,7 +446,7 @@ public class Endpoints
 		.template()
 		.summary("Find ghost entities")
 		.description("A ghost entity is an entity that is loosely referenced but that does not exist in the registry. This endpoint lists all entities that reference ghosts.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -497,7 +498,7 @@ public class Endpoints
 			.optional(true)
 			.format(Parameter.Format.NUMBER)
 			)
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -529,7 +530,7 @@ public class Endpoints
 		.template()
 		.summary("Fetch monitoring data")
 		.description("This endpoint returns all available monitoring data for the last completed time frame.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
@@ -542,7 +543,7 @@ public class Endpoints
 		.template()
 		.summary("Provides system integrity information")
 		.description("This endpoint returns information about all plugins in the system.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{

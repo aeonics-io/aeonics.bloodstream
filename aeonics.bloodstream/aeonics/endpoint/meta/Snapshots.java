@@ -29,8 +29,8 @@ public class Snapshots
 			.rule(Parameter.Rule.ALPHANUM)
 			.max(30)
 			.optional(true)
-			.defaultValue(Data.of("")))
-		.build()
+			.defaultValue(""))
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -46,7 +46,7 @@ public class Snapshots
 		.template()
 		.summary("Latest snapshot")
 		.description("This endpoint returns the name of the latest snapshot.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -61,7 +61,7 @@ public class Snapshots
 		.template()
 		.summary("List snapshots")
 		.description("This endpoint returns the list of all snapshots.")
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -80,7 +80,7 @@ public class Snapshots
 			.description("The snapshot name.")
 			.format(Parameter.Format.TEXT)
 			.optional(false))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -100,7 +100,7 @@ public class Snapshots
 			.description("The snapshot name.")
 			.format(Parameter.Format.TEXT)
 			.optional(false))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{

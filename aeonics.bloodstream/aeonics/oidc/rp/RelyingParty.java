@@ -4,7 +4,6 @@ import java.util.function.Supplier;
 
 import aeonics.data.Data;
 import aeonics.entity.Entity;
-import aeonics.entity.Registry;
 import aeonics.entity.security.Group;
 import aeonics.entity.security.Role;
 import aeonics.entity.security.User;
@@ -39,9 +38,9 @@ public class RelyingParty extends Item<RelyingParty.Type>
 		}
 
 		@Override
-		public Data export()
+		public Data snapshot()
 		{
-			return super.export()
+			return super.snapshot()
 				.put("__secret", clientSecret());
 		}
 	}
@@ -66,13 +65,13 @@ public class RelyingParty extends Item<RelyingParty.Type>
 				.description("Allow this client to use the OAuth2 Password Grant flow.")
 				.format(Parameter.Format.BOOLEAN)
 				.rule(Parameter.Rule.BOOLEAN)
-				.defaultValue(Data.of(false)))
+				.defaultValue(false))
 			.add(new Parameter("allow_client_credentials_grant")
 				.summary("Allow Client Credentials Grant")
 				.description("Allow this client to use the OAuth2 Client Credentials Grant flow and authenticate as an app.")
 				.format(Parameter.Format.BOOLEAN)
 				.rule(Parameter.Rule.BOOLEAN)
-				.defaultValue(Data.of(false)))
+				.defaultValue(false))
 			.add(new Relationship("user")
 				.category(User.class)
 				.summary("App User")
@@ -86,14 +85,10 @@ public class RelyingParty extends Item<RelyingParty.Type>
 				.category(Group.class)
 				.summary("Group")
 				.description("The list of security user groups allowed to use this client. If a user is not member of one of these groups, then login will be denied."))
-			.builder((data, instance) -> 
+			.onCreate((data, instance) -> 
 			{
-				if( instance instanceof RelyingParty.Type )
-				{
-					if( data.containsKey("__secret") ) ((RelyingParty.Type)instance).secret = data.asString("__secret");
-					else ((RelyingParty.Type)instance).secret = Manager.of(Security.class).randomHash();
-				}
-				Registry.add(instance);
+				if( data.containsKey("__secret") ) ((RelyingParty.Type)instance).secret = data.asString("__secret");
+				else ((RelyingParty.Type)instance).secret = Manager.of(Security.class).randomHash();
 			});
 	}
 }

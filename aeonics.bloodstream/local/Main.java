@@ -12,6 +12,7 @@ import java.util.Base64;
 
 import aeonics.Plugin;
 import aeonics.data.Data;
+import aeonics.entity.Probe;
 import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
@@ -69,24 +70,24 @@ public class Main extends Plugin
 			.description("The OTP time window in seconds.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(30)));
+			.defaultValue(30));
 		c.declare(Security.class, new Parameter("otp.digits")
 			.summary("OTP number of digits")
 			.description("The number of OTP code digits.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(6)));
+			.defaultValue(6));
 		c.declare(Security.class, new Parameter("otp.algorithm")
 			.summary("OTP algorithm")
 			.description("The name of the hash algorithm to use in OTP.")
 			.values("SHA1")
 			.format(Parameter.Format.SELECT)
-			.defaultValue(Data.of("SHA1")));
+			.defaultValue("SHA1"));
 		c.declare(Security.class, new Parameter("otp.issuer")
 			.summary("OTP issuer name")
 			.description("The name of the OTP issuer to be displayed by MFA apps.")
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.of("Aeonics Bloodstream Enterprise Suite")));
+			.defaultValue("Aeonics Bloodstream Enterprise Suite"));
 		c.declare(Security.class, new Parameter("otp.initialized")
 			.summary("Default OTP has been initialized")
 			.description("This parameter defines if the default MFA has already been initialized (true) or if it should done when starting the run phase (false)."
@@ -94,7 +95,7 @@ public class Main extends Plugin
 			.format(Parameter.Format.BOOLEAN)
 			.rule(Parameter.Rule.BOOLEAN)
 			.optional(true)
-			.defaultValue(Data.of(false)));
+			.defaultValue(false));
 		
 		// ===========================
 		// OP stuff
@@ -104,37 +105,37 @@ public class Main extends Plugin
 			.description("The url of this OIDC OP instance.")
 			.rule(Parameter.Rule.URL)
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.of("https://localhost")));
+			.defaultValue("https://localhost"));
 		c.declare(Security.class, new Parameter("oidc.op.access_token.ttl")
 			.summary("OIDC OP access token validity")
 			.description("The validity period in seconds for access tokens issued by this OIDC OP.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(86400)));
+			.defaultValue(86400));
 		c.declare(Security.class, new Parameter("oidc.op.id_token.ttl")
 			.summary("OIDC OP id token validity")
 			.description("The validity period in seconds for id tokens issued by this OIDC OP.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(300)));
+			.defaultValue(300));
 		c.declare(Security.class, new Parameter("oidc.op.refresh_token.ttl")
 			.summary("OIDC OP refresh token validity")
 			.description("The validity period in seconds for refresh tokens issued by this OIDC OP.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(2592000)));
+			.defaultValue(2592000));
 		c.declare(Security.class, new Parameter("oidc.op.auth_code.ttl")
 			.summary("OIDC OP authentication code validity")
 			.description("The validity period in seconds for the authentication code in this OIDC OP. This means that the user must complete authentication within this time window.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(180)));
+			.defaultValue(180));
 		c.declare(Security.class, new Parameter("oidc.op.auth_code.max")
 			.summary("OIDC OP maximum concurrent authentication flows")
 			.description("The maximum number of concurrent authentication flows in this OIDC OP. This limit is set to avoid spam.")
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER)
-			.defaultValue(Data.of(5000)));
+			.defaultValue(5000));
 		c.declare(Security.class, new Parameter("oidc.op.jwt.public")
 			.summary("OIDC OP JWT public key")
 			.description("The public key used by this OIDC OP to verify the JWT signature. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
@@ -152,24 +153,50 @@ public class Main extends Plugin
 			.defaultValue(Data.empty()));
 		c.declare(Security.class, new Parameter("local.provider")
 			.summary("Local OIDC identity provider")
-			.description("The ID of the local OIDC OP. This paramater is set automatically by the system on startup and should not be changed.")
+			.description("The ID of the local OIDC OP. This parameter is set automatically by the system on startup and should not be changed.")
 			.format(Parameter.Format.TEXT)
 			.rule(Parameter.Rule.ID)
 			.optional(false));
 		
-		Monitor.addProbe("registry", () ->
-		{
-			int categories = 0;
-			int entities = 0;
-			
-			for( Registry<?> r : Registry.all() )
+		new Probe() {}
+			.template()
+			.summary("Registry")
+			.description("This probe returns the current number of registry categories and total number of entities.")
+			.create()
+			.source(() ->
 			{
-				categories++;
-				entities += r.size();
-			}
+				int categories = 0;
+				int entities = 0;
 				
-			return Data.map().put("categories", categories).put("entities", entities);
-		});
+				for( Registry<?> r : Registry.all() )
+				{
+					categories++;
+					entities += r.size();
+				}
+					
+				return Data.map().put("categories", categories).put("entities", entities);
+			})
+			.name("registry");
+			
+		new Probe() {}
+			.template()
+			.summary("Factory")
+			.description("This probe returns the current number of factory categories and total number of templates.")
+			.create()
+			.source(() ->
+			{
+				int categories = 0;
+				int templates = 0;
+				
+				for( Factory<?> f : Factory.all() )
+				{
+					categories++;
+					templates += f.size();
+				}
+					
+				return Data.map().put("categories", categories).put("entities", templates);
+			})
+			.name("factory");
 	}
 	
 	private static void onRun()
@@ -227,18 +254,18 @@ public class Main extends Plugin
 		if( !c.get(Security.class, "otp.initialized").asBool() )
 		{
 			// restrict access to /api/meta
-			Policy.Type policy = new Policy.Deny().template().build(Data.map().put("scope", "http"));
+			Policy.Type policy = new Policy.Deny().template().create(Data.map().put("scope", "http"));
 			policy.name("Deny /api/meta to non administrators");
-			policy.addRelation("rule", new Rule.And().template().build()
-				.addRelation("rules", new Rule.MatchContext().template().build(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
-				.addRelation("rules", new Rule.Not().template().build().addRelation("rule", new Rule.Role().template().build(Data.map().put("role", "Administrator")))));
+			policy.addRelation("rule", new Rule.And().template().create()
+				.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
+				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("role", "Administrator")))));
 			
 			// set and save the monitoring storage
-			Storage.Type monitor = new Storage.File().template().build(Data.map().put("root", "stats")).name("Monitor statistics");
+			Storage.Type monitor = new Storage.File().template().create(Data.map().put("root", "stats")).name("Monitor statistics");
 			c.set(Monitor.class, "storage", Data.of(monitor.id()));
 			
 			// set and save the security storage
-			Storage.Type securityStorage = new Storage.File().template().build(Data.map().put("root", "security")).name("Security storage");
+			Storage.Type securityStorage = new Storage.File().template().create(Data.map().put("root", "security")).name("Security storage");
 			c.set(Security.class, "oidc.op.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "otp.initialized", Data.of(true));
@@ -262,13 +289,13 @@ public class Main extends Plugin
 	private static void afterRun()
 	{
 		// default oidc client and rp
-		RelyingParty.Type rp = new RelyingParty().template().build(Data.map()
+		RelyingParty.Type rp = new RelyingParty().template().create(Data.map()
 			.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
 			.addRelation("groups", "Administrators")
 			.name("Local Provider")
 			.internal(true)
 			.<RelyingParty.Type>cast();
-		OidcProvider.Type provider = new OidcProvider().template().build(Data.map()
+		OidcProvider.Type provider = new OidcProvider().template().create(Data.map()
 			.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
 			.put("client_id", rp.clientId())
 			.put("client_secret", rp.clientSecret()))

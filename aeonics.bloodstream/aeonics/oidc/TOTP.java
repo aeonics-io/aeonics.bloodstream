@@ -102,7 +102,7 @@ public class TOTP
 			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to enroll the user with TOTP.")
 			.optional(true)
 			.format(Parameter.Format.TEXT))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
@@ -192,7 +192,7 @@ public class TOTP
 			.optional(false)
 			.rule(Parameter.Rule.DIGIT)
 			.format(Parameter.Format.NUMBER))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
@@ -248,7 +248,7 @@ public class TOTP
 			.description("The OTP is required to be able to opt out of OTP as a proof of ownership.")
 			.optional(false)
 			.format(Parameter.Format.TEXT))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{
@@ -276,7 +276,7 @@ public class TOTP
 			.description("Instead of providing a direct authentication, this endpoint can be called with a temporary authentication code to check if the target user has enrolled with TOTP.")
 			.optional(true)
 			.format(Parameter.Format.TEXT))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->
 		{

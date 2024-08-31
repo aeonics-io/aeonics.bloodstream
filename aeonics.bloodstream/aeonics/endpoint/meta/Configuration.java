@@ -29,7 +29,7 @@ public class Configuration
 			.format(Parameter.Format.TEXT)
 			.optional(true)
 			.defaultValue(Data.empty()))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -73,7 +73,7 @@ public class Configuration
 			.description("The configuration parameter name.")
 			.format(Parameter.Format.TEXT)
 			.optional(false))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -97,7 +97,7 @@ public class Configuration
 			.description("The configuration parameter name.")
 			.format(Parameter.Format.TEXT)
 			.optional(false))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -130,7 +130,7 @@ public class Configuration
 			.format(Parameter.Format.TEXT)
 			.optional(true)
 			.defaultValue(Data.empty()))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
@@ -155,7 +155,7 @@ public class Configuration
 			.description("The configuration parameter name.")
 			.format(Parameter.Format.TEXT)
 			.optional(false))
-		.build()
+		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
