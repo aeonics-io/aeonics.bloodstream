@@ -175,9 +175,9 @@ var x = new Promise((ok, nok) =>
 								Node.span({className: 'title'}, Translator.get('info.entity.type')),
 								Node.span({className: 'value'}, ae.safeHtml(entity.__type)),
 								Node.span({className: 'icon ref', 
-									dataset: {subtype: entity.__type}, 
+									dataset: {subtype: entity.__type, category: entity.__category}, 
 									title: Translator.get('all'), 
-									click: function() { self.listSubtype(this.dataset.subtype); }}, 'more')
+									click: function() { self.listSubtype(this.dataset.category, this.dataset.subtype); }}, 'more')
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.class')),
@@ -468,7 +468,7 @@ var x = new Promise((ok, nok) =>
 					p.classList.add('open');
 				},
 				
-				listSubtype: function(type)
+				listSubtype: function(category, type)
 				{
 					var self = this;
 					
@@ -503,7 +503,7 @@ var x = new Promise((ok, nok) =>
 							Node.span({className: 'icon'}, 'search')
 						]),
 						Node.ul(this.data.nodes
-							.filter((n) => n.type == 'e' && n.subtype == type)
+							.filter((n) => n.type == 'e' && n.category == category && n.subtype == type)
 							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
 							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
 						)
@@ -531,7 +531,7 @@ var x = new Promise((ok, nok) =>
 						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, ae.safeHtml(t)),
 						Node.div(Node.div({className: 'detail'}, Node.ul(
 							this.data.nodes
-								.filter((n) => n.type == 'e' && n.subtype == t)
+								.filter((n) => n.type == 'e' && n.category == category && n.subtype == t)
 								.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
 								.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
 						)))

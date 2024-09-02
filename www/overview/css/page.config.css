@@ -31,7 +31,7 @@ section.config section .detail p, .configInfo p { padding: 0.5rem; display: flex
 section.config section .detail p:hover { background-color: #ffffff10; }
 section.config section .detail .title, .configInfo .title,
 section.config section .detail .value, .configInfo .value,
-section.config section .detail .text, .configInfo .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+section.config section .detail .text, .configInfo .text { display: inline-block; font-size: 0.8rem; vertical-align: top; word-break: break-all; }
 section.config section .detail .title, .configInfo .title { width: 30%; min-width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
 section.config section .detail .text, .configInfo .text { color: var(--orange); flex: 1; }
 section.config section .detail .value, .configInfo .value { color: var(--blue); font-family: monospace; flex: 1; }

@@ -601,7 +601,7 @@ public class Endpoints
 				if( data.containsKey("signin_token") )
 					info.put("signin_token", data.get("signin_token"));
 				if( data.containsKey("user") )
-					info.put("user_id", user.id()).put("user_name", user.name());
+					info.put("user_id", user.id()).put("user_name", user.name()).put("user_login", user.login());
 			}
 			
 			return info;

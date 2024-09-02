@@ -156,7 +156,8 @@ public class OidcProvider extends Provider
 		
 		public boolean supports(String user)
 		{
-			User.Type u = Registry.of(User.class).get(user);
+			if( user == null ) return false;
+			User.Type u = Registry.of(User.class).get((x) -> user.equals(x.login()));
 			if( u == null ) return false;
 			Data match = privateData(u);
 			return match != null && match.isList("sub") && match.size() > 0;
@@ -171,7 +172,8 @@ public class OidcProvider extends Provider
 			Data data = Manager.of(Vault.class).get(Manager.of(Security.class).hash(id() + "." + sub), this);
 			if( data == null || data.isEmpty() ) return null;
 			
-			return Registry.of(User.class).get(data.asString("user"));
+			// caution, we auth based on the user ID, not the login. See #join()
+			return Registry.of(User.class).get((u) -> data.asString("user").equals(u.id()));
 		}
 		
 		public synchronized User.Type join(Data context, User.Type existing)
@@ -185,7 +187,7 @@ public class OidcProvider extends Provider
 			// check for clash
 			if( existing == null )
 			{
-				User.Type user = Registry.of(User.class).get(name);
+				User.Type user = Registry.of(User.class).get((u) -> name.equals(u.login()));
 				if( user != null ) existing = user;
 			}
 			
@@ -208,7 +210,7 @@ public class OidcProvider extends Provider
 			else
 			{
 				// create user
-				existing = Factory.of(User.class).get(User.class).create().name(name);
+				existing = Factory.of(User.class).get(User.class).create(Data.map().put("login", name).put("active", true)).name(name);
 				// bind him
 				privateData(existing, Data.map().put("sub", Data.list().add(sub)));
 				// reverse bind

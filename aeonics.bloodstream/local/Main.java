@@ -270,6 +270,8 @@ public class Main extends Plugin
 			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "otp.initialized", Data.of(true));
 		}
+		else
+			initialized = true;
 		
 		aeonics.endpoint.meta.Configuration.register();
 		aeonics.endpoint.meta.Endpoints.register();
@@ -285,29 +287,37 @@ public class Main extends Plugin
 	}
 	
 	private static Monitoring m;
+	private static boolean initialized = false;
 	
 	private static void afterRun()
 	{
-		// default oidc client and rp
-		RelyingParty.Type rp = new RelyingParty().template().create(Data.map()
-			.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
-			.addRelation("groups", "Administrators")
-			.name("Local Provider")
-			.internal(true)
-			.<RelyingParty.Type>cast();
-		OidcProvider.Type provider = new OidcProvider().template().create(Data.map()
-			.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
-			.put("client_id", rp.clientId())
-			.put("client_secret", rp.clientSecret()))
-			.name("Local Authentication")
-			.internal(true)
-			.<OidcProvider.Type>cast();
-		provider.join(Data.map()
-			.put("iss", provider.issuer())
-			.put("sub", "admin")
-			.put("aud", provider.id())
-			.put("exp", System.currentTimeMillis()/1000 + 3600),
-			Registry.of(User.class).get("admin"));
-		Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
+		if( !initialized )
+		{
+			// default oidc client and rp
+			RelyingParty.Type rp = new RelyingParty().template().create(Data.map()
+				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
+				.addRelation("groups", "Administrators")
+				.name("Local Provider")
+				.<RelyingParty.Type>cast();
+			OidcProvider.Type provider = new OidcProvider().template().create(Data.map()
+				.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
+				.put("client_id", rp.clientId())
+				.put("client_secret", rp.clientSecret()))
+				.name("Local Authentication")
+				.<OidcProvider.Type>cast();
+			Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
+			
+			// join the admin to the OIDC provider
+			User.Type admin = Registry.of(User.class).get((u) -> "admin".equals(u.login()));
+			if( admin != null )
+			{
+				provider.join(Data.map()
+					.put("iss", provider.issuer())
+					.put("sub", admin.id())
+					.put("aud", provider.id())
+					.put("exp", System.currentTimeMillis()/1000 + 3600),
+					admin);
+			}
+		}
 	}
 }

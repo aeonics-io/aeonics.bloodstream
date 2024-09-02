@@ -86,7 +86,7 @@ public class Endpoints
 				Provider.Type p = Registry.of(Provider.class).get(provider);
 				if( !(p instanceof OidcProvider.Type) ) return redirectError("invalid_state", "Incompatible security provider");
 				
-				if( Common.Code.count() > Manager.of(Config.class).get(Security.class, "oidc.op.auth_code.max").asInt() ) return redirectError("server_error", "Too many pending requests (" + Common.Code.count() + ")");
+				if( Common.Code.count() > Manager.of(Config.class).get(Security.class, "oidc.op.auth_code.max").asInt() )return redirectError("server_error", "Too many pending requests (" + Common.Code.count() + ")");
 				
 				String state = "ae-" + Manager.of(Security.class).randomHash();
 				Data relayState = Data.map()
