@@ -233,8 +233,8 @@ public class Main extends Plugin
 	            KeyPair pair = keyGen.generateKeyPair();
 	            
 	            // set the config -> re-trigger the watch
-	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.public", Data.of(new String(Base64.getEncoder().encode(pair.getPublic().getEncoded()))));
-	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.private", Data.of(new String(Base64.getEncoder().encode(pair.getPrivate().getEncoded()))));
+	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.public", new String(Base64.getEncoder().encode(pair.getPublic().getEncoded())));
+	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.private", new String(Base64.getEncoder().encode(pair.getPrivate().getEncoded())));
 			}
 			else
 			{
@@ -305,7 +305,7 @@ public class Main extends Plugin
 				.put("client_secret", rp.clientSecret()))
 				.name("Local Authentication")
 				.<OidcProvider.Type>cast();
-			Manager.of(Config.class).set(Security.class, "local.provider", Data.of(provider.id()));
+			Manager.of(Config.class).set(Security.class, "local.provider", provider.id());
 			
 			// join the admin to the OIDC provider
 			User.Type admin = Registry.of(User.class).get((u) -> "admin".equals(u.login()));
