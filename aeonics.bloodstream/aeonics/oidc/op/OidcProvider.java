@@ -210,7 +210,7 @@ public class OidcProvider extends Provider
 			else
 			{
 				// create user
-				existing = Factory.of(User.class).get(User.class).create(Data.map().put("login", name).put("active", true)).name(name);
+				existing = Factory.of(User.class).get(User.class).create(Data.map().put("parameters", Data.map().put("login", name).put("active", true))).name(name);
 				// bind him
 				privateData(existing, Data.map().put("sub", Data.list().add(sub)));
 				// reverse bind

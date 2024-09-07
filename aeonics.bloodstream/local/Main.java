@@ -31,7 +31,6 @@ import aeonics.oidc.op.OidcProvider;
 import aeonics.oidc.rp.RelyingParty;
 import aeonics.template.Factory;
 import aeonics.template.Parameter;
-import aeonics.util.Callback;
 
 public class Main extends Plugin
 {
@@ -40,19 +39,19 @@ public class Main extends Plugin
 	
 	public void start()
 	{
-		Lifecycle.on(Phase.LOAD, Callback.once(() -> onLoad()));
-		Lifecycle.on(Phase.CONFIG, Callback.once(() -> onConfig()));
-		Lifecycle.on(Phase.RUN, Callback.once(() -> onRun()));
-		Lifecycle.after(Phase.RUN, Callback.once(() -> afterRun()));
+		Lifecycle.on(Phase.LOAD, this::onLoad);
+		Lifecycle.on(Phase.CONFIG, this::onConfig);
+		Lifecycle.on(Phase.RUN, this::onRun);
+		Lifecycle.after(Phase.RUN, this::afterRun);
 	}
 	
-	private static void onLoad()
+	private void onLoad()
 	{
 		Factory.add(new OidcProvider());
 		Factory.add(new RelyingParty());
 	}
 	
-	private static void onConfig()
+	private void onConfig()
 	{
 		Config c = Manager.of(Config.class);
 		
@@ -199,7 +198,7 @@ public class Main extends Plugin
 			.name("factory");
 	}
 	
-	private static void onRun()
+	private void onRun()
 	{
 		// bind the config
 		Config c = Manager.of(Config.class);
@@ -254,18 +253,18 @@ public class Main extends Plugin
 		if( !c.get(Security.class, "otp.initialized").asBool() )
 		{
 			// restrict access to /api/meta
-			Policy.Type policy = new Policy.Deny().template().create(Data.map().put("scope", "http"));
+			Policy.Type policy = new Policy.Deny().template().create(Data.map().put("parameters", Data.map().put("scope", "http")));
 			policy.name("Deny /api/meta to non administrators");
 			policy.addRelation("rule", new Rule.And().template().create()
-				.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true)))
-				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("role", "Administrator")))));
+				.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("parameters", Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true))))
+				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("parameters", Data.map().put("role", "Administrator"))))));
 			
 			// set and save the monitoring storage
-			Storage.Type monitor = new Storage.File().template().create(Data.map().put("root", "stats")).name("Monitor statistics");
+			Storage.Type monitor = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", "stats"))).name("Monitor statistics");
 			c.set(Monitor.class, "storage", Data.of(monitor.id()));
 			
 			// set and save the security storage
-			Storage.Type securityStorage = new Storage.File().template().create(Data.map().put("root", "security")).name("Security storage");
+			Storage.Type securityStorage = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", "security"))).name("Security storage");
 			c.set(Security.class, "oidc.op.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "otp.initialized", Data.of(true));
@@ -286,23 +285,23 @@ public class Main extends Plugin
 		m.setup();
 	}
 	
-	private static Monitoring m;
-	private static boolean initialized = false;
+	private Monitoring m;
+	private boolean initialized = false;
 	
-	private static void afterRun()
+	private void afterRun()
 	{
 		if( !initialized )
 		{
 			// default oidc client and rp
-			RelyingParty.Type rp = new RelyingParty().template().create(Data.map()
-				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response"))
+			RelyingParty.Type rp = new RelyingParty().template().create(Data.map().put("parameters", Data.map()
+				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response")))
 				.addRelation("groups", "Administrators")
 				.name("Local Provider")
 				.<RelyingParty.Type>cast();
-			OidcProvider.Type provider = new OidcProvider().template().create(Data.map()
+			OidcProvider.Type provider = new OidcProvider().template().create(Data.map().put("parameters", Data.map()
 				.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
 				.put("client_id", rp.clientId())
-				.put("client_secret", rp.clientSecret()))
+				.put("client_secret", rp.clientSecret())))
 				.name("Local Authentication")
 				.<OidcProvider.Type>cast();
 			Manager.of(Config.class).set(Security.class, "local.provider", provider.id());

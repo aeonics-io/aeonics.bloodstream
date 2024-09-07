@@ -41,7 +41,7 @@ public class RelyingParty extends Item<RelyingParty.Type>
 		public Data snapshot()
 		{
 			return super.snapshot()
-				.put("__secret", clientSecret());
+				.put("secret", clientSecret());
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class RelyingParty extends Item<RelyingParty.Type>
 				.description("The list of security user groups allowed to use this client. If a user is not member of one of these groups, then login will be denied."))
 			.onCreate((data, instance) -> 
 			{
-				if( data.containsKey("__secret") ) ((RelyingParty.Type)instance).secret = data.asString("__secret");
+				if( data.containsKey("secret") ) ((RelyingParty.Type)instance).secret = data.asString("secret");
 				else ((RelyingParty.Type)instance).secret = Manager.of(Security.class).randomHash();
 			});
 	}
