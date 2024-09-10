@@ -247,7 +247,7 @@ var x = new Promise((ok, nok) =>
 					
 					self.setGauge('esg_hourly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
-					var time_ratio = Math.round(Object.keys(result.response).length / 360 * 100);
+					var time_ratio = Math.round(uptime_sec / 3600 * 100);
 					self.setGauge('esg_hourly2_svg', time_ratio, time_ratio + '%');
 					
 					cpu.lastChild.lastChild.textContent = self.getWeightWithUnits(cpu_gco2e) + ' CO2e';
@@ -334,8 +334,8 @@ var x = new Promise((ok, nok) =>
 					var lifecycle_co2e = (max_gco2e / parseFloat(document.getElementById('esg_i_pue').value) * (1-lr)) + (network_co2e * net * 0.013);
 					
 					self.setGauge('esg_daily_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
-					
-					var time_ratio = Math.round(Object.keys(result.response).length / (360*24) * 100);
+
+					var time_ratio = Math.round(uptime_sec / (3600*24) * 100);
 					self.setGauge('esg_daily2_svg', time_ratio, time_ratio + '%');
 					
 					cpu.lastChild.lastChild.textContent = self.getWeightWithUnits(cpu_gco2e) + ' CO2e';
@@ -464,7 +464,7 @@ var x = new Promise((ok, nok) =>
 					uptime_sec *= 10; // monitoring is taken in 10s interval
 					
 					// we should add the current day data
-					uptime_sec = 31536000;//+= self._daily[0];
+					uptime_sec += self._daily[0];
 					cpu_time += self._daily[1];
 					network_bytes += self._daily[2];
 					
@@ -476,7 +476,7 @@ var x = new Promise((ok, nok) =>
 					
 					self.setGauge('esg_monthly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
-					var time_ratio = Math.round(Object.keys(result.response).length / (360*24*number_of_days_in_month) * 100);
+					var time_ratio = Math.round(uptime_sec / (3600*24*number_of_days_in_month) * 100);
 					self.setGauge('esg_monthly2_svg', time_ratio, time_ratio + '%');
 					
 					cpu_m.lastChild.lastChild.textContent = self.getWeightWithUnits(cpu_gco2e) + ' CO2e';
@@ -511,7 +511,7 @@ var x = new Promise((ok, nok) =>
 					
 					self.setGauge('esg_yearly_svg', ratio, self.getWeightWithUnits(min_gco2e + cpu_gco2e + lifecycle_co2e + network_co2e));
 					
-					time_ratio = Math.round(Object.keys(result.response).length / (360*24*number_of_days_in_year) * 100);
+					time_ratio = Math.round(uptime_sec / (3600*24*number_of_days_in_year) * 100);
 					self.setGauge('esg_yearly2_svg', time_ratio, time_ratio + '%');
 					
 					cpu_y.lastChild.lastChild.textContent = self.getWeightWithUnits(cpu_gco2e) + ' CO2e';

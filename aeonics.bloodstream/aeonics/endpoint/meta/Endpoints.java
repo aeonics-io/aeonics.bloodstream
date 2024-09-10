@@ -74,15 +74,7 @@ public class Endpoints
 		{
 			Data list = Data.list();
 			for( Entity e : Registry.of(parameters.asString("category")) )
-			{
-				Data related = Data.list();
-				for( String relation : e.relationships() )
-					for( Tuple<Entity, Data> t : e.relations(relation) )
-						if( t.a != null )
-							related.add(t.a.id());
-				
-				list.add(Data.map().put("id", e.id()).put("name", e.name()).put("type", e.type()).put("relations", related));
-			}
+				list.add(e.export());
 			return list;
 		})
 		.url(ROOT + "registry/{category}/entities")
@@ -152,14 +144,7 @@ public class Endpoints
 		{
 			Data list = Data.list();
 			for( Template<?> t : Factory.of(parameters.asString("category")) )
-			{
-				list.add(Data.map()
-					.put("type", StringUtils.toLowerCase(t.type()))
-					.put("target", StringUtils.toLowerCase(t.target()))
-					.put("name", t.name())
-					.put("plugin", t.type().getModule().getName())
-					);
-			}
+				list.add(t.export());
 			return list;
 		})
 		.url(ROOT + "factory/{category}/templates")

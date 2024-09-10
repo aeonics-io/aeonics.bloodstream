@@ -7,6 +7,7 @@ class Node
 	static h1(a, c) { 		return Node.create('h1', a, c); }
 	static h2(a, c) { 		return Node.create('h2', a, c); }
 	static h3(a, c) { 		return Node.create('h3', a, c); }
+	static h4(a, c) { 		return Node.create('h4', a, c); }
 	static main(a, c) { 	return Node.create('main', a, c); }
 	static header(a, c) { 	return Node.create('header', a, c); }
 	static footer(a, c) { 	return Node.create('footer', a, c); }

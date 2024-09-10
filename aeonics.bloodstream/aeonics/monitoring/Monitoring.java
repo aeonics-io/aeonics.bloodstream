@@ -166,7 +166,7 @@ public class Monitoring
 		try
 		{
 			Data data = Data.map().put("threads", getThreadCPU()).put("network", getNetworkUsage());
-			time = time.minusSeconds(1);
+			time = time.minusSeconds(5);
 			cleanupIfNeeded(time);
 			
 			Storage.Type s = storage();
@@ -198,7 +198,7 @@ public class Monitoring
 		{
 			for( int second = 0; second < 6; second++ )
 			{
-				String key = "m" + minute + "s" + second + "0";
+				String key = "m" + leadingZeroes(minute) + "s" + second + "0";
 				Data data = hour.get(key);
 				if( data == null || data.isEmpty() ) continue;
 				

@@ -129,7 +129,7 @@ var x = new Promise((ok, nok) =>
 							while( i.firstChild ) i.lastChild.remove();
 							
 							i.append(
-								Node.h1(ae.safeHtml(entity.__name||'-no name-')),
+								Node.h1(ae.safeHtml(entity.name||'-no name-')),
 								self.getEntityInfo(entity),
 								self.getTemplateInfo(template)
 							);
@@ -161,31 +161,31 @@ var x = new Promise((ok, nok) =>
 						Node.div(Node.div({className: 'detail'}, [
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.id')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.__id))
+								Node.span({className: 'value'}, ae.safeHtml(entity.id))
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.category')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.__category)),
+								Node.span({className: 'value'}, ae.safeHtml(entity.category)),
 								Node.span({className: 'icon ref', 
-									dataset: {id: 'registry:'+entity.__category}, 
+									dataset: {id: 'registry:'+entity.category}, 
 									title: Translator.get('all'), 
 									click: function() { self.nodeClick(this.dataset.id); }}, 'more')
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.type')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.__type)),
+								Node.span({className: 'value'}, ae.safeHtml(entity.type)),
 								Node.span({className: 'icon ref', 
-									dataset: {subtype: entity.__type, category: entity.__category}, 
+									dataset: {subtype: entity.type, category: entity.category}, 
 									title: Translator.get('all'), 
 									click: function() { self.listSubtype(this.dataset.category, this.dataset.subtype); }}, 'more')
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.class')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.__class))
+								Node.span({className: 'value'}, ae.safeHtml(entity.class))
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.internal')),
-								Node.span({className: 'value'}, Translator.get(entity.__internal ? 'yes': 'no'))
+								Node.span({className: 'value'}, Translator.get(entity.internal ? 'yes': 'no'))
 							])
 						]))
 					]);
@@ -219,7 +219,7 @@ var x = new Promise((ok, nok) =>
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.template.type_plugin')),
-								Node.span({className: 'value'}, ae.safeHtml(template.__type_plugin))
+								Node.span({className: 'value'}, ae.safeHtml(template.type_plugin))
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.template.target')),
@@ -227,15 +227,15 @@ var x = new Promise((ok, nok) =>
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.template.target_plugin')),
-								Node.span({className: 'value'}, ae.safeHtml(template.__target_plugin))
+								Node.span({className: 'value'}, ae.safeHtml(template.target_plugin))
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.template.class')),
-								Node.span({className: 'value'}, ae.safeHtml(template.__class))
+								Node.span({className: 'value'}, ae.safeHtml(template.class))
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.template.template_plugin')),
-								Node.span({className: 'value'}, ae.safeHtml(template.__plugin))
+								Node.span({className: 'value'}, ae.safeHtml(template.type_plugin))
 							])
 						]))
 					]);
@@ -299,7 +299,7 @@ var x = new Promise((ok, nok) =>
 					return Node.div([
 						Node.fieldset({dataset: {config: config}}, [
 							Node.label({htmlFor: '__' + param.name}, ae.safeHtml(param.name)),
-							Node.input({type: 'text', readOnly: true, value: entity[param.name]||'', id: '__' + param.name}),
+							Node.input({type: 'text', readOnly: true, value: entity.parameters[param.name]||'', id: '__' + param.name}),
 							/*
 								TODO : edit parameter/config value
 								Node.span({className: 'icon edit', title: Translator.get('edit')}, 'edit'),
@@ -356,7 +356,7 @@ var x = new Promise((ok, nok) =>
 					var self = this;
 					
 					var content = this.data.links
-						.filter((l) => l.target.id == entity.__id && l.source.type == 'e')
+						.filter((l) => l.target.id == entity.id && l.source.type == 'e')
 						.map((l) => Node.p([
 							Node.span({className: 'title'}, Translator.get('info.link.target')),
 							Node.span({className: 'value'}, Translator.get('info.link.target2', ae.safeHtml(l.source.name), ae.safeHtml(l.source.subtype))),
@@ -368,7 +368,7 @@ var x = new Promise((ok, nok) =>
 						
 					Object.values(template.relations).sort((a, b) => { return a.name > b.name ? 1 : -1; }).forEach((r) =>
 					{
-						var node = self.getRelationDetail(r, entity[r.name]);
+						var node = self.getRelationDetail(r, entity.relationships[r.name]);
 						if( node ) content.push(node);
 					});
 					
@@ -689,7 +689,8 @@ var x = new Promise((ok, nok) =>
 						{
 							graphdata.nodes.push({id: e.id, name: e.name, color: '#E0C200', visible: true, type: 'e', category: key, subtype: e.type});
 							graphdata.links.push({source: 'registry:'+key, target: e.id, color: '#FB813640'});
-							e.relations.forEach(rel => graphdata.links.push({source: e.id, target: rel, relate: true, color: '#E0C20040'}));
+							Object.values(e.relationships).forEach(rel1 =>
+								rel1.forEach(rel => graphdata.links.push({source: e.id, target: rel.id, relate: true, color: '#E0C20040'})));
 						});
 					};
 					this.fixPosition(1, node_main, node_list);
@@ -754,7 +755,7 @@ var x = new Promise((ok, nok) =>
 						{
 							value.forEach(f =>
 							{
-								if( f.plugin == p.name )
+								if( f.type_plugin == p.name )
 								{
 									if( !data.registry[key] )
 										return;

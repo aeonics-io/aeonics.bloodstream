@@ -17,14 +17,15 @@ main#main_container {
 nav {
 	position: fixed; z-index: 2;
 	top: 0; left: 0; bottom: 0;
-	padding: 2rem 0;
+	padding: 1rem 0;
 	max-width: 5rem;
 	background-color: #26252D;
 	border-right: 1px solid #302E38;
 	transition: max-width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	overflow-y: hidden; overflow-x: hidden;
 }
 
-nav:hover { max-width: 30rem; }
+nav:hover { max-width: 30rem; overflow-y: auto; overflow-x: hidden; }
 nav:hover li { color: #fff; }
 
 nav ol { list-style: none; margin: 0; padding: 0; }
@@ -33,7 +34,18 @@ nav li {
 	color: transparent; transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	white-space: nowrap;
 }
-nav li.selected { background: var(--orange) !important; }
+nav ol:nth-of-type(1) { border-left: 2px var(--orange) solid ; }
+nav ol:nth-of-type(2) { border-left: 2px var(--blue) solid ; }
+nav ol:nth-of-type(3) { border-left: 2px var(--green) solid ; }
+nav ol:nth-of-type(1) li.selected { background: var(--orange) !important; }
+nav ol:nth-of-type(2) li.selected { background: var(--blue) !important; }
+nav ol:nth-of-type(3) li.selected { background: var(--green) !important; }
+
 nav li:hover { background: #42404F; }
 nav li .icon { display: inline-block; margin-right: 1rem; color: #fff; font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important; }
 nav li { color: transparent; }
+
+nav p { text-align: center; padding: 1rem 0 0.5rem 0; margin-bottom: 0.5rem; border-bottom: 1px solid var(--blue); color: transparent;
+	transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); white-space: nowrap; text-overflow: ellipsis;
+}
+nav:hover p { color: var(--white); }
