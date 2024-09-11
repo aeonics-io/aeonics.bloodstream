@@ -8,6 +8,7 @@ section.config {
 
 section.config h1 { display: block; text-align: center; margin: 2rem; }
 section.config h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+section.config > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
 section.config section { 
 	background: #ffffff10;
 	margin-bottom: 0.5rem;

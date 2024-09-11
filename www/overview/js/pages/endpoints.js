@@ -30,7 +30,6 @@ var x = new Promise((ok, nok) =>
 				while(this.dom.firstChild) this.dom.firstChild.remove();
 				
 				this.dom.append(
-					Node.h1(Translator.get('endpoints.title')),
 					Node.div({className: 'search'}, [
 						Node.input({type: 'search', input: function()
 						{
@@ -38,6 +37,7 @@ var x = new Promise((ok, nok) =>
 						}}),
 						Node.span({className: 'icon'}, 'search')
 					]),
+					Node.h1(Translator.get('endpoints.title')),
 					Node.p(Translator.get('endpoints.explain')),
 					Node.div({className: 'action'},
 					[
@@ -98,6 +98,7 @@ var x = new Promise((ok, nok) =>
 				var div = this.dom.querySelector('#endpoint_list');
 				while(div.firstChild) div.firstChild.remove();
 				
+				this.dom.classList.add('wait');
 				Promise.all([
 					Ajax.get('/api/meta/registry/aeonics.http.endpoint/entities'),
 					Ajax.get('/api/meta/factory/aeonics.http.endpoint/templates'),
@@ -192,6 +193,9 @@ var x = new Promise((ok, nok) =>
 					{
 						div.appendChild(Node.p(Translator.get('endpoints.empty')));
 					}
+					
+					// re-apply filter if needed
+					self.filter(self.dom.querySelector('.search input').value);
 					
 					self.dom.classList.remove('wait');
 				}, (error) =>

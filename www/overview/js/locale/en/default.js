@@ -13,6 +13,8 @@ export default {
 	'time_ratio': "% CPU Time",
 	'scale_network': "Network activity (MB)",
 	'settings': "Settings",
+	'download': "Download",
+	'restore': "Restore",
 	
 	'login.welcome': "Welcome {}",
 	'login.no_access': "Unfortunately you do not have access to this application. Please login with another user.",
@@ -37,6 +39,7 @@ export default {
 	'menu.debug': "Debug",
 	'menu.logs': "Logs",
 	'menu.metrics': "Metrics",
+	'menu.snapshot': "Snapshots",
 	
 	'info.technical': "Identification",
 	'info.template': "Entity type",
@@ -134,7 +137,7 @@ export default {
 		+ "impacts such as water consumption, acidification of soils or plenetary resources exhaustion.<br /><br />"
 		+ "Numbers and figures presented on this page may be considered as KPIs for <em>ESG</em> and suitable for <em>CSRD</em> reporting.</p>",
 	
-	'security.integrity': "Plugin integrity",
+	'security.integrity': "Software Bill of Materials",
 	'security.integrity.explain': "This section includes details such as the binary size, modification date, and hash value "
 		+ "to ensure that the original file has not been tampered with. Additionally, it lists the internal code packages and their interactions "
 		+ "with other components. Regularly reviewing this information is crucial, and applying the principles of least privilege and least exposure "
@@ -189,7 +192,7 @@ export default {
 	'config.title': "Systemwide Configuration",
 	'config.snapshot.explain': "Systemwide configuration parameters are not specific to a particular entity instance. They apply globally "
 		+ "and all modules may react to changes in real time. "
-		+ "<br />However, changes <em>will not be persisted</em> after reboot unless you perform a system snapshot.<br /><br />",
+		+ "<br />However, changes <em>will not be persisted</em> after reboot unless you perform a system snapshot.",
 	'config.undocumented': "Undocumented",
 	'config.undocumented.explain': "Undocumented configuration parameters are usually imported from command line or environment parameters. "
 		+ "You may change or remove the value but it may not produce any effect.",
@@ -238,9 +241,37 @@ export default {
 	'endpoints.wizard.fail': "Publication failed",
 	'endpoints.wizard.fail2': "Error on line <em>{}</em>:<br />{}",
 	'endpoints.upload': "Upload",
-	'endpoints.remove.confirm': "Are you sure you want to remove the endpoint:<br /><em>{}</em> <strong>{}</strong>",
+	'endpoints.remove.confirm': "Are you sure you want to remove the endpoint:<br /><em>{} {}</em>",
 	'endpoints.remove.ok': "Endpoint removed",
 	'endpoints.remove.error': "Could not remove endpoint",
+	
+	'snapshot.title': "System Snapshots",
+	'snapshot.explain': "The system uses direct in-memory configuration and in-memory registry which implies that modifications in those "
+		+ "are <em>not persisted across a system restart</em>. In order to persist the configuration, the registry or other module-specific "
+		+ "state, you can perform a system snapshot. Note that internal components, managers and factories are not affected by snapshots.<br />"
+		+ "Snapshot can also be restored on another system to facilitate releases and deployment of new environments.",
+	'snapshot.current': "Current snapshot manager",
+	'snapshot.latest': "Latest snapshot",
+	'snapshot.list': "Available snapshots",
+	'snapshot.empty': "There are no snapshots available",
+	'snapshot.create': "Create",
+	'snapshot.name.prompt': "Display name of the snapshot:<br />(max 30 characters, no special characters)",
+	'snapshot.create.success': "Snapshot created",
+	'snapshot.create.error': "Could not create snapshot",
+	'snapshot.info.name': "Full name",
+	'snapshot.info.date': "Creation date",
+	'snapshot.info.actions': "Actions",
+	'snapshot.remove.confirm': "Please confirm that you want to permanently remove snapshot <em>{}</em>",
+	'snapshot.restore.confirm': "Please confirm that you want to restore snapshot <em>{}</em><br />Note that the latest snapshot will always have precedence "
+		+ "in case of system restart.<br />After the restore operation is complete, you may have to login again.",
+	'snapshot.remove.success': "Snapshot removed",
+	'snapshot.remove.error': "Could not remove snapshot",
+	'snapshot.restore.success': "Snapshot restored",
+	'snapshot.restore.error': "Could not restore snapshot",
+	'snapshot.download.error': "Could not download snapshot",
+	'snapshot.upload': "Upload",
+	'snapshot.upload.success': "Snapshot uploaded",
+	'snapshot.upload.error': "Could not upload snapshot",
 	
 	'': ""
 };

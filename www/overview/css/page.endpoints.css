@@ -7,7 +7,7 @@ section.endpoints {
 }
 
 section.endpoints h1 { display: block; text-align: center; margin: 2rem; }
-
+section.endpoints > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
 section.endpoints .hidden { display: none !important; }
 
 section.endpoints .search {

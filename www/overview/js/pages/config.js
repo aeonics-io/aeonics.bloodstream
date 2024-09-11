@@ -28,7 +28,6 @@ var x = new Promise((ok, nok) =>
 				while(this.dom.firstChild) this.dom.firstChild.remove();
 				
 				this.dom.append(
-					Node.h1(Translator.get('config.title')),
 					Node.div({className: 'search'}, [
 						Node.input({type: 'search', input: function()
 						{
@@ -36,6 +35,7 @@ var x = new Promise((ok, nok) =>
 						}}),
 						Node.span({className: 'icon'}, 'search')
 					]),
+					Node.h1(Translator.get('config.title')),
 					Node.p(Translator.get('config.snapshot.explain')),
 					Node.div({id: 'configList'})
 				);

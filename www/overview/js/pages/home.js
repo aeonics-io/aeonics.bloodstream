@@ -733,7 +733,7 @@ var x = new Promise((ok, nok) =>
 						node_list.push(node);
 						graphdata.nodes.push(node);
 						graphdata.links.push({source: 'manager', target: 'manager:'+key, color: '#D21D5080'});
-						if( value ) graphdata.links.push({source: 'manager:'+key, target: value, color: '#D21D5040'});
+						if( value ) graphdata.links.push({source: 'manager:'+key, target: value.id, color: '#D21D5040'});
 					};
 					this.fixPosition(0, node_main, node_list);
 					

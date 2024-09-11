@@ -1,7 +1,10 @@
 package aeonics.endpoint.meta;
 
+import java.nio.charset.StandardCharsets;
+
 import aeonics.data.Data;
 import aeonics.http.Endpoint;
+import aeonics.http.HttpException;
 import aeonics.http.Endpoint.Rest;
 import aeonics.manager.Manager;
 import aeonics.manager.Snapshot;
@@ -87,7 +90,7 @@ public class Snapshots
 			Manager.of(Snapshot.class).restore(params.asString("name")).await();
 			return Data.map().put("success", true);
 		})
-		.url("/api/admin/snapshot/{name}/restore")
+		.url("/api/admin/snapshot/restore/{name}")
 		.method("GET")
 		;
 	
@@ -109,5 +112,54 @@ public class Snapshots
 		})
 		.url("/api/admin/snapshot/{name}")
 		.method("DELETE")
+		;
+	
+	private static final Endpoint.Rest.Type upload = new Endpoint.Rest() { }
+		.template()
+		.summary("Uploads a snapshot")
+		.description("This endpoint uploads a snapshot on this system.")
+		.add(new Parameter("zip")
+			.summary("Zip file")
+			.description("The snapshot content as a zip file.")
+			.format(Parameter.Format.OPAQUE)
+			.optional(false))
+		.create()
+		.<Rest.Type>cast()
+		.process((params, user, request) ->
+		{
+			byte[] zip = null;
+			if( params.isMap("zip") ) zip = params.get("zip").asString("content").getBytes(StandardCharsets.ISO_8859_1);
+			else zip = params.asString("zip").getBytes(StandardCharsets.ISO_8859_1);
+
+			try { Manager.of(Snapshot.class).upload(zip); }
+			catch(Exception e) { throw new HttpException(413, e); }
+			return Data.map().put("success", true);
+		})
+		.url("/api/admin/snapshot/upload")
+		.method("POST")
+		;
+	
+	private static final Endpoint.Rest.Type download = new Endpoint.Rest() { }
+		.template()
+		.summary("Download a snapshot")
+		.description("This endpoint downloads the specified snapshot as a zip file.")
+		.add(new Parameter("name")
+			.summary("Name")
+			.description("The snapshot name.")
+			.format(Parameter.Format.TEXT)
+			.optional(false))
+		.create()
+		.<Rest.Type>cast()
+		.process((params, user) ->
+		{
+			byte[] snapshot = Manager.of(Snapshot.class).download(params.asString("name"));
+			return Data.map()
+				.put("isHttpResponse", true)
+				.put("code", 200)
+				.put("body", new String(snapshot, StandardCharsets.ISO_8859_1))
+				.put("mime", "application/zip");
+		})
+		.url("/api/admin/snapshot/download/{name}")
+		.method("GET")
 		;
 }

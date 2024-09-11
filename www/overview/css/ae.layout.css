@@ -34,9 +34,9 @@ nav li {
 	color: transparent; transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	white-space: nowrap;
 }
-nav ol:nth-of-type(1) { border-left: 2px var(--orange) solid ; }
-nav ol:nth-of-type(2) { border-left: 2px var(--blue) solid ; }
-nav ol:nth-of-type(3) { border-left: 2px var(--green) solid ; }
+nav ol:nth-of-type(1) { border-left: 2px var(--orange) solid; }
+nav ol:nth-of-type(2) { border-left: 2px var(--blue) solid; }
+nav ol:nth-of-type(3) { border-left: 2px var(--green) solid; }
 nav ol:nth-of-type(1) li.selected { background: var(--orange) !important; }
 nav ol:nth-of-type(2) li.selected { background: var(--blue) !important; }
 nav ol:nth-of-type(3) li.selected { background: var(--green) !important; }

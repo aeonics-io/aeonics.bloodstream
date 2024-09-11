@@ -55,6 +55,10 @@ var x = new Promise((ok, nok) =>
 								Node.span({className: 'icon'}, 'storage'), 
 								Translator.get('menu.storage')
 							]),
+							Node.li({className: location.hash == '#snapshot' ? 'selected' : '', dataset: {link: 'snapshot'}}, [
+								Node.span({className: 'icon'}, 'folder_zip'), 
+								Translator.get('menu.snapshot')
+							]),
 							Node.li({className: location.hash == '#access' ? 'selected' : '', dataset: {link: 'access'}}, [
 								Node.span({className: 'icon'}, 'lock'), 
 								Translator.get('menu.access')

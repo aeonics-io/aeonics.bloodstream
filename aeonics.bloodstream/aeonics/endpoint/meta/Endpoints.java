@@ -195,7 +195,7 @@ public class Endpoints
 		{
 			Data list = Data.map();
 			for( Manager.Type p : Manager.all() )
-				list.put(StringUtils.toLowerCase(p.manager()), p.id());
+				list.put(StringUtils.toLowerCase(p.manager()), p.export());
 			return list;
 		})
 		.url(ROOT + "managers")
