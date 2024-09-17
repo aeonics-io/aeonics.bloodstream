@@ -39,10 +39,10 @@ var x = new Promise((ok, nok) =>
 					Node.p(Translator.get('snapshot.explain')),
 					Node.div({className: 'action'},
 					[
-						Node.button({className: 'raised', click: () => { this.create(); }}, [
+						Node.button({className: 'raised', click: (e) => { e.preventDefault(); this.create(); }}, [
 							Node.span({className: 'icon'}, 'add'), 
 							Node.span(Translator.get('snapshot.create'))]),
-						Node.button({className: 'raised', click: () => { this.upload(); }}, [
+						Node.button({className: 'raised', click: (e) => { e.preventDefault(); this.upload(); }}, [
 							Node.span({className: 'icon'}, 'file_upload'), 
 							Node.span(Translator.get('snapshot.upload'))])
 					]),

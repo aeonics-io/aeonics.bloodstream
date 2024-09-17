@@ -17,7 +17,6 @@ import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.entity.security.Policy;
 import aeonics.entity.security.Rule;
-import aeonics.entity.security.User;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
@@ -305,18 +304,6 @@ public class Main extends Plugin
 				.name("Local Authentication")
 				.<OidcProvider.Type>cast();
 			Manager.of(Config.class).set(Security.class, "local.provider", provider.id());
-			
-			// join the admin to the OIDC provider
-			User.Type admin = Registry.of(User.class).get((u) -> "admin".equals(u.login()));
-			if( admin != null )
-			{
-				provider.join(Data.map()
-					.put("iss", provider.issuer())
-					.put("sub", admin.id())
-					.put("aud", provider.id())
-					.put("exp", System.currentTimeMillis()/1000 + 3600),
-					admin);
-			}
 		}
 	}
 }

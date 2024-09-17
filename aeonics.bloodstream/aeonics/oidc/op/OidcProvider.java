@@ -166,7 +166,7 @@ public class OidcProvider extends Provider
 		public User.Type authenticate(Data context)
 		{
 			if( context == null || !context.isMap() || !context.containsKey("sub") || !context.asString("iss").equals(issuer()) ) return null;
-			if( !context.asString("iss").equals(issuer()) || !context.asString("aud").equals(clientId()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
+			if( !context.asString("aud").equals(clientId()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
 			
 			String sub = context.asString("sub");
 			Data data = Manager.of(Vault.class).get(Manager.of(Security.class).hash(id() + "." + sub), this);
@@ -179,15 +179,22 @@ public class OidcProvider extends Provider
 		public synchronized User.Type join(Data context, User.Type existing)
 		{
 			if( context == null || !context.isMap() || !context.containsKey("sub") || !context.asString("iss").equals(issuer()) ) return null;
-			if( !context.asString("iss").equals(issuer()) || !context.asString("aud").equals(id()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
+			if( !context.asString("aud").equals(clientId()) || (context.asLong("exp")*1000) < System.currentTimeMillis() ) return null;
 			
 			String sub = context.asString("sub");
-			String name = context.containsKey("email") ? context.asString("email") : sub;
+			String login = context.asString("email");
+			String name = context.asString("name");
 			
 			// check for clash
 			if( existing == null )
 			{
-				User.Type user = Registry.of(User.class).get((u) -> name.equals(u.login()));
+				// first check by id using sub
+				User.Type user = Registry.of(User.class).get((u) -> sub.equals(u.id()));
+				// then check on login using email
+				if( user == null ) user = Registry.of(User.class).get((u) -> login.equals(u.login()));
+				// then check on login using sub
+				if( user == null ) user = Registry.of(User.class).get((u) -> sub.equals(u.login()));
+				
 				if( user != null ) existing = user;
 			}
 			
@@ -210,7 +217,10 @@ public class OidcProvider extends Provider
 			else
 			{
 				// create user
-				existing = Factory.of(User.class).get(User.class).create(Data.map().put("parameters", Data.map().put("login", name).put("active", true))).name(name);
+				existing = Factory.of(User.class).get(User.class).create(Data.map().put("parameters", Data.map()
+					.put("login", login.isBlank() ? sub : login)
+					.put("active", true)))
+					.name(name.isBlank() ? login.isBlank() ? sub : login : name);
 				// bind him
 				privateData(existing, Data.map().put("sub", Data.list().add(sub)));
 				// reverse bind

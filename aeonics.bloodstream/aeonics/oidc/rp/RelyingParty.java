@@ -21,7 +21,7 @@ public class RelyingParty extends Item<RelyingParty.Type>
 	{
 		public String redirectUri() { return valueOf("redirect_uri").asString(); }
 		public String clientId() { return id(); }
-		public User.Type user() { for( Tuple<Entity, Data> t : relations("user") ) return ((User.Type)t.a); return null; }
+		public User.Type user() { return firstRelation("user"); }
 		
 		private String secret = null;
 		public String clientSecret() { return secret; }

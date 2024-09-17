@@ -182,7 +182,9 @@ public class Endpoints
 				try { jwt = checkJwt(op, response.asString("id_token")); }
 				catch(Exception e) { return redirectError("invalid_token", e.getMessage()); }
 				
-				user = op.authenticate(jwt);
+				// if we arrive here, it means the JWT from the relying party was successful
+				// so we automatically join the response user to our provider
+				user = op.join(jwt, null);
 				if( user == null || user == User.ANONYMOUS ) return redirectError("invalid_token", "Failed to authenticate");
 				
 				String token = null;

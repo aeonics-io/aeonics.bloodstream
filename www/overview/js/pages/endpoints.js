@@ -41,10 +41,10 @@ var x = new Promise((ok, nok) =>
 					Node.p(Translator.get('endpoints.explain')),
 					Node.div({className: 'action'},
 					[
-						Node.button({className: 'raised', click: () => { this.wizard(); }}, [
+						Node.button({className: 'raised', click: (e) => { e.preventDefault(); this.wizard(); }}, [
 							Node.span({className: 'icon'}, 'star'), 
 							Node.span(Translator.get('endpoints.wizard'))]),
-						Node.button({className: 'raised', click: () => { this.upload(); }}, [
+						Node.button({className: 'raised', click: (e) => { e.preventDefault(); this.upload(); }}, [
 							Node.span({className: 'icon'}, 'file_upload'), 
 							Node.span(Translator.get('endpoints.upload'))])
 					]),
@@ -180,9 +180,9 @@ var x = new Promise((ok, nok) =>
 									Node.span({className: 'title'}, ""),
 									Node.span({className: 'value'}, 
 									[
-										Node.button({className: 'raised', click: function() { self.testEndpoint(r.id); }}, Translator.get('endpoints.test')),
-										r.dynamic ? Node.button({className: 'raised', click: function() { self.updateDynamic(r.id); }}, Translator.get('endpoints.update')) : null,
-										r.dynamic ? Node.button({className: 'raised', click: function() { self.removeDynamic(r.id); }}, Translator.get('endpoints.remove')) : null,
+										Node.button({className: 'raised', click: function(e) { e.preventDefault(); self.testEndpoint(r.id); }}, Translator.get('endpoints.test')),
+										r.dynamic ? Node.button({className: 'raised', click: function(e) { e.preventDefault(); self.updateDynamic(r.id); }}, Translator.get('endpoints.update')) : null,
+										r.dynamic ? Node.button({className: 'raised', click: function(e) { e.preventDefault(); self.removeDynamic(r.id); }}, Translator.get('endpoints.remove')) : null,
 									])
 								])
 							])
@@ -299,8 +299,9 @@ var x = new Promise((ok, nok) =>
 							Node.input({type: 'text', placeholder: Translator.get('endpoints.test.token'), name: '__user__', input: function() { this.previousSibling.checked = true; }})
 						])
 					]),
-					Node.button({className: 'raised', click: function()
+					Node.button({className: 'raised', click: function(e)
 					{
+						e.preventDefault(); 
 						var form = this.previousSibling;
 						var data = {};
 						for( var i = 0; i < form.elements.length; i++ )
@@ -513,7 +514,8 @@ var x = new Promise((ok, nok) =>
 				var p = Modal.custom(
 				[
 					Node.create('code-input', {id: 'source', lang: "Java", value: code, 'line-numbers': true}),
-					Node.button({click: function() {
+					Node.button({click: function(e) {
+						e.preventDefault(); 
 						var w = Modal.custom(Node.p({id: 'waiter_text'}, Translator.get('endpoints.wizard.wait')), false);
 						
 						var data = {code: this.previousSibling.value};

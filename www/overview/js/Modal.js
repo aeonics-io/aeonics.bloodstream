@@ -11,8 +11,9 @@ var x = new Promise((ok, nok) =>
 				var p = Modal.custom(
 				[
 					Node.p(message),
-					Node.button({click: function()
+					Node.button({click: function(e)
 					{
+						e.preventDefault();
 						p.ok(0);
 					}}, Translator.get('ok'))
 				], false);
@@ -32,7 +33,7 @@ var x = new Promise((ok, nok) =>
 				// add buttons in reverse order
 				buttons.slice().reverse().forEach((b, i) =>
 				{
-					nodes.push( Node.button({click: function() { p.ok(l - i); }}, typeof b == "string" ? ae.safeHtml(b) : b) );
+					nodes.push( Node.button({click: function(e) { e.preventDefault(); p.ok(l - i); }}, typeof b == "string" ? ae.safeHtml(b) : b) );
 				});
 				
 				p = Modal.custom(nodes, escapable||false);
@@ -50,8 +51,8 @@ var x = new Promise((ok, nok) =>
 				[
 					Node.p(message),
 					form,
-					Node.button({click: function() { try { p.nok("canceled"); } catch(x) { } }}, Translator.get('cancel')),
-					Node.button({click: function() { p.ok(form); }}, Translator.get('ok'))
+					Node.button({click: function(e) { e.preventDefault(); try { p.nok("canceled"); } catch(x) { } }}, Translator.get('cancel')),
+					Node.button({click: function(e) { e.preventDefault(); p.ok(form); }}, Translator.get('ok'))
 				], true);
 				
 				var escHandler = document.addEventListener("escape", function() { p.nok('escaped') });

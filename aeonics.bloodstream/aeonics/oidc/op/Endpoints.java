@@ -679,7 +679,7 @@ public class Endpoints
 				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "This endpoint must be called using a secure TLS connection."));
 			
 			Token t = Manager.of(Security.class).authenticate(params.asString("signin_token"), false);
-			if( t == null || t.user() == User.ANONYMOUS || !t.inScope("signin") )
+			if( t == null || t.user() == null || t.user() == User.ANONYMOUS || !t.inScope("signin") )
 				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid sign in token."));
 			
 			return Data.map()

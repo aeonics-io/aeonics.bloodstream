@@ -249,7 +249,7 @@ export default {
 	'snapshot.explain': "The system uses direct in-memory configuration and in-memory registry which implies that modifications in those "
 		+ "are <em>not persisted across a system restart</em>. In order to persist the configuration, the registry or other module-specific "
 		+ "state, you can perform a system snapshot. Note that internal components, managers and factories are not affected by snapshots.<br />"
-		+ "Snapshot can also be restored on another system to facilitate releases and deployment of new environments.",
+		+ "Snapshots can also be restored on another system to facilitate releases and deployment of new environments.",
 	'snapshot.current': "Current snapshot manager",
 	'snapshot.latest': "Latest snapshot",
 	'snapshot.list': "Available snapshots",
