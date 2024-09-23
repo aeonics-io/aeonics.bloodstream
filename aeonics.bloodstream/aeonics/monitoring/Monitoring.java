@@ -36,6 +36,8 @@ import aeonics.manager.Scheduler;
  */
 public class Monitoring 
 {
+	// TODO : improve aggregate by day/year insead of discard
+	
 	private AtomicBoolean enabled = new AtomicBoolean(false);
 	public void setup()
 	{

@@ -68,7 +68,7 @@ public class Common
 	{
 		return Registry.of(Storage.class).get(Manager.of(Config.class).get(Security.class, "oidc.op.storage").asString());
 	}
-	
+
 	/**
 	 * the timeout tracker
 	 */
@@ -115,6 +115,20 @@ public class Common
 						return false;
 					}
 				});
+				
+				Common.Consent.local.entrySet().removeIf((c) -> 
+				{
+					if( c == null ) return true;
+					
+					long left = (c.getValue().asLong("_time") + OP_REFRESH_TOKEN_TTL*1000) - now;
+					
+					if( left <= 0 ) return true;
+					else
+					{
+						min.set(Math.min(min.get(), left));
+						return false;
+					}
+				});
 			}
 			else
 			{
@@ -137,6 +151,17 @@ public class Common
 					long left = (m.asLong("_time") + OP_REFRESH_TOKEN_TTL*1000) - now;
 					
 					if( left <= 0 ) storage.remove(token);
+					else min.set(Math.min(min.get(), left));
+				}
+				
+				for( String consent : storage.list(Common.Consent.path) )
+				{
+					Data m = storage.getData(consent);
+					if( m == null || m.isEmpty() ) continue;
+					
+					long left = (m.asLong("_time") + OP_REFRESH_TOKEN_TTL*1000) - now;
+					
+					if( left <= 0 ) storage.remove(consent);
 					else min.set(Math.min(min.get(), left));
 				}
 			}
@@ -208,6 +233,61 @@ public class Common
 		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
 		
 		public static String path = "refresh/";
+		
+		public static void put(String code, Data state)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + code, state);
+			else
+				local.put(code, state);
+		}
+		
+		public static Data get(String code)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + code);
+				if( m == null || m.length == 0 ) return null;
+				return Json.decode(new String(m));
+			}
+			else
+				return local.get(code);
+		}
+		
+		public static Data remove(String code)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + code);
+				if( m == null ) return null;
+				
+				storage.remove(path + code);
+				return Json.decode(new String(m));
+			}
+			else
+				return local.remove(code);
+		}
+		
+		public static int count()
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+				return storage.tree(path).size();
+			else
+				return local.size();
+		}
+	}
+	
+	public static class Consent
+	{
+		private Consent() { /* no instances */ }
+		
+		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
+		
+		public static String path = "consent/";
 		
 		public static void put(String code, Data state)
 		{

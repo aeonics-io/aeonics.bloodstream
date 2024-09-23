@@ -120,7 +120,7 @@ var x = new Promise((ok, nok) =>
 								}
 								else
 								{
-									if( !ids.find((i) => i.id == responses[i].value.response.id) )
+									if( !ids.find((x) => x.id == responses[i].value.response.id) )
 									{
 										responses[i].value.response.token = tokens[j];
 										ids.push(responses[i].value.response);

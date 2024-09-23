@@ -4,7 +4,7 @@ section.consent {
 	overflow: auto; background: #1C1B21;
 }
 
-#consent_panel { width: 450px; max-height: 400px; min-height: 200px; background-color: #fff; 
+#consent_panel { width: 450px; max-width: 95vw; max-height: 400px; min-height: 200px; background-color: #fff; 
 	padding: 45px; box-sizing: border-box; 
 	box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px; 
 	overflow-y: hidden; overflow-x: auto; 

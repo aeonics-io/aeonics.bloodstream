@@ -94,7 +94,7 @@ var x = new Promise((ok, nok) =>
 						if( !!username )
 						{
 							div.append(
-								Node.p(Translator.get("login.welcome", ad.safeHtml(username))),
+								Node.p(Translator.get("login.welcome", ae.safeHtml(username))),
 								Node.p({className: 'warning'}, Translator.get("login.no_access"))
 							);
 						}

@@ -15,7 +15,9 @@ import aeonics.data.Data;
 import aeonics.entity.Probe;
 import aeonics.entity.Registry;
 import aeonics.entity.Storage;
+import aeonics.entity.security.Group;
 import aeonics.entity.security.Policy;
+import aeonics.entity.security.Role;
 import aeonics.entity.security.Rule;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
@@ -256,7 +258,7 @@ public class Main extends Plugin
 			policy.name("Deny /api/meta to non administrators");
 			policy.addRelation("rule", new Rule.And().template().create()
 				.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("parameters", Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true))))
-				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("parameters", Data.map().put("role", "Administrator"))))));
+				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("parameters", Data.map().put("role", Role.SUPERADMIN.id()))))));
 			
 			// set and save the monitoring storage
 			Storage.Type monitor = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", "stats"))).name("Monitor statistics");
@@ -294,7 +296,8 @@ public class Main extends Plugin
 			// default oidc client and rp
 			RelyingParty.Type rp = new RelyingParty().template().create(Data.map().put("parameters", Data.map()
 				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response")))
-				.addRelation("groups", "Administrators")
+				.addRelation("groups", Group.ADMINISTRATORS)
+				.addRelation("groups", Group.USERS)
 				.name("Local Provider")
 				.<RelyingParty.Type>cast();
 			OidcProvider.Type provider = new OidcProvider().template().create(Data.map().put("parameters", Data.map()

@@ -1,6 +1,6 @@
 
 #notifyArea {
-	position: fixed; bottom: 0; left: 0; min-width: 344px; max-width: 800px; z-index: 1001;
+	position: fixed; bottom: 0; left: 0; min-width: 344px; max-width: min(800px, 95vw); z-index: 1001;
 	list-style: none; margin: 0; padding: 16px; line-height: 0; box-sizing: border-box;
 	text-align: left;
 }
