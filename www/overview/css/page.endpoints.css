@@ -96,7 +96,7 @@ section.endpoints .search input:focus + .icon { color: var(--blue); border-botto
 .pre { padding-left: 20px; }
 .modal code-input { min-width: 50vw; min-height: 65vh; max-width: 50vw; max-height: 65vh; font-size: 0.85rem !important; line-height: 1.1rem !important; }
 .modal code-input textarea::selection { background-color: #FB813660 !important; color: #FB8136 !important; }
-pre.response { max-height: 60vh; }
+.parameterInfo pre.response { max-height: 60vh; max-width: 40rem; }
 
 section.endpoints .action { text-align: right; }
 section.endpoints .action button { display: inline-block; width: unset; margin-left: 0.5rem; }

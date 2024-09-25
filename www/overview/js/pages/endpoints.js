@@ -299,9 +299,9 @@ var x = new Promise((ok, nok) =>
 							Node.input({type: 'text', placeholder: Translator.get('endpoints.test.token'), name: '__user__', input: function() { this.previousSibling.checked = true; }})
 						])
 					]),
-					Node.button({className: 'raised', click: function(e)
+					Node.button({className: 'raised', click: function(evt)
 					{
-						e.preventDefault(); 
+						evt.preventDefault(); 
 						var form = this.previousSibling;
 						var data = {};
 						for( var i = 0; i < form.elements.length; i++ )
@@ -395,24 +395,24 @@ var x = new Promise((ok, nok) =>
 								ms = "-";
 							
 							Modal.alert(Node.div({className: 'parameterInfo'},
-								[
-									Node.div({className: 'group'}, [
-										Node.p([
-											Node.span({className: 'title'}, Translator.get('endpoints.result.status')),
-											Node.span({className: 'text'}, ae.safeHtml(""+error.status))
-										]),
-										Node.p([
-											Node.span({className: 'title'}, Translator.get('endpoints.result.roundtrip')),
-											Node.span({className: 'value'}, roundtrip + "ms")
-										]),
-										Node.p([
-											Node.span({className: 'title'}, Translator.get('endpoints.result.processing')),
-											Node.span({className: 'value'}, ms)
-										]),
-										Node.pre({className: 'response'}, Node.code({id: 'endpoint_response', className: "language-json"}, JSON.stringify(error.response, null, 4)))
-									])
-								]));
-								Prism.highlightElement(document.getElementById('endpoint_response'));
+							[
+								Node.div({className: 'group'}, [
+									Node.p([
+										Node.span({className: 'title'}, Translator.get('endpoints.result.status')),
+										Node.span({className: 'text'}, ae.safeHtml(""+error.status))
+									]),
+									Node.p([
+										Node.span({className: 'title'}, Translator.get('endpoints.result.roundtrip')),
+										Node.span({className: 'value'}, roundtrip + "ms")
+									]),
+									Node.p([
+										Node.span({className: 'title'}, Translator.get('endpoints.result.processing')),
+										Node.span({className: 'value'}, ms)
+									]),
+									Node.pre({className: 'response'}, Node.code({id: 'endpoint_response', className: "language-json"}, JSON.stringify(error.response, null, 4)))
+								])
+							]));
+							Prism.highlightElement(document.getElementById('endpoint_response'));
 						});
 					}}, [Node.span(Translator.get('endpoints.run'))])
 				], true);

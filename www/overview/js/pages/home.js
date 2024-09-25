@@ -2,7 +2,7 @@
 let ae = globalThis.ae;
 var x = new Promise((ok, nok) =>
 {
-	ae.require('Page', 'Node', 'Translator', 'Ajax', 'Notify', 'page.home.css', 'ext/d3-force.min.js', 'ext/d3-quadtree.min.js', 'ext/force-graph.min.js').then(([Page, Node, Translator, Ajax, Notify]) =>
+	ae.require('Page', 'Node', 'Translator', 'Ajax', 'Notify', 'Entity', 'page.home.css', 'ext/d3-force.min.js', 'ext/d3-quadtree.min.js', 'ext/force-graph.min.js').then(([Page, Node, Translator, Ajax, Notify, Entity]) =>
 	{
 		Translator.load('default').then(() =>
 		{
@@ -65,7 +65,8 @@ var x = new Promise((ok, nok) =>
 								});
 							}}),
 							Node.span({className: 'icon'}, 'search')
-						])
+						]),
+						Node.div({id: 'homeAddAnything', click: function() { Entity.explore(); }}, 'add')
 					);
 					this.getData();
 				},

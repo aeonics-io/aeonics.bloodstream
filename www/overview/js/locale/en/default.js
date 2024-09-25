@@ -15,6 +15,10 @@ export default {
 	'settings': "Settings",
 	'download': "Download",
 	'restore': "Restore",
+	'browse': "Browse",
+	'query': "Query",
+	'save': "Save",
+	'create': "Create",
 	
 	'login.welcome': "Welcome {}",
 	'login.no_access': "Unfortunately you do not have access to this application. Please login with another user.",
@@ -40,6 +44,17 @@ export default {
 	'menu.logs': "Logs",
 	'menu.metrics': "Metrics",
 	'menu.snapshot': "Snapshots",
+	
+	'entity.edit.invalid': "Cannot edit this entity",
+	'entity.edit.success': "Entity updated",
+	'entity.edit.error': "Entity update failed",
+	'entity.create.invalid': "Cannot create this type of entity",
+	'entity.create.success': "Entity created",
+	'entity.create.error': "Entity creation failed",
+	'entity.template.error': "Cannot fetch entity template",
+	'entity.name': "Name",
+	'entity.choose.category': "Choose a category",
+	'entity.name.description': "The name of the entity can be used as an identifier, but there is no check performed to determine if the name is unique or not.",
 	
 	'info.technical': "Identification",
 	'info.template': "Entity type",
@@ -272,6 +287,21 @@ export default {
 	'snapshot.upload': "Upload",
 	'snapshot.upload.success': "Snapshot uploaded",
 	'snapshot.upload.error': "Could not upload snapshot",
+	
+	'storage.title': "Storage Locations",
+	'storage.explain': "In order to increase independence of components and entities, the Storage entity can be used to persist some content "
+		+ "using a typical directory structure. The storage persistency may be temporary or long-lived, local or remote, file-based or any "
+		+ "other implementation.<br />"
+		+ "Similarly, the Database entity represents a connection to a database and eases the query operations to deal with built-in data structures.",
+	'storage.storage': "Storage",
+	'storage.database': "Database",
+	'storage.remove.storage.confirm': "Please confirm that you want to permanently remove storage <em>{}</em>",
+	'storage.remove.storage.success': "Storage removed",
+	'storage.remove.storage.error': "Could not remove storage",
+	'storage.remove.database.confirm': "Please confirm that you want to permanently remove database <em>{}</em>",
+	'storage.remove.database.success': "Database removed",
+	'storage.remove.database.error': "Could not remove database",
+	'storage.query': "SQL query to perform",
 	
 	'': ""
 };
