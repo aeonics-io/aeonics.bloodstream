@@ -56,15 +56,32 @@ nav:hover p { color: var(--white); }
 #entity_editor li { background-color: #ffffff10; padding: 1rem; margin: 1rem 0; cursor: pointer; }
 #entity_editor li:hover { background-color: #ffffff20; }
 #entity_editor li:hover h2 { color: var(--blue); }
-#entity_editor fieldset { margin: 1rem 0; }
+#entity_editor fieldset { margin: 1rem 0; text-align: left; }
 #entity_editor fieldset.required label::after { content: ' *'; color: var(--red); }
 #entity_editor fieldset label::before { 
 	content: '\e5cc'; display: inline-block; margin-right: 0.2rem; font-family: material !important; font-feature-settings: "liga" 1; 
 	vertical-align: -0.32rem; text-transform: none !important; font-size: 1.2rem;
 }
+#entity_editor fieldset.link label::before { content: '\e157'; }
 #entity_editor fieldset label { font-size: 0.8rem; }
-#entity_editor fieldset p { color: var(--blue); font-size: 0.8rem; line-height: 1rem; }
+#entity_editor fieldset p { color: var(--blue); font-size: 0.8rem; line-height: 1rem; text-align: justify; }
 #entity_editor fieldset input { margin: 0.5rem 0; padding: 0.5rem; font-size: 0.8rem; font-family: monospace; }
 #entity_editor fieldset textarea { }
 #entity_editor fieldset select { }
 #entity_editor fieldset input[type="checkbox"] { }
+#entity_editor fieldset .relations { list-style: none; padding: 0; margin: 0.5rem 0 1rem 2rem }
+#entity_editor fieldset .relations li :last-child:hover { color: var(--orange); }
+#entity_editor fieldset .relations li :last-child {
+	font-family: material !important; font-feature-settings: "liga" 1;
+	margin-left: 0.5rem; font-size: 1.2rem;
+}	
+#entity_editor fieldset .relations li span { display: inline-block; vertical-align: middle; } 
+#entity_editor fieldset .relations li { 
+	display: inline-block; margin: 0; margin-left: 1rem; border-radius: 3rem; background-color: #fff3;
+	padding: 0.2rem 0.8rem; font-size: 0.8rem;
+}
+#entity_editor fieldset .relations > span:hover { color: var(--orange); background-color: #FB813630; }
+#entity_editor fieldset .relations > span { 
+	display: inline-block; font-family: material !important; font-feature-settings: "liga" 1; background-color: #fff3; 
+	border-radius: 3rem; margin-left: 1rem; cursor: pointer; text-align: center; padding: 0.2rem 0.4rem; font-size: 1.2rem; vertical-align: middle;
+}

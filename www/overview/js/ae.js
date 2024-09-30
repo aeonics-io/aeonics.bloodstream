@@ -21,19 +21,19 @@ let cssImport = function(url)
 
 document.addEventListener('keyup', function(e)
 {
-	if( e.keyCode == 13 )
+	if( e.key == "Enter" )
 	{
 		var ev = new Event('enter', {cancelable: true});
 		ev.origin = e;
 		this.dispatchEvent(ev);
 	}
-	else if( e.keyCode == 27 )
+	else if( e.key == "Escape" )
 	{
 		var ev = new Event('escape', {cancelable: true});
 		ev.origin = e;
 		this.dispatchEvent(ev);
 	}
-	else if( e.keyCode == 46 )
+	else if( e.key == "Delete" )
 	{
 		var ev = new Event('delete', {cancelable: true});
 		ev.origin = e;

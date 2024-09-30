@@ -53,6 +53,9 @@ export default {
 	'entity.create.error': "Entity creation failed",
 	'entity.template.error': "Cannot fetch entity template",
 	'entity.name': "Name",
+	'entity.related': "Related entity",
+	'entity.related.description': "The related entity will be linked and referenced by its id.",
+	'entity.relation.limit': "Maximum relations reached",
 	'entity.choose.category': "Choose a category",
 	'entity.name.description': "The name of the entity can be used as an identifier, but there is no check performed to determine if the name is unique or not.",
 	
@@ -302,6 +305,13 @@ export default {
 	'storage.remove.database.success': "Database removed",
 	'storage.remove.database.error': "Could not remove database",
 	'storage.query': "SQL query to perform",
+	'storage.browse.error': "Failed to get storage content",
+	'storage.remove.item.confirm': "Please confirm that you want to remove <em>{}</em>",
+	'storage.remove.item.success': "Item removed",
+	'storage.remove.item.error': "Could not remove item",
+	'storage.download.item.error': "Could not download file",
+	'storage.upload.item.success': "Upload complete",
+	'storage.upload.item.error': "Upload failed",
 	
 	'': ""
 };

@@ -103,7 +103,7 @@ var x = new Promise((ok, nok) =>
 				]).then((results) =>
 				{
 					self.storages = results[0].response;
-					self.storages.sort((a, b) => { return a.name > b.name ? 1 : -1; });
+					self.storages.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 					
 					div_storage.append(
 						Node.div({className: 'action'}, Node.button({className: 'raised', click: function(e)
@@ -145,7 +145,7 @@ var x = new Promise((ok, nok) =>
 					);
 					
 					self.databases = results[1].response;
-					self.databases.sort((a, b) => { return a.name > b.name ? 1 : -1; });
+					self.databases.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 					
 					div_database.append(
 						Node.div({className: 'action'}, Node.button({className: 'raised', click: function(e)
@@ -232,8 +232,236 @@ var x = new Promise((ok, nok) =>
 				Entity.edit(item).then(() => self.refresh(), () => {});
 			},
 			
-			browse: function(id)
+			browse: function(id, path)
 			{
+				var self = this;
+				if( !path ) path= '/';
+				
+				var div = document.querySelector('#storageBrowser');
+				if( !div )
+				{
+					div = Node.div({id: 'storageBrowser',
+						drop: function(e)
+						{
+							e.preventDefault();
+							if( !e.dataTransfer.items ) return;
+							var list = [];
+							[...e.dataTransfer.items].forEach((item, i) => {
+								if( item.kind != "file" ) return;
+								const file = item.getAsFile();
+								if( !file ) return;
+								
+								var form = new FormData();
+								form.append('path', div.dataset.path);
+								form.append('file', file);
+								
+								list.push(Ajax.post('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: form}));
+							});
+							
+							div.classList.add('wait');
+							Promise.all(list).then(() =>
+							{
+								Notify.success(Translator.get('storage.upload.item.success'));
+								self.browse(id, div.dataset.path);
+							}, () =>
+							{
+								Notify.error(Translator.get('storage.upload.item.error'));
+								div.classList.remove('wait');
+							});
+						},
+						dragover: function(e)
+						{
+							e.preventDefault();
+						}},
+					[
+						Node.div({className: 'addressBar'},
+						[
+							Node.span({className: 'icon', click: function() 
+							{
+								var parts = this.nextSibling.textContent.split('/');
+								parts.pop();
+								parts.pop();
+								parts.push('');
+								self.browse(id, parts.join('/'));
+							}}, 'arrow_upward'),
+							Node.p(ae.safeHtml(path))
+						]),
+						Node.ol({tabIndex: -1, 
+							click: function(e)
+							{
+								this.focus();
+								if( e.target.nodeName != 'LI' ) return;
+								var s = this.querySelector('li.selected');
+								if( s ) s.classList.remove('selected');
+								e.target.classList.add('selected');
+							},
+							dblclick: function(e)
+							{
+								e.preventDefault();
+								if( e.target.nodeName != 'LI' ) return;
+								if( e.target.classList.contains('folder') ) { self.browse(id, e.target.dataset.path); return; }
+								else
+								{
+									var name = e.target.dataset.path.split('/').pop();
+									div.classList.add('wait');
+									Ajax.get('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: {path: s.dataset.path}, responseType: 'blob'}).then((response) =>
+									{
+										div.classList.remove('wait');
+										Node.a({href: URL.createObjectURL(response.response), download: name, target: '_blank'}).click();
+									}, (error) =>
+									{
+										Notify.error(Translator.get('storage.download.item.error'))
+										div.classList.remove('wait');
+									});
+								}
+							},
+							keydown: function(e)
+							{
+								var s = this.querySelector('li.selected');
+								if( !s ) return;
+								
+								if( e.key == "Enter" )
+								{
+									if( s.classList.contains('folder') ) { self.browse(id, s.dataset.path); return; }
+									else
+									{
+										var name = s.dataset.path.split('/').pop();
+										div.classList.add('wait');
+										Ajax.get('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: {path: s.dataset.path}, responseType: 'blob'}).then((response) =>
+										{
+											div.classList.remove('wait');
+											Node.a({href: URL.createObjectURL(response.response), download: name, target: '_blank'}).click();
+										}, (error) =>
+										{
+											Notify.error(Translator.get('storage.download.item.error'));
+											div.classList.remove('wait');
+										});
+									}
+								}
+								else if( e.key == "Delete" )
+								{
+									Modal.confirm(Translator.get('storage.remove.item.confirm', ae.safeHtml(s.dataset.path)), [Translator.get('remove'), Translator.get('cancel')]).then((index) =>
+									{
+										if( index > 0 ) return;
+										div.classList.add('wait');
+										Ajax.delete('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: {path: s.dataset.path}}).then(() =>
+										{
+											Notify.success(Translator.get('config.remove.ok'));
+											self.browse(id, div.dataset.path);
+										}, (error) =>
+										{
+											Notify.error(Translator.get('config.remove.error'));
+											div.classList.remove('wait');
+										});
+									}, () => {});
+								}
+								else if( e.key == "Backspace" )
+								{
+									var parts = div.dataset.path.split('/');
+									parts.pop();
+									parts.pop();
+									parts.push('');
+									self.browse(id, parts.join('/'));
+								}
+								else if( e.key == "ArrowLeft" )
+								{
+									if( s.previousSibling )
+									{
+										s.classList.remove('selected');
+										s.previousSibling.classList.add('selected');
+										s.previousSibling.scrollIntoView({block: "nearest"});
+									}
+								}
+								else if( e.key == "ArrowRight" )
+								{
+									if( s.nextSibling )
+									{
+										s.classList.remove('selected');
+										s.nextSibling.classList.add('selected');
+										s.nextSibling.scrollIntoView({block: "nearest"});
+									}
+								}
+								else if( e.key == "ArrowDown" )
+								{
+									if( !s.nextSibling ) return;
+									for( var c = s; c; c = c.nextSibling )
+									{
+										if( c.offsetTop == s.offsetTop ) continue;
+										if( c.offsetLeft == s.offsetLeft )
+										{
+											s.classList.remove('selected');
+											c.classList.add('selected');
+											c.scrollIntoView({block: "nearest"});
+											return;
+										}
+									}
+								}
+								else if( e.key == "ArrowUp" )
+								{
+									if( !s.previousSibling ) return;
+									for( var c = s; c; c = c.previousSibling )
+									{
+										if( c.offsetTop == s.offsetTop ) continue;
+										if( c.offsetLeft == s.offsetLeft )
+										{
+											s.classList.remove('selected');
+											c.classList.add('selected');
+											c.scrollIntoView({block: "nearest"});
+											return;
+										}
+									}
+								}
+								else if( (e.key >= 'a' && e.key <= 'z') || (e.key >= 'A' && e.key <= 'Z') || (e.key >= '0' && e.key <= '9') )
+								{
+									for( var i = 0; i < this.children.length; i++ )
+									{
+										var c = this.children[i];
+										if( c.textContent[0] == e.key.toUpperCase() || c.textContent[0] == e.key.toLowerCase() )
+										{
+											s.classList.remove('selected');
+											c.classList.add('selected');
+											c.scrollIntoView({block: "nearest"});
+											return;
+										}
+									}
+								}
+							}})
+					]);
+					Modal.custom(div, true);
+				}
+				
+				div.classList.add('wait');
+				div.dataset.path = path;
+				
+				Ajax.get('/api/admin/storage/' + encodeURIComponent(id), {data: {path: path}}).then((result) =>
+				{
+					result.response.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+					
+					var ol = div.lastChild;
+					var address = div.firstChild.lastChild;
+					
+					address.textContent = path;
+					while( ol.firstChild ) ol.firstChild.remove();
+					
+					result.response.filter(p => p.endsWith('/')).forEach(p =>
+					{
+						ol.append(Node.li({className: 'folder', title: p, dataset: {path: path + p}}, ae.safeHtml(p.slice(0, -1))));
+					});
+					
+					result.response.filter(p => !p.endsWith('/')).forEach(p =>
+					{
+						ol.append(Node.li({className: 'file', title: p, dataset: {path: path + p}}, ae.safeHtml(p)));
+					});
+					
+					if( ol.firstChild ) ol.firstChild.classList.add('selected');
+					setTimeout(() => ol.focus(), 1);
+					
+					div.classList.remove('wait');
+				}, (error) =>
+				{
+					Notify.error(Translator.get('storage.browse.error'));
+					div.classList.remove('wait');
+				});
 			},
 			
 			query: function(id)

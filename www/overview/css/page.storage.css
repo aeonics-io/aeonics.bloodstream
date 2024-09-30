@@ -68,3 +68,23 @@ code-input#sql textarea::selection { background-color: #FB813660 !important; col
 .queryResult .value { color: #ffffffa0; font-family: monospace; flex: 1; }
 .queryResult .text { color: var(--orange); flex: 1; }
 .queryResult pre.response { max-height: 50vh; max-width: 40rem; }
+
+#storageBrowser { width: 60vw; height: 60vh; }
+#storageBrowser .addressBar { display: flex; align-items: center; }
+#storageBrowser .addressBar span.icon:hover { color: var(--blue); }
+#storageBrowser .addressBar span.icon {
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	padding: 0.2rem 0.5rem; cursor: pointer;
+}
+#storageBrowser .addressBar p { flex: 1; padding: 0.3rem 1rem; border-radius: 0.3rem; background-color: #ffffff10; margin-left: 1rem; }
+#storageBrowser ol { list-style: none; padding: 0; margin-top: 1rem; user-select: none; }
+#storageBrowser ol:focus { outline: none; }
+#storageBrowser li { display: inline-block; cursor: default; padding: 0.5rem; width: 20ch; overflow: hidden; text-overflow: ellipsis; 
+	border-radius: 0.3rem; margin: 0 0.2rem; border: 1px solid #fff1; white-space: nowrap; }
+#storageBrowser li.selected { border-color: var(--blue); }
+#storageBrowser li::before {
+	display: inline-block; margin-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important; 
+}
+#storageBrowser li.folder::before { content: '\e2c7'; color: var(--orange); }
+#storageBrowser li.file::before { content: '\e873'; }

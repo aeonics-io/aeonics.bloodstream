@@ -120,10 +120,10 @@ public class Storage
 			if( path.endsWith("/") || s.containsPath(path) )
 			{
 				// path is a directory
-				if( !params.isMap("file") || params.get("file").isEmpty("filename") )
+				if( !params.isMap("file") || params.get("file").isEmpty("name") )
 					throw new HttpException(413, "Missing file name, target path is a directory");
 				if( !path.endsWith("/") ) path += "/";
-				path += Path.of(params.get("file").asString("filename")).getFileName();
+				path += Path.of(params.get("file").asString("name")).getFileName();
 			}
 			
 			s.put(path, file);

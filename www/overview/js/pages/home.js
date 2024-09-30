@@ -66,7 +66,7 @@ var x = new Promise((ok, nok) =>
 							}}),
 							Node.span({className: 'icon'}, 'search')
 						]),
-						Node.div({id: 'homeAddAnything', click: function() { Entity.explore(); }}, 'add')
+						Node.div({id: 'homeAddAnything', click: function() { Entity.explore().then(() => { self.hide(); self.show(); }, () => {}); }}, 'add')
 					);
 					this.getData();
 				},
@@ -254,7 +254,7 @@ var x = new Promise((ok, nok) =>
 					return Node.section({className: 'open'}, [
 						Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, Translator.get('info.channels')),
 						Node.div(Node.div({className: 'detail'}, Object.values(inputs).concat(Object.values(outputs))
-							.sort((a, b) => { a.name > b.name ? 1 : -1; })
+							.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
 							.map((c) => Node.div({className: 'sublevel'}, [
 								Node.h3(ae.safeHtml(c.name)),
 								Node.p([
@@ -367,7 +367,7 @@ var x = new Promise((ok, nok) =>
 								click: function() { self.nodeClick(this.dataset.id); }}, 'link')
 						]));
 						
-					Object.values(template.relations).sort((a, b) => { return a.name > b.name ? 1 : -1; }).forEach((r) =>
+					Object.values(template.relations).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())).forEach((r) =>
 					{
 						var node = self.getRelationDetail(r, entity.relationships[r.name]);
 						if( node ) content.push(node);
@@ -461,7 +461,7 @@ var x = new Promise((ok, nok) =>
 						Node.ul(this.data.nodes
 							.filter((n) => n.type == 'e' && n.category == category)
 							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
-							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+							.sort((a, b) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase()))
 						)
 					);
 					
@@ -506,7 +506,7 @@ var x = new Promise((ok, nok) =>
 						Node.ul(this.data.nodes
 							.filter((n) => n.type == 'e' && n.category == category && n.subtype == type)
 							.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
-							.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+							.sort((a, b) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase()))
 						)
 					);
 					
@@ -534,7 +534,7 @@ var x = new Promise((ok, nok) =>
 							this.data.nodes
 								.filter((n) => n.type == 'e' && n.category == category && n.subtype == t)
 								.map((n) => Node.li({dataset: {id: n.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(n.name)))
-								.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; })
+								.sort((a, b) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase()))
 						)))
 					]));
 					
@@ -590,7 +590,7 @@ var x = new Promise((ok, nok) =>
 					var lis = this.data.links
 						.filter((l) => l.source.id == 'plugin:' + name)
 						.map((l) => Node.li({dataset: {id: l.target.id}, click: function() { self.nodeClick(this.dataset.id); }}, ae.safeHtml(l.target.name)))
-						.sort((a, b) => { return a.textContent > b.textContent ? 1 : -1; });
+						.sort((a, b) => a.textContent.toLowerCase().localeCompare(b.textContent.toLowerCase()));
 					
 					i.append(
 						Node.h1(ae.safeHtml(name||'-no name-')),
@@ -774,6 +774,14 @@ var x = new Promise((ok, nok) =>
 					// ===========================
 					// MAP FOR HIGHLIGHT
 					// ===========================
+					
+					graphdata.links = graphdata.links.filter(link =>
+					{
+						// remove broken links
+						const a = graphdata.nodes.find(n => n.id == link.source);
+						const b = graphdata.nodes.find(n => n.id == link.target);
+						return !!a && !!b;
+					});
 					
 					graphdata.links.forEach(link => {
 						const a = graphdata.nodes.find(n => n.id == link.source);

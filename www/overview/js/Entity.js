@@ -43,7 +43,7 @@ var x = new Promise((ok, nok) =>
 				
 				Ajax.get('/api/meta/factory/categories').then((result) =>
 				{
-					result.response.sort((a, b) => { return a > b ? 1 : -1; });
+					result.response.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 					
 					div.append(
 						Node.p(Translator.get('entity.choose.category')),
@@ -142,11 +142,19 @@ var x = new Promise((ok, nok) =>
 								Node.input({type: 'text', name: '__name', id: 'entity__name', value: entity?entity.name:''}),
 								Node.p(Translator.get('entity.name.description'))
 							]),
-							Object.entries(t.parameters).sort((a, b) => { return a[1].summary > b[1].summary ? 1 : -1; }).map(([key, detail]) =>
+							Object.entries(t.parameters).sort((a, b) => a[1].summary.toLowerCase().localeCompare(b[1].summary.toLowerCase())).map(([key, detail]) =>
 							{
 								return Node.fieldset({className: detail.optional ? '' : 'required'}, [
 									Node.label({htmlFor: 'entity__' + key}, ae.safeHtml(detail.summary)),
 									Entity.__getField(key, detail, entity?entity.parameters[key]:null),
+									Node.p(ae.safeHtml(detail.description))
+								])
+							}),
+							Object.entries(t.relations).sort((a, b) => a[1].summary.toLowerCase().localeCompare(b[1].summary.toLowerCase())).map(([key, detail]) =>
+							{
+								return Node.fieldset({className: 'link' + (detail.min > 0 ? '' : ' required')}, [
+									Node.label({htmlFor: 'entity_rel__' + key}, ae.safeHtml(detail.summary)),
+									Entity.__getRelation(key, detail, entity?entity.relations[key]:null),
 									Node.p(ae.safeHtml(detail.description))
 								])
 							}),
@@ -164,10 +172,14 @@ var x = new Promise((ok, nok) =>
 								var data = {name: form.__name.value, parameters: {}, relationships: {}};
 								for( var e of form.elements )
 								{
-									if( e.name && e.name != '__name' )
+									if( e.name && !e.name.startsWith('__') )
 									{
 										if( e.type != 'checkbox' || e.checked )
 											data.parameters[e.name] = e.value;
+									}
+									else if( e.name == '__rel' )
+									{
+										data.relationships[e.parentNode.dataset.name] = JSON.parse(e.value||'[]');
 									}
 								}
 								
@@ -213,6 +225,56 @@ var x = new Promise((ok, nok) =>
 				return p;
 			}
 			
+			static __getRelation(key, detail, value)
+			{
+				if( !value ) value = [];
+				
+				const get_li = function(v) 
+				{
+					return Node.li({dataset: {id: v.id}}, [
+						Node.span({click: function()
+						{
+							Entity.__promptRelation(detail, v).then((w) => {
+								this.dataset.id = w.id;
+								this.textContent = w.id;
+								var values = JSON.parse(this.parentNode.parentNode.lastChild.value);
+								var i = values.findIndex(x => x.id == w.id);
+								values[i] = w;
+								this.parentNode.parentNode.lastChild.value = JSON.stringify(values);
+							}, () => {});
+						}}, ae.safeHtml(v.id)),
+						Node.span({click: function()
+						{
+							this.parentNode.parentNode.lastChild.value = JSON.stringify(
+								JSON.parse(this.parentNode.parentNode.lastChild.value)
+								.filter(x => x.id != this.parentNode.dataset.id)
+							);
+							this.parentNode.remove();
+						}}, 'cancel')
+					]);
+				};
+				
+				return Node.ol({className: 'relations', dataset: {name: key}}, [
+					value.map(v => get_li(v)),
+					Node.span({click: function()
+					{ 
+						if( detail.max > 0 && (this.parentNode.children.length - 2) >= detail.max )
+						{
+							Notify.warning(Translator.get('entity.relation.limit'));
+							return;
+						}
+						
+						Entity.__promptRelation(detail, null).then((v) => {
+							this.parentNode.insertBefore(get_li(v), this);
+							var values = JSON.parse(this.parentNode.lastChild.value);
+							values.push(v);
+							this.parentNode.lastChild.value = JSON.stringify(values);
+						}, () => {});
+					}}, 'add'),
+					Node.input({type: 'hidden', name: '__rel', value: JSON.stringify(value)}),
+				]);
+			}
+			
 			static __getField(key, detail, value)
 			{
 				switch(detail.format)
@@ -222,6 +284,7 @@ var x = new Promise((ok, nok) =>
 					case "text":
 						return Node.input({type: 'text', name: key, id: 'entity__' + key, value: value||detail.defaultValue||''});
 					case "json":
+						return Node.textarea({name: key, id: 'entity__' + key}, JSON.stringify(value||detail.defaultValue));
 					case "code":
 					case "longtext":
 						return Node.textarea({name: key, id: 'entity__' + key}, ''+(value||detail.defaultValue));
@@ -254,6 +317,72 @@ var x = new Promise((ok, nok) =>
 						return Node.select({name: key, id: 'entity__' + key, value: value||detail.defaultValue||''}, 
 							detail.values.map(v => Node.option({value: v}, ae.safeHtml(v))));
 				}
+			}
+			
+			static __promptRelation(detail, value)
+			{
+				var div = Node.div({id: 'entity_editor', className: 'wait'});
+				var ok, nok;
+				var p  = new Promise((_ok, _nok) => { ok = _ok; nok = _nok; });
+				p.ok = ok;
+				p.nok = nok;
+				var m = Modal.custom(div, true);
+				m.then(() => {}, () => { p.nok(); });
+				m.dom.classList.add('promptable');
+				
+				Ajax.get('/api/meta/registry/' + encodeURIComponent(detail.category) + '/entities').then((result) =>
+				{
+					div.append(Node.form(
+					[
+						Node.fieldset({className: 'required'}, [
+							Node.label({htmlFor: 'relentity__id'}, ae.safeHtml(Translator.get('entity.related'))),
+							Node.select({name: 'id', id: 'relentity__id', value: value?value.id:''}, 
+								result.response.map(e => Node.option({value: e.id}, ae.safeHtml(e.name)))),
+							Node.p(ae.safeHtml(Translator.get('entity.related.description')))
+						]),
+						Object.entries(detail.parameters).sort((a, b) => a[1].summary.toLowerCase().localeCompare(b[1].summary.toLowerCase()))
+							.map(([key, detail2]) =>
+						{
+							if( detail2.name == 'id' ) return null;
+							else return Node.fieldset({className: detail2.optional ? '' : 'required'}, [
+								Node.label({htmlFor: 'entity__' + key}, ae.safeHtml(detail2.summary)),
+								Entity.__getField(key, detail2, value?value[key]:null),
+								Node.p(ae.safeHtml(detail2.description))
+							]);
+						}),
+						Node.button({click: function(e)
+						{
+							e.preventDefault();
+							m.nok();
+						}}, Translator.get('cancel')),
+						Node.button({click: function(e)
+						{
+							e.preventDefault();
+							
+							var form = this.parentNode;
+							var data = {};
+							for( var e of form.elements )
+							{
+								if( e.name && !e.name.startsWith('__') )
+								{
+									if( e.type != 'checkbox' || e.checked )
+										data[e.name] = e.value;
+								}
+							}
+							m.ok();
+							p.ok(data);
+						}}, Translator.get('ok'))
+					]));
+					
+					div.classList.remove('wait');
+				}, (error) =>
+				{
+					Notify.error(Translator.get('entity.template.error'));
+					m.nok();
+					p.nok();
+				});
+				
+				return p;
 			}
 		}
 		

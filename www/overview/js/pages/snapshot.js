@@ -188,7 +188,7 @@ var x = new Promise((ok, nok) =>
 				var self = this;
 				
 				this.dom.classList.add('wait');
-				Ajax.get('/api/admin/snapshot/download/' + name, {responseType: 'blob'}).then((response) =>
+				Ajax.get('/api/admin/snapshot/download/' + encodeURIComponent(name), {responseType: 'blob'}).then((response) =>
 				{
 					self.dom.classList.remove('wait');
 					Node.a({href: URL.createObjectURL(response.response), download: name+".zip", target: '_blank'}).click();

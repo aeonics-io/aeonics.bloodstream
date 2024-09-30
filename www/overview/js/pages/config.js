@@ -91,8 +91,8 @@ var x = new Promise((ok, nok) =>
 				{
 					self.configs = result.response;
 					
-					const documented = self.configs.filter(c => !!c.definition.summary).sort((a, b) => { return a.entity < b.entity ? -1 : a.entity == b.entity ? a.name < b.name ? -1 : 1 : 1; });
-					const undocumented = self.configs.filter(c => !c.definition.summary).sort((a, b) => { return a.entity < b.entity ? -1 : a.entity == b.entity ? a.name < b.name ? -1 : 1 : 1; });
+					const documented = self.configs.filter(c => !!c.definition.summary).sort((a, b) => { return a.entity < b.entity ? -1 : a.entity == b.entity ? a.name.toLowerCase().localeCompare(b.name.toLowerCase()) : 1; });
+					const undocumented = self.configs.filter(c => !c.definition.summary).sort((a, b) => { return a.entity < b.entity ? -1 : a.entity == b.entity ? a.name.toLowerCase().localeCompare(b.name.toLowerCase()) : 1; });
 					
 					Object.entries(Object.groupBy(documented, (c) => c.entity)).forEach((e) =>
 					{
