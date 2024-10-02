@@ -304,7 +304,7 @@ var x = new Promise((ok, nok) =>
 								{
 									var name = e.target.dataset.path.split('/').pop();
 									div.classList.add('wait');
-									Ajax.get('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: {path: s.dataset.path}, responseType: 'blob'}).then((response) =>
+									Ajax.get('/api/admin/storage/' + encodeURIComponent(id) + '/file', {data: {path: e.target.dataset.path}, responseType: 'blob'}).then((response) =>
 									{
 										div.classList.remove('wait');
 										Node.a({href: URL.createObjectURL(response.response), download: name, target: '_blank'}).click();

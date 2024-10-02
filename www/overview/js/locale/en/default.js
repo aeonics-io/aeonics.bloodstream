@@ -313,5 +313,38 @@ export default {
 	'storage.upload.item.success': "Upload complete",
 	'storage.upload.item.error': "Upload failed",
 	
+	'logs.title': "Live logs",
+	'logs.explain': "Connect to the live data stream of system logs. Using data workflows, you can subscribe to the <em>log</em> topic and fetch the messages "
+		+ "in real time. This enables live troubleshooting and monitoring of events.",
+	'logs.start': "Start",
+	'logs.suspend': "Suspend",
+	'logs.stop': "Stop",
+	'logs.restore.level': "Restore log level",
+	'logs.restore.success': "Log level restored",
+	'logs.restore.fail': "Could not restore log level",
+	'logs.choose.level': "Desired log level",
+	'logs.choose.filter': "Filter by tag",
+	'logs.ws.disconnect': "Live logging disconnected",
+	'logs.ws.success': "Live logging enabled",
+	'logs.set.error': "Could not enable logging",
+	'logs.suspended': "Live logging suspended",
+	'logs.status': "Current state: ",
+	'logs.status.connected': "Connected",
+	'logs.status.disconnected': "Disconnected",
+	
+	'debug.title': "Live debugging",
+	'debug.explain': "Debug information come from the underlying source code of entities. You can output any message or variables to the <em>Debug.debug()</em> "
+		+ "method and the output will be treated as a data stream. You can then subscribe to the <em>debug</em> topic and " 
+		+ "fetch the messages in real time. This enables live troubleshooting and eases debugging of internal entity state at runtime.",
+	'debug.start': "Start",
+	'debug.stop': "Stop",
+	'debug.choose.filter': "Filter by tag",
+	'debug.ws.disconnect': "Live debug disconnected",
+	'debug.ws.success': "Live debug enabled",
+	'debug.status': "Current state: ",
+	'debug.status.connected': "Connected",
+	'debug.status.disconnected': "Disconnected",
+	
+	
 	'': ""
 };

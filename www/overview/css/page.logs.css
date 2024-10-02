@@ -1,0 +1,37 @@
+
+section.logs {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+	position: relative;
+}
+
+section.logs h1 { display: block; text-align: center; margin: 2rem; }
+section.logs > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
+section.logs .log_status.connected { color: var(--green); }
+section.logs .log_status.disconnected { color: var(--red); }
+
+section.logs .action { text-align: right; }
+section.logs .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.logs .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+section.logs .logs_list { margin: 0; padding: 0; list-style: none; text-align: left; }
+section.logs .logs_list li { display: block; font-family: monospace; text-align: left; padding: 0.7rem; font-size: 0.8rem; border-radius: 0.2rem; }
+section.logs .logs_list li:hover { background-color: #fff1; }
+
+section.logs .logs_list li span.level { display: inline-block; padding: 0.2rem 0.5rem; margin-right: 2ch; border-radius: 0.2rem; min-width: 9ch; }
+section.logs .logs_list li span.level.ALL { background-color: #666666; }
+section.logs .logs_list li span.level.FINE { background-color: #0091EA; }
+section.logs .logs_list li span.level.FINER { background-color: #0091EA; }
+section.logs .logs_list li span.level.FINEST { background-color: #0091EA; }
+section.logs .logs_list li span.level.CONFIG { background-color: #8100EB; }
+section.logs .logs_list li span.level.INFO { background-color: #8100EB; }
+section.logs .logs_list li span.level.WARNING { background-color: #FFD600; }
+section.logs .logs_list li span.level.SEVERE { background-color: #D50000; }
+section.logs .logs_list li span.level.SEVEREST { background-color: #D50000; }
+section.logs .logs_list li span.date { display: inline-block; padding: 0.2rem 1ch; margin-right: 2ch; min-width: 14ch; }
+section.logs .logs_list li span.tag { display: inline-block; padding: 0.2rem 1ch; margin-right: 2ch; border-radius: 0.2rem; background-color: #C0C0C060; }
+section.logs .logs_list li p.message { display: inline; line-height: 1.5rem; }

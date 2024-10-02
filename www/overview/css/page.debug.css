@@ -1,0 +1,26 @@
+
+section.debug {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+	position: relative;
+}
+
+section.debug h1 { display: block; text-align: center; margin: 2rem; }
+section.debug > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
+section.debug .log_status.connected { color: var(--green); }
+section.debug .log_status.disconnected { color: var(--red); }
+
+section.debug .action { text-align: right; }
+section.debug .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.debug .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+section.debug .debug_list { margin: 0; padding: 0; list-style: none; text-align: left; }
+section.debug .debug_list li { 
+	display: block; font-family: monospace; text-align: left; padding: 0.7rem; font-size: 0.8rem; 
+	border-radius: 0.5rem; background-color: #fff1; margin-bottom: 1rem; }
+
+section.debug .debug_list li pre { background: transparent; }
