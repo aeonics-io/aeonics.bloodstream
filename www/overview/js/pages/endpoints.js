@@ -477,11 +477,16 @@ var x = new Promise((ok, nok) =>
 						+ "public class Custom implements Supplier<Entity> {\n"
 						+ "\tpublic Entity get() {\n"
 						+ "\t\treturn new Endpoint.Rest() { }\n"
-						+ "\t\t\t.template()\n"
-						+ "\t\t\t.returns(\"" + form.returns.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n"
-						+ "\t\t\t.summary(\"" + form.summary.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n"
-						+ "\t\t\t.description(\"" + form.description.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n"
-						+ "\t\t\t.create()\n"
+						+ "\t\t\t.template()\n";
+						
+					if( form.returns.value )
+						code += "\t\t\t.returns(\"" + form.returns.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n";
+					if( form.summary.value )
+						code += "\t\t\t.summary(\"" + form.summary.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n";
+					if( form.description.value )
+						code += "\t\t\t.description(\"" + form.description.value.replaceAll(/\\/g, '\\\\').replaceAll(/"/g,'\\"') + "\")\n";
+					
+					code += "\t\t\t.create()\n"
 						+ "\t\t\t.<Endpoint.Rest.Type>cast()\n"
 						+ "\t\t\t.process((data, user) -> {\n"
 						+ "\t\t\t\t// YOUR CODE HERE\n"
