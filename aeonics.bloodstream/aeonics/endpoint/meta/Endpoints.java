@@ -171,7 +171,7 @@ public class Endpoints
 	private static final Endpoint.Rest.Type plugins = new Endpoint.Rest() { }
 		.template()
 		.summary("Lists plugins")
-		.description("This endpoint returns the name of all plugins and shared libraries.")
+		.description("This endpoint returns the name of all compatible plugins.")
 		.create()
 		.<Rest.Type>cast()
 		.process(() ->

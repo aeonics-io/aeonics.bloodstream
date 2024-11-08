@@ -796,7 +796,16 @@ public class Endpoints
 			if( user == User.ANONYMOUS )
 				return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/login?code=" + code);
 			else
-				return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/consent?code=" + code);
+			{
+				if( Common.Consent.get(user.id() + "_" + c.id()) != null )
+				{
+					try { return consent.process(params.put("granted", true), user, request); }
+					catch(HttpException e) { throw e; }
+					catch(Exception ex) { throw new RuntimeException(ex); }
+				}
+				else
+					return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/consent?code=" + code);
+			}
 		}
 	}
 	

@@ -100,7 +100,7 @@ public class Main extends Plugin
 		// ===========================
 		// OP stuff
 		
-		c.declare(Security.class, new Parameter("oidc.op.issuer")
+		c.declare(Security.class, new Parameter("oidcissuer")
 			.summary("OIDC OP issuer url")
 			.description("The url of this OIDC OP instance.")
 			.rule(Parameter.Rule.URL)
@@ -203,7 +203,7 @@ public class Main extends Plugin
 	{
 		// bind the config
 		Config c = Manager.of(Config.class);
-		c.watch(Security.class, "oidc.op.issuer", (key, value) -> Common.OP_ISSUER_URL = value.asString());
+		c.watch(Security.class, "oidcissuer", (key, value) -> Common.OP_ISSUER_URL = value.asString());
 		c.watch(Security.class, "oidc.op.access_token.ttl", (key, value) -> Common.OP_ACCESS_TOKEN_TTL = value.asLong());
 		c.watch(Security.class, "oidc.op.id_token.ttl", (key, value) -> Common.OP_ID_TOKEN_TTL = value.asLong());
 		c.watch(Security.class, "oidc.op.refresh_token.ttl", (key, value) -> Common.OP_REFRESH_TOKEN_TTL = value.asLong());
@@ -275,6 +275,7 @@ public class Main extends Plugin
 		
 		aeonics.endpoint.meta.Configuration.register();
 		aeonics.endpoint.meta.Endpoints.register();
+		aeonics.endpoint.meta.Plugins.register();
 		aeonics.endpoint.meta.Security.register();
 		aeonics.endpoint.meta.Snapshots.register();
 		aeonics.endpoint.meta.Storage.register();

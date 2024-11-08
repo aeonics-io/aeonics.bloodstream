@@ -8,8 +8,8 @@ section.debug {
 
 section.debug h1 { display: block; text-align: center; margin: 2rem; }
 section.debug > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
-section.debug .log_status.connected { color: var(--green); }
-section.debug .log_status.disconnected { color: var(--red); }
+section.debug .debug_status.connected { color: var(--green); }
+section.debug .debug_status.disconnected { color: var(--red); }
 
 section.debug .action { text-align: right; }
 section.debug .action button { display: inline-block; width: unset; margin-left: 0.5rem; }

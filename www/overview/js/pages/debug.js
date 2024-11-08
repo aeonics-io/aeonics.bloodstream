@@ -39,7 +39,7 @@ var x = new Promise((ok, nok) =>
 					Node.p(Translator.get('debug.explain')),
 					Node.p([
 						Node.span(Translator.get('debug.status')),
-						Node.span({className: 'log_status disconnected'}, Translator.get('debug.status.disconnected'))
+						Node.span({className: 'debug_status disconnected'}, Translator.get('debug.status.disconnected'))
 					]),
 					Node.div({className: 'action'},
 					[
@@ -73,7 +73,7 @@ var x = new Promise((ok, nok) =>
 						
 					self.ws.addEventListener('open', () => 
 					{
-						var state = self.dom.querySelector('.log_status');
+						var state = self.dom.querySelector('.debug_status');
 						state.classList.remove('disconnected');
 						state.classList.add('connected');
 						state.textContent = Translator.get('debug.status.connected');
@@ -85,7 +85,7 @@ var x = new Promise((ok, nok) =>
 					{
 						self.ws = null;
 						
-						var state = self.dom.querySelector('.log_status');
+						var state = self.dom.querySelector('.debug_status');
 						state.classList.remove('connected');
 						state.classList.add('disconnected');
 						state.textContent = Translator.get('debug.status.disconnected');
@@ -99,7 +99,7 @@ var x = new Promise((ok, nok) =>
 						self.ws.close();
 						self.ws = null;
 						
-						var state = self.dom.querySelector('.log_status');
+						var state = self.dom.querySelector('.debug_status');
 						state.classList.remove('connected');
 						state.classList.add('disconnected');
 						state.textContent = Translator.get('debug.status.disconnected');
@@ -113,7 +113,7 @@ var x = new Promise((ok, nok) =>
 				{
 					this.ws.close();
 					this.ws = null;
-					Notify.info(Translator.get('debug.suspended'));
+					Notify.info(Translator.get('debug.ws.disconnect'));
 				}
 			},
 			

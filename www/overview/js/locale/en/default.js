@@ -345,6 +345,24 @@ export default {
 	'debug.status.connected': "Connected",
 	'debug.status.disconnected': "Disconnected",
 	
+	'metrics.title': "Live internal metrics",
+	'metrics.explain': "Metrics come from the underlying entities and managers. The reported information contain the number of occurences and an aggregated sum "
+		+ "over a configurable time window. Depending on the metric, the meaning of the data may vary. Since the amount of monitoring data can grow large, "
+		+ "this page shows a simple high level summary of the data. Consider using a specialized monitoring dashboard for more analysis capabilities.",
+	'metrics.start': "Start",
+	'metrics.stop': "Stop",
+	'metrics.ws.disconnect': "Live metrics disconnected",
+	'metrics.ws.success': "Live metrics enabled",
+	'metrics.status': "Current state: ",
+	'metrics.status.connected': "Connected",
+	'metrics.status.disconnected': "Disconnected",
+	'metrics.time': "Next data collection in ",
+	'metrics.time.left': "{}s",
+	'metrics.nodata': "There are no metrics data at this time. If you just started the system or the monitoring, this is normal.",
+	'metrics.table.category': "Category",
+	'metrics.table.type': "Item Type",
+	'metrics.table.id': "Entity",
+	'metrics.table.metric': "Units",
 	
 	'': ""
 };

@@ -1,12 +1,16 @@
 package aeonics.endpoint.meta;
 
 import aeonics.data.Data;
+import aeonics.entity.Entity;
+import aeonics.entity.security.Group;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
 import aeonics.http.HttpException;
 import aeonics.manager.Manager;
+import aeonics.oidc.TOTP;
 import aeonics.template.Parameter;
 import aeonics.util.Json;
+import aeonics.util.Tuples.Tuple;
 import aeonics.http.Endpoint.Rest;
 
 @SuppressWarnings("unused")
@@ -28,10 +32,38 @@ public class Security
 		.<Rest.Type>cast()
 		.process((params, user) ->
 		{
+			Data roles = Data.list();
+			for( Tuple<Entity, Data> r : user.relations("roles") )
+			{
+				if( r.a != null )
+					roles.add(Data.map().put("name", r.a.name()).put("id", r.a.id()));
+			}
+			
+			Data groups = Data.list();
+			for( Tuple<Entity, Data> g : user.relations("groups") )
+			{
+				if( g.a != null )
+				{
+					groups.add(Data.map().put("name", g.a.name()).put("id", g.a.id()));
+					
+					for( Tuple<Entity, Data> r : g.a.relations("roles") )
+					{
+						if( r.a != null && roles.find(d -> d.get("id").equals(r.a.id())) == null )
+							roles.add(Data.map().put("name", r.a.name()).put("id", r.a.id()));
+					}
+				}
+			}
+			
 			return Data.map()
 				.put("id", user.id())
 				.put("name", user.name())
-				.put("anonymous", user == User.ANONYMOUS);
+				.put("login", user.login())
+				.put("active", user.active())
+				.put("attributes", user.valueOf("attributes"))
+				.put("anonymous", user == User.ANONYMOUS)
+				.put("groups", groups)
+				.put("roles", roles)
+				.put("mfa", TOTP.enrolled(user));
 		})
 		.url("/api/security/me")
 		.method("GET")
