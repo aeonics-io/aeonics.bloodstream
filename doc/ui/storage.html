@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Data Storage</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#storage">Storage</a>
+	<a class="h3" href="#storage-remove">Remove</a>
+	<a class="h3" href="#storage-edit">Edit</a>
+	<a class="h3" href="#storage-browse">Browse</a>
+	<a class="h3" href="#storage-create">Create</a>
+	<a class="h2" href="#database">Database</a>
+	<a class="h3" href="#storage-remove">Remove</a>
+	<a class="h3" href="#storage-edit">Edit</a>
+	<a class="h3" href="#storage-query">Query</a>
+	<a class="h3" href="#storage-create">Create</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Data Storage</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page allows to manage the data storage locations.</p>
+		<p>There are 2 tabs available on this page:</p>
+		<ul>
+			<li><strong>Storage</strong>: these are the entities that provide simple fetch-store operations.</li>
+			<li><strong>Database</strong>: these are the entities that allow to perform complex queries without the need to manage connectivity.</li>
+		</ul>
+		<p>The goal is to add more flexibility to the system by referencing a storage location
+			instead of rather than embedding storage details directly in the code. This approach decouples the storage logic from the rest of the system, 
+			ensuring that storage-related operations are modular and interchangeable. By defining storage configurations separately, the system can 
+			seamlessly switch or update storage types (e.g., switching from a database to disk storage) without requiring modifications to other 
+			system components.</p>
+		<img src="../images/ui/page-storage.png" alt="Screenshot" style="max-width: 100%;" />
+		<p>You can use the search bar on the top left corner of the page to filter the relevant elements as needed.</p>
+	</div>
+	
+	<div>
+		<h2 id="storage">Storage</h2>
+		<p>In the storage section, all sort of storage entities are listed and ordered by name. You have the possibility to inspect each entity by clicking on 
+			the unique ID in blue. The item type and entity class give you a hint about the type of storage that this item represents.</p>
+		<img src="../images/ui/page-storage2.png" alt="Screenshot" style="width: 50ch;" />
+		<p>For each storage location, you can perform different actions by clicking on the icons.</p>
+		
+		<section id="storage-remove">
+			<h3>Remove</h3>
+			<p>You can click on the first icon (cross) to remove this storage location. You will be prompted for confirmation.</p>
+			<img src="../images/ui/page-storage3.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-edit">
+			<h3>Edit</h3>
+			<p>You can  click on the second icon (pencil) to modify the configuration of the storage location. The parameters available
+				depend on the type of storage.</p>
+			<img src="../images/ui/page-storage4.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-browse">
+			<h3>Browse</h3>
+			<p>You can  click on the last icon (folder) to browse the storage in a simplified file-explorer window.</p>
+			<p>If you double click on a directory (orange) you can list the contents. <br />
+				If you double click on a file (white) it will download it.<br />
+				If you drag &amp; drop a file from your computer into the browsing area, it will upload it. <br />
+				If you focus on a file and press the delete key, it will remove the file.</p>
+			<img src="../images/ui/page-storage5.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-create">
+			<h3>Create</h3>
+			<p>You can create a new storage location by clicking the button on the top right border of the storage section.</p>
+			<img src="../images/ui/page-storage6.png" alt="Screenshot" style="width: 15ch;" />
+			<p>This will open the entity creation prompt with the different storage locations available in the system. Depending on the
+				one you choose, the configuration parameters may differ.</p>
+			<img src="../images/ui/page-storage7.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="database">Database</h2>
+		<p>In the database section, you can see all the database connections that are ready to be used. You have the possibility to inspect each entity 
+			by clicking on the unique ID in blue. The item type and entity class give you a hint about the type of storage that this item represents.</p>
+		<img src="../images/ui/page-storage8.png" alt="Screenshot" style="width: 50ch;" />
+		<p>For each database connection, you can perform different actions by clicking on the icons.</p>
+		
+		<section id="storage-remove">
+			<h3>Remove</h3>
+			<p>You can click on the first icon (cross) to remove this database connection. You will be prompted for confirmation.</p>
+			<img src="../images/ui/page-storage9.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-edit">
+			<h3>Edit</h3>
+			<p>You can  click on the second icon (pencil) to modify the configuration of the database connection. The parameters available
+				depend on the type of storage but generally include common settings such as the <em>driver</em> and the <em>jdbc</em> connection string.</p>
+			<img src="../images/ui/page-storage10.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-query">
+			<h3>Query</h3>
+			<p>You can  click on the last icon (database) to test the connection and perform a direct query. 
+				Be careful because any query is passed directly unfiltered to the database.</p>
+			<img src="../images/ui/page-storage11.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+		
+		<section id="storage-create">
+			<h3>Create</h3>
+			<p>You can create a new database connection by clicking the button on the top right border of the storage section.</p>
+			<img src="../images/ui/page-storage6.png" alt="Screenshot" style="width: 15ch;" />
+			<p>This will open the entity creation prompt with the different parameters to setup the connection. Note that the connection 
+				<em>is not validated</em> at creation, but only <strong>when you perform the first query</strong>.</p>
+			<img src="../images/ui/page-storage12.png" alt="Screenshot" style="width: 60ch;" />
+		</section>
+	</div>
+</main>
+</body>
+</html>

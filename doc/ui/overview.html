@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Overview</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	
+	<a class="h2" href="#details">Details Panel</a>
+	<a class="h3" href="#details-factory">Factory</a>
+	<a class="h3" href="#details-registry">Registry</a>
+	<a class="h3" href="#details-plugin">Plugin</a>
+	<a class="h3" href="#details-entity">Entity</a>
+	
+	<a class="h2" href="#add">Create Entity</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Overview</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page offers a live systemwide inspection tool to visualize the heart of the system and the relationships that exists beween elements.
+			It helps understand the system behavior and troubleshoot the inner entities as the system is running.</p>
+		<img src="../images/ui/page-overview.png" alt="Screenshot" style="max-width: 100%;" />
+		
+		<p>This representation is dynamic and you can navigate with the mouse to zoom (scroll), move around (drag), and interact (click) with the dots.
+			If the view is too crowded or if you want to isolate a subset, you can drag dots around.</p>
+		<p>The dots are linked together with colored lines based on 4 aspects:</p>
+		<img src="../images/ui/page-overview4.png" alt="Screenshot" style="width: 20ch;" />
+		<ul>
+			<li><strong>Factory</strong>: the blue component on top represents the internal <em>factory</em> that is responsible to create, document, 
+				and update entities. It is needed to track what category and type of object is exposed by an entity. The direct linked blue dots
+				are the different categories. You can click on them to highlight only the relevant entities that are part of that category.</li>
+			<li><strong>Managers</strong>: the red component on the right represents the different systemwide <em>managers</em> that present
+				shared and common behavior across the entire system. The  direct linked red dots represent the different manager types.
+				You can click on them to highlight the current implementation entity.</li>
+			<li><strong>Registry</strong>: the orange component on the bottom represents the <em>registry</em> of the system, this is where all entities
+				are maintained and organized in different categories. The direct linked orange dots are the different categories. You can click on them
+				to highlight all the entities that are contained in that part of the registry.</li>
+			<li><strong>Plugins</strong>: the green component on the left represents the different <em>plugins</em> that are loaded in the system. It helps
+				keep track of the origin of entities and the dependencies of the system. The direct linked green dots are the plugins themselves. You can click on
+				them to highlight all the entities that is attached to that plugin.</li>
+		</ul>
+		
+		<p>All <em>entities</em> in the system are displayed in the middle with yellow dots. You can click on them to display specific details. and visualize their
+			relationship with the reference aspects listed above.</p>
+		<img src="../images/ui/page-overview3.png" alt="Screenshot" style="width: 80ch;" />
+		
+		<p>Using the search box in the top left corner of the page, you can filter only relevant entities. You can search by name or by ID.</p>
+		<img src="../images/ui/page-overview2.png" alt="Screenshot" style="width: 60ch;" />
+	</div>
+	
+	<div>
+		<h2 id="details">Details Panel</h2>
+		<p>The details panel appears on the right of the screen when you click on a dot. Each type of dot (color) will display its own set of information.</p>
+		
+		<section id="details-factory">
+			<h3>Factory</h3>
+			<p>When clicking on a factory (blue) dot, the details panel will display all entities of that category, regrouped by implementation type.
+				You can filter the content and click on any listed entity to get its own details.</p>
+			<img src="../images/ui/page-overview7.png" alt="Screenshot" style="width: 50ch;" />
+		</section>
+		
+		<section id="details-registry">
+			<h3>Registry</h3>
+			<p>When clicking on a registry (orange) dot, the details panel will display all entities that are registered in that category.
+				You can filter the content and click on any listed entity to get its own details.</p>
+			<img src="../images/ui/page-overview8.png" alt="Screenshot" style="width: 50ch;" />
+		</section>
+		
+		<section id="details-plugin">
+			<h3>Plugin</h3>
+			<p>When clicking on a plugin (green) dot, the details panel will display all entities related to that plugin.
+				You can filter the content and click on any listed entity to get its own details.</p>
+			<img src="../images/ui/page-overview6.png" alt="Screenshot" style="width: 50ch;" />
+		</section>
+		
+		<section id="details-entity">
+			<h3>Entity</h3>
+			<p>When clicking on an entity (yellow) dot, the details panel will display all the information available about it, regrouped into four main sections.</p>
+			<p>Technically speaking, an entity is a concept that regroups an <code>Item</code> to encapsulate a <code>Template</code> which provides documentation
+				and characteristics of the entity, and the <code>Entity</code> itself which stores a specific state and set of methods.</p>
+			<img src="../images/ui/page-overview5.png" alt="Screenshot" style="width: 50ch;" />
+			
+			<h4>Identification</h4>
+			<p>This section shows the global identification characteristics of the entity.</p>
+			<img src="../images/ui/page-overview12.png" alt="Screenshot" style="width: 50ch;" />
+			<ul>
+				<li><strong>Unique ID</strong>: this is the globally unique identifier of the entity.</li>
+				<li><strong>Item category</strong>: this is the category of entities to which it belongs. Clicking on the icon on the right will select and
+					display information about this registry category.</li>
+				<li><strong>Item type</strong>: this is the specific type of entity. Clicking on the icon on the right will list all registry 
+					entities of the same type.</li>
+				<li><strong>Entity class</strong>: this is the implementing class name of the entity.</li>
+				<li><strong>Internal entity</strong>: whether or not the entity is considered tpo be managed by the system (yes = internal) or
+					managed by the user (no = not internal).</li>
+			</ul>
+			
+			<h4>Entity type</h4>
+			<p>This section shows the template information of the entity.</p>
+			<img src="../images/ui/page-overview13.png" alt="Screenshot" style="width: 50ch;" />
+			<ul>
+				<li><strong>Summary</strong>: this is the display name of the type of entity.</li>
+				<li><strong>Description</strong>: this is the documentation of the entity.</li>
+				<li><strong>Item category</strong>: this is the template item category. Clicking on the icon on the right will select and display
+					information about this factory category.</li>
+				<li><strong>Item type</strong>: this is the item template type.</li>
+				<li><strong>Item plugin</strong>: this is the plugin that declared the item template.</li>
+				<li><strong>Entity class</strong>: this is the entity class that this template is able to create.</li>
+				<li><strong>Entity plugin</strong>: this is the plugin that declared the entity implementation class.</li>
+				<li><strong>Template class</strong>: this is the actual template implementation class.</li>
+				<li><strong>Template plugin</strong>: this is the plugin that declared the template class.</li>
+			</ul>
+			
+			<h4>Configuration</h4>
+			<p>This section lists all the configuration parameters of the entity that have been declared by the template. The current value for this entity 
+				is displayed in the rectangle area.</p>
+			<img src="../images/ui/page-overview14.png" alt="Screenshot" style="width: 50ch;" />
+			<p>If you click on the icon on the right, it shows more information about this configuration parameter, such as the display name, description and
+				other characteristics about the type of value it accepts.</p>
+			<img src="../images/ui/page-overview16.png" alt="Screenshot" style="width: 50ch;" />
+			
+			<h4>Relationships</h4>
+			<p>This section lists all the relationships of the entity that have been declared by the template. If the entity has an existing relation, it
+				is listed. Clicking the icon on the right will select and display information about that other entity.</p>
+			<img src="../images/ui/page-overview15.png" alt="Screenshot" style="width: 50ch;" />
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="add">Create Entity</h2>
+		<p>You can create an arbitrary entity by clicking on the bottom left button.</p>
+		<img src="../images/ui/page-overview17.png" alt="Screenshot" style="width: 10ch;" />
+		<p>The first step is to choose an entity category, which depends on the available factory categories (blue dots).</p>
+		<img src="../images/ui/page-overview10.png" alt="Screenshot" style="width: 50ch;" />
+		<p>If there are multiple template types available in the selected category, they will be listed with the display name and description. Select the 
+			one you want to create.</p>
+		<img src="../images/ui/page-overview11.png" alt="Screenshot" style="width: 50ch;" />
+		<p>Based on the configuration parameters and possible relationships declared by the template, a form with different options will be presented.
+			Fill-in all the required information and click save to create the new entity.</p>
+		<img src="../images/ui/page-overview1.png" alt="Screenshot" style="width: 50ch;" />
+	</div>
+</main>
+</body>
+</html>

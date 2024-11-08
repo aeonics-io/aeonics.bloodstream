@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - Quick Start</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="index.html">&lt; Back to documentation</a><br /><br />
+	
+	<a class="h2" href="#introduction">Introduction</a>
+	
+	<a class="h2" href="#setup">Initial setup</a>
+	<a class="h3" href="#setup-requirements">Requirements</a>
+	<a class="h3" href="#setup-installation">Installation</a>
+	<a class="h3" href="#setup-files">File structure</a>
+	<a class="h3" href="#setup-env">Environment parameters</a>
+	<a class="h3" href="#setup-login">First login</a>
+	
+	<a class="h2" href="#ui">Management Interface</a>
+	<a class="h3" href="#ui-login">Login screen</a>
+	<a class="h3" href="#ui-layout">Layout</a>
+	<a class="h3" href="#ui-pages">Pages</a>
+	<a class="direct" href="ui/user.html">Current user</a>
+	<a class="direct" href="ui/overview.html">Overview</a>
+	<a class="direct" href="ui/statistics.html">Statistics</a>
+	<a class="direct" href="ui/carbon.html">Carbon Footprint</a>
+	<a class="direct" href="ui/security.html">Security</a>
+	<a class="direct" href="ui/workflows.html">Workflows</a>
+	<a class="direct" href="ui/configuration.html">Configuration</a>
+	<a class="direct" href="ui/endpoints.html">Web Endpoints</a>
+	<a class="direct" href="ui/storage.html">Data Storage</a>
+	<a class="direct" href="ui/snapshots.html">Snapshots</a>
+	<a class="direct" href="ui/acl.html">Access Control</a>
+	<a class="direct" href="ui/plugins.html">Plugins</a>
+	<a class="direct" href="ui/debug.html">Debug</a>
+	<a class="direct" href="ui/logs.html">Logs</a>
+	<a class="direct" href="ui/metrics.html">Metrics</a>
+</nav>
+<main>
+	<h1>Aeonics Quick Start</h1>
+	
+	<div>
+		<h2 id="introduction">Introduction</h2>
+		<p>This documentation describes the first steps to install the system and connect to the management interface. The estimated time for
+			installation and first connection on the running system is about 5 minutes.</p>
+		<p>The information contained in this documentation is provided as-is without any guarantee of correctness nor any other sort, 
+			it is provided in good faith and is regularly checked and updated. If some content is not clear, outdated or misleading, please let us
+			know and we will try to fix it. Some fine internal details are voluntarily omitted from this guide, if you need more information about 
+			a specific aspect, please contact us.</p>
+	</div>
+	
+	<div>
+		<h2 id="setup">Initial setup</h2>
+		
+		<section id="setup-requirements">
+			<h3>Requirements</h3>
+			<p>Aeonics is a standalone application that runs on top of the JVM. Therefore, it can be deployed on any operating system and any virtualization technology that is supported by the JVM.</p>
+			<p>The base requirements are:</p>
+			<ul>
+				<li>Runtime: Java 11. Different version including and up to Java 23 are also supported.</li>
+				<li>Disk space: minimum 10MB</li>
+				<li>Memory: minimum 128MB RAM available for the JVM to start, minimum 16MB heap space for Aeonics to run</li>
+				<li>Network: port 443 should be open to use the web interface</li>
+				<li>Privileges: Aeonics should be run using an account able to start the web server on port 443 and should have full privileges on its own 
+				disk location to manage files internally.</li>
+			</ul>
+			<p>There are no further requirements in terms of processing power, Aeonics will use the available resources from the system. 
+			The performance of the system will depend on the number of available (v)CPU and their clock frequency.
+				The recommended processing power for a baseline system is 2 (v)CPU @2GHz.</p>
+			<p>Additional storage, databases or network connectivity may be necessary depending on your business logic, those are not part 
+			of the base requirements.</p>
+		</section>
+		
+		<section id="setup-installation">
+			<h3>Installation</h3>
+			<p>Aeonics can be run from any location and does not require any installation per-se. The system is distributed as an archive file 
+			(usually a compressed tar file) or can be compiled from source.
+			</p>
+			<p>Deployment procedure on <strong>Red Hat</strong>, <strong>Debian</strong>, <strong>Ubuntu</strong>, <strong>Linux</strong>, <strong>Mac OS</strong> and other <strong>Unix</strong>-based systems:</p>
+			<ol>
+				<li>It is recommend to download and use a fresh Java runtime so that Aeonics is not affected by the default one and can be upgraded easily.
+					Place it in a folder named <code>jre</code>.
+					<pre class="shell">
+$ mkdir /opt/aeonics
+$ wget https://download.oracle.com/graalvm/23/latest/graalvm-jdk-23_linux-x64_bin.tar.gz
+$ tar -xzf graalvm-jdk-23_linux-x64_bin.tar.gz
+$ mv graalvm-jdk-23.0.1+11.1 /opt/aeonics/jre</pre>
+				</li>
+				<li>Uncompress the Aeonics archive.
+					<pre class="shell">
+$ tar -xzf aeonics.tgz -C /opt/aeonics</pre>
+				</li>
+				<li>Install Aeonics as a systemd service and review the <code>aeonics.env</code> file.
+					<pre class="shell">
+$ systemctl enable /opt/aeonics/aeonics.service</pre>
+				</li>
+				<li>Start the Aeonics service.
+					<pre class="shell">
+$ systemctl start aeonics</pre>
+				</li>
+			</ol>
+			<p>Deployment procedure on <strong>Windows</strong>:</p>
+			<ol>
+				<li>Uncompress the Aeonics archive to a location accessible to your operating system.
+					<pre class="shell">
+> mkdir D:\aeonics
+> tar -xzf aeonics.tgz -C D:\aeonics</pre>
+					For older Windows version, decompress the archive manually.
+				</li>
+				<li>Start Aeonics using the standard Java command.
+					<pre class="shell">
+> cd D:\aeonics
+> java --module-path ae.jar --module aeonics.boot/aeonics.Boot</pre>
+				</li>
+				<li><strong>Out of scope</strong>: Install Aeonics as a service.</li>
+			</ol>
+		</section>
+		
+		<section id="setup-files">
+			<h3>File structure</h3>
+			<p>The Aeonics deployment directory contains a set of files and folders by default. Those can be modified at runtime using environment parameters
+			or command line parameters.</p>
+			<ul>
+				<li class="file"><em>ae.jar</em> : this is the boot loader of the Aeonics system</li>
+				<li class="folder"><em>plugins</em> : this folder is used as the default location for all plugins</li>
+				<li class="folder"><em>security</em> : this folder is used as default storage for various security-related data. <strong>This directory
+					will be created automatically.</strong></li>
+				<li class="folder"><em>snapshots</em> : this folder is used as default storage for snapshots of the system. <strong>This directory
+					will be created automatically.</strong></li>
+				<li class="folder"><em>stats</em> : this folder is used as default storage for usage statistics of the system. <strong>This directory
+					will be created automatically.</strong></li>
+				<li class="folder"><em>www</em> : this folder is used as default location for static web applications and assets</li>
+			</ul>
+			<p>These directories are default used from a vanilla installation. They can be reconfigured at runtime if necessary. 
+			Some additional modules may use other folders or files. Custom storage locations or custom behavior may also use other files from the filesystem.</p>
+		</section>
+		
+		<section id="setup-env">
+			<h3>Environment parameters</h3>
+			<p>The Aeonics system will automatically look for some parameters at boot time.</p>
+			<ol>
+				<li>The system will first check the Java properties passed with the <code>-Dkey=value</code> command line parameters</li>
+				<li>If a value is not present, the system will check the local environment parameters</li>
+				<li>Finally, if a value is still not present, a default value is set</li>
+				<li>After startup, if a snapshot exists, all parameters are overwritten with the snapshot value</li>
+			</ol>
+			<p>The list of startup parameters is the following:</p>
+			<ul>
+				<li><strong>AEONICS_PLUGIN_PATH</strong> : the path to the plugins directory. The default value is <code>plugins</code>.
+					<em>This parameter is required regardless of any snapshot as it is used before system startup.</em></li>
+				<li><strong>AEONICS_MANAGER_LOGGER_LEVEL</strong> : the default log level before loading the custom config. 
+					The default value is <code>700</code>.</li>
+				<li><strong>AEONICS_MANAGER_SNAPSHOT_PATH</strong> : the default path to the snapshot storage location. The default value is 
+					<code>shapshots</code>.</li>
+				<li><strong>AEONICS_MANAGER_SNAPSHOT_CURRENT</strong> : the name of the snapshot to load on startup. If not set, the latest snapshot is 
+					loaded. The default value is not set.</li>
+				<li><strong>AEONICS_SECURITY_ADMIN_HASH</strong> : the unique password hash of the admin user. This parameter does not have a default
+					value. If it is not specified, it will be generated at first startup. If this parameter is provided as command line parameter, then
+					it will be cleared and the rest of the application will not have access to it. If it is set as an environement variable, then
+					the value will be visible anywhere in the application.</li>
+				<li><strong>AEONICS_SECURITY_ADMIN_SALT</strong> : the unique salt used to hash the admin password. This parameter does not have a default
+					value. If it is not specified, it will be generated at first startup. If this parameter is provided as command line parameter, then
+					it will be cleared and the rest of the application will not have access to it. If it is set as an environement variable, then
+					the value will be visible anywhere in the application.</li>
+				<li><strong>AEONICS_SECURITY_VAULT_SALT</strong> : the unique salt used to hash secure secrets in the Vault manager. 
+					This parameter does not have a default value. If it is not specified, it will be generated at first startup. 
+					If this parameter is provided as command line parameter, then it will be cleared and the rest of the application will not 
+					have access to it. If it is set as an environement variable, then the value will be visible anywhere in the application.</li>
+				<li><strong>AEONICS_MANAGER_SECURITY_OIDCISSUER</strong> : the url prefix to connect to your instance.
+					The default value is <code>https://localhost</code>. <em>If this parameter is misconfigured, you will not be able to login.</em>
+					You may use the IP address of the machine or a domain name and specify the port if not using standard <code>443</code>.</li>
+			</ul>
+			<p>Any other configuration parameter from the system can be initialized using the same technique and will be available 
+				during the lifecycle <code>LOAD</code> phase.</p>
+		</section>
+		
+		<section id="setup-login">
+			<h3>First login</h3>
+			<p>The system is ready once the lifecycle <code>RUN</code> phase has completed.
+				If an error happens during the startup, it will be displayed according to the default log level.</p>
+			<p>If you did not specify both <code>AEONICS_SECURITY_ADMIN_HASH</code> and <code>AEONICS_SECURITY_ADMIN_SALT</code> in absence of any previous
+				snapshot, then a new admin password will be randomly generated and it will be displayed in the console.</p>
+			<pre>
+****** CAUTION ******
+No default admin user hash/salt were provided. A new password was generated:
+        5a99853ab703261e02e834ebfa537bed897bfa9cd5811d30bce02dde24d26597
+To reuse this password without snapshot, use these command line arguments:
+        -DAEONICS_SECURITY_ADMIN_HASH=663d6ac944431aa2675937b8faebb9405e11f99af61b1cfc7c745f33f192d202
+        -DAEONICS_SECURITY_ADMIN_SALT=a9fc1ad7cd570b97f6d7fd3022f1d07209c0c1dd7732aaeb42c6f193d537a3da</pre>
+			<p>You can then use your browser and navigate to the address <em>https://[host]/admin</em> to access the Aeonics management interface.
+				The initial username is <code>admin</code> and the password is the one provided.</p>
+			<p>Note that any administrator user will be required to enroll with <strong>multifactor authentication</strong>.</p>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="ui">Management Interface</h2>
+		<p>This section describes the management web interface. It is available by default when the system starts, you can use your browser and 
+		navigate to <strong>https://[host]/admin</strong>.</p>
+		
+		<section id="ui-login">
+			<h3>Login screen</h3>
+			<p>In order to use the management interface, you need to authenticate with an administrator account. Clicking on the login button will
+				redirect you to the centralized authentication system.</p>
+			<img src="images/ui/login1.png" alt="Login screen" style="width: 50ch;" />
+			
+			<p>When the authentication fow starts, you have <em>3 minutes</em> to complete, there is a countdown timer at the bottom of the dialog window.</p>
+			<p>If you are already signed-in, you can reuse an existing session, otherwise you can start a new authentication flow.</p>
+			<img src="images/ui/login3.png" alt="Reuse session" style="width: 50ch;" />
+			
+			<p>The first step is to choose an authentication provider. There might be multiple options depending on your setup. The <strong>Local
+				identity provider</strong> is the default one.</p>
+			<img src="images/ui/login2.png" alt="Authentication providers" style="width: 50ch;" />
+			
+			<p>The default security provider is password based. This can vary depending on the type of provider (OpenID,...).</p>
+			<img src="images/ui/login4.png" alt="Username password" style="width: 50ch;" />
+			
+			<p>If you are an admin and you did not yet enable multifactor authentication, you must do it before proceeding. You can use any standard
+				authenticator app that supports Time-based One Time Password (TOTP).</p>
+			<img src="images/ui/login5.png" alt="Multifactor registration" style="width: 50ch;" />
+			
+			<p>You then have to provide your multifactor authentication code.</p>
+			<img src="images/ui/login6.png" alt="Multifactor authentication" style="width: 50ch;" />
+			
+			<p>Since the system can be configured using external identity providers, you will be prompted for consent if not done already.</p>
+			<img src="images/ui/login7.png" alt="Consent screen" style="width: 50ch;" />
+			
+			<p>After giving consent, you will be redirected to the management interface application. In case of error, you will be redirected to the
+				error page. For your safety, the login flow does not provide second-guesses, close your browser and start again.</p>
+			<img src="images/ui/login8.png" alt="Error page" style="width: 50ch;" />
+		</section>
+		
+		<section id="ui-layout">
+			<h3>Layout</h3>
+			<p>The management interface is composed of a menu on the left, and a main display area in the center. If you hover the menu icons, the menu 
+				expands to display the labels.</p>
+			<img src="images/ui/layout1.png" alt="Page layout" style="width: 70ch;" />
+			
+			<p>There are 3 categories of pages available, they are identified by a thin colored border on the left of each menu element. 
+				The orange category relates to informational and visualization pages.
+				The blue category relates to actionable configuration pages.
+				The green category relates to live data capture.</p>
+			<img src="images/ui/layout2.png" alt="Menu" style="width: 70ch;" />
+			
+			<p>Notifications will appear in the bottom left corner of the page as an indication. Notifications disapear after a few seconds unless you hover
+				them with the mouse. There are 4 types of notifications: success, warning, info and error.</p>
+			<img src="images/ui/layout3.png" alt="Notifications" style="width: 40ch;" />
+			
+			<p>When an action is in progress, a busy indicator is displayed. Normally operations should complete in seconds. If the busy indicator remains for
+				a longer period, it could mean something went wrong and a notification should mention it.</p>
+			<img src="images/ui/layout4.png" alt="Waiting indicator" style="width: 20ch;" />
+			
+			<p>Across pages, you may encounter references to entities. Those are presented as a blue link composed of 24 hexadecimal numbers.
+				If you click on it, you will be redirected to the overview page to inspect that particular item.</p>
+			<img src="images/ui/layout5.png" alt="Identifiers" style="width: 60ch;" />
+		</section>
+		
+		<section id="ui-pages">
+			<h3>Pages</h3>
+			<p>The management interface contains different pages accessible from the menu. Each page is detailed separately:</p>
+			<ul>
+				<li><a href="ui/user.html">Current user</a>: provides information about the current logged user.</li>
+				<li><a href="ui/overview.html">Overview</a>: gives the possibility to explore all entities in the system.</li>
+				<li><a href="ui/statistics.html">Statistics</a>: displays various performance indicators.</li>
+				<li><a href="ui/carbon.html">Carbon Footprint</a>: computes the carbon footprint of the system.</li>
+				<li><a href="ui/security.html">Security</a>: evaluates the security exposure of the system.</li>
+				<li><a href="ui/workflows.html">Workflows</a>: design data processing workflows.</li>
+				<li><a href="ui/configuration.html">Configuration</a>: manage system-wide configuration parameters.</li>
+				<li><a href="ui/endpoints.html">Web Endpoints</a>: manage and create web endpoints.</li>
+				<li><a href="ui/storage.html">Data Storage</a>: configure databases and data storage locations.</li>
+				<li><a href="ui/snapshots.html">Snapshots</a>: manage system snapshots.</li>
+				<li><a href="ui/acl.html">Access Control</a>: define security policies.</li>
+				<li><a href="ui/plugins.html">Plugins</a>: deploy and manage plugins.</li>
+				<li><a href="ui/debug.html">Debug</a>: collecto live debug information from the system.</li>
+				<li><a href="ui/logs.html">Logs</a>: collect logs in real time.</li>
+				<li><a href="ui/metrics.html">Metrics</a>: collect internal system metrics.</li>
+			</ul>
+		</section>
+	</div>
+</main>
+</body>
+</html>

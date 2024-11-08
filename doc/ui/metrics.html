@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Metrics</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#startstop">Start / Stop</a>
+	<a class="h2" href="#detail">Metrics Details</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Metrics</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page allows display system metrics and counters in real time. Metrics are time-based which means that the information is reset and 
+			recomputed at regular interval. By default, the reset interval is <strong>60 seconds</strong></p>
+		<img src="../images/ui/page-metrics.png" alt="Screenshot" style="max-width: 100%;" />
+	</div>
+	
+	<div>
+		<h2 id="startstop">Start / Stop</h2>
+		<p>There are 2 actions available in the top right part of the page: <strong>Start</strong> and <strong>Stop</strong>.</p>
+		<img src="../images/ui/page-metrics2.png" alt="Screenshot" style="width: 25ch;" />
+		
+		<p>When you click on the <em>Start</em> button the collection happens directly. Once the live capture is enabled, the connection 
+			indicator will be adjusted in the top left part of the page. The second line will show approximatively how much time is left before
+			the next time-window of data.</p>
+		<img src="../images/ui/page-metrics3.png" alt="Screenshot" style="width: 25ch;" />
+		<p>When you click on the <em>Stop</em> button, the live stream in interrupted. You have the possibility to keep the internal metrics collection
+			active (No button), or completely stop it to spare computing resources (Yes button).</p>
+		<img src="../images/ui/page-metrics4.png" alt="Screenshot" style="width: 70ch;" />
+	</div>
+	
+	<div>
+		<h2 id="detail">Metrics Details</h2>
+		<p>The metrics system in this framework provides a structured, time-windowed approach to monitoring real-time data across the application. 
+			Metrics are organized into a four-level hierarchy: category, type, entity ID, and metric name, allowing fine-grained tracking of specific 
+			operations or resources.</p>
+		<p>Each metric is monitored by two counters. The first counter tracks the <em>occurrences</em>, counting how often the metric is recorded. 
+			The second counter is a value <em>sum</em>, accumulating all provided values for that metric within the specified time window.</p>
+		<p>At the end of each window, these metrics are emitted as a snapshot, providing a detailed summary of activity, then the counters reset, 
+			ready to capture fresh data for the next time interval. This structure enables precise, time-bound insights into system performance 
+			and behavior without retaining outdated or redundant data.</p>
+			
+		<p>The main central region is divided in 2 main sections. The first one (top) displays simple cards that aggregate the metrics values per category
+			as long as the monitoring is active in the page. This allows to smooth out the values over time. The cards displayed in orange are for
+			counter-only metrics, and the ones in blue are for those that provide an accumulated value.</p>
+		<img src="../images/ui/page-metrics5.png" alt="Screenshot" style="width: 70ch;" />
+		<p>On the example above, we can see that the <code>aeonics.http.filter</code> category was activated <code>32</code> times with an average of 
+			<code>11k</code> nanoseconds (0,01 milliseconds).</p>
+		
+		<p>The second section (bottom) displays a table with all the details of the metrics. At each collection, a new column is appended at the right 
+			of the table. If new elements are encountered, new lines may appear at the bottom of the table.</p>
+		<img src="../images/ui/page-metrics6.png" alt="Screenshot" style="width: 70ch;" />
+	</div>
+</main>
+</body>
+</html>

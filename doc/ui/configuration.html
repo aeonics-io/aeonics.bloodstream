@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Configuration</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#editing">Editing</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Configuration</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page displays all systemwide configuration parameters are not specific to a particular entity instance. 
+			They apply globally and all modules may react to changes in real time. The configuration parameters are declared by plugins
+			and the display is regrouped by categories.</p>
+		<p>The top left search bar allows to quickly find the relevant parameters.</p>
+		<img src="../images/ui/page-config.png" alt="Screenshot" style="max-width: 100%;" />
+	</div>
+	
+	<div>
+		<h2 id="editing">Editing</h2>
+		<p>You can edit individual configuration parameters using the 3 icons on each line. The changes will be reflected immediately, but if you want
+			the new value to persist a system reboot, you must take a snapshot of the system. This particular 2-step save ensures that any mistake is not
+			permanent and can be recovered by simply rebooting the system.</p>
+		
+		<p>The first icon shows the details of the parameter including its description and expected value type.</p>
+		<img src="../images/ui/page-config1.png" alt="Screenshot" style="width: 60ch;" />
+		
+		<p>The second icon will allow you to change the runtime value of the configuration parameter.</p>
+		<img src="../images/ui/page-config2.png" alt="Screenshot" style="width: 50ch;" />
+		
+		<p>The third icon can be used to remove entirely a configuration parameter, you will be prompter for confirmation first.</p>
+		<img src="../images/ui/page-config3.png" alt="Screenshot" style="width: 60ch;" />
+	</div>
+</main>
+</body>
+</html>

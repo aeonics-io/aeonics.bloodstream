@@ -1,0 +1,33 @@
+@font-face { font-family: 'p'; font-style: normal; font-weight: 200; font-display: swap; src: url(../fonts/p200.woff2) format('woff2'); }
+@font-face { font-family: 'p'; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/p600.woff2) format('woff2'); }
+@font-face { font-family: 'r'; font-style: normal; font-weight: 300; font-display: swap; src: url(../fonts/r300.woff2) format('woff2'); }
+@font-face { font-family: 'r'; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/r700.woff2) format('woff2'); }
+
+:root {
+	--black: #1C1B21; --blackrgb: 28, 27, 33;
+	--orange: #FB8136; --orangergb: 251, 129, 54;
+	--blue: #36B0FB; --bluergb: 54, 176, 251;
+	--white: #ffffff; --whitergb: 255, 255, 255;
+	font-family: r, sans-serif;
+	font-weight: 300;
+	color: var(--black);
+	background-color: var(--white);
+}
+
+main { color: var(--black); background-color: var(--white); line-height: 1.4em; padding-bottom: 20vh; }
+main div.logo { text-align: center; margin: 10vh 0; }
+main > div { padding: 32px; }
+main h1 { font-family: p, sans-serif; color: var(--black); padding: 24px 0; font-size: 2rem; font-weight: 600; margin: 0; }
+
+main div.sections { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 16px; margin: 64px 0; }
+main div.sections a { 
+	text-decoration: none; color: inherit; display: block; 
+	flex: 1 1 30%; box-sizing: border-box; padding: 32px; border-radius: 2px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+	text-align: center; cursor: pointer;
+}
+main div.sections a:hover { box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22); }
+main section p { text-align: justify; }
+main h2 { font-family: p, sans-serif; color: var(--orange); padding: 10px; margin: 0; font-size: 1.4rem; font-weight: 200; }
+main em { text-decoration: none; font-style: normal; color: var(--blue); }

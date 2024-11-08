@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - Technological Overview</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="index.html">&lt; Back to documentation</a><br /><br />
+
+	<a class="h2" href="#introduction">Introduction</a>
+	<a class="h3" href="#introduction-goal">Goal</a>
+	<a class="h3" href="#introduction-principles">Core Principles</a>
+	<a class="h3" href="#introduction-runtime">Runtime Boundary</a>
+	<a class="h3" href="#introduction-framework">A New Framework</a>
+	
+	<a class="h2" href="#overview">Overview and Terminology</a>
+	<a class="h3" href="#overview-actors">Actors</a>
+	<a class="h3" href="#overview-item">Item, Template, Entity</a>
+	<a class="h3" href="#overview-registry">Registry, Factory</a>
+	<a class="h3" href="#overview-xgress">Origin, Action, Destination</a>
+	<a class="h3" href="#overview-queue">Topic, Queue</a>
+	<a class="h3" href="#overview-data">Message, Data</a>
+	<a class="h3" href="#overview-managers">Managers</a>
+	<a class="h3" href="#overview-security">Security Model</a>
+	
+	<a class="h2" href="#runtime">Runtime Mechanics</a>
+	<a class="h3" href="#runtime-plugins">Plugins</a>
+	<a class="h3" href="#runtime-lifecycle">Lifecycle</a>
+	<a class="h3" href="#runtime-execution">Execution</a>
+</nav>
+<main>
+	<h1>Aeonics Technological Overview</h1>
+	
+	<div>
+		<h2 id="introduction">Introduction</h2>
+		<p>In today's fast-paced software development environment, change is a constant. 
+		Applications are continuously evolving to meet new functional requirements, address bug and security fixes, integrate new technologies, 
+		and adapt to ever-changing market demands. This dynamic nature of software development means that maintaining an application over its 
+		lifecycle is a complex, resource-intensive task. From the initial design phase to deployment, and through ongoing maintenance, an 
+		application must be flexible and resilient to change.</p>
+		<p>The lifecycle of an application typically involves several key stages: planning, design, development, testing, deployment, and maintenance. 
+		Multiple stakeholders are involved throughout this process, including business analysts, developers, quality assurance teams, IT operations, 
+		and end-users. Each of these parties has a vested interest in the application, contributing to its development, operation, and continual improvement.</p>
+		<p>However, as applications grow in complexity and scale, managing changes becomes increasingly challenging. Every modification — whether it's 
+		a functional enhancement, a bug fix, or an adaptation to new technologies — can introduce new risks and require significant effort to ensure 
+		that the changes do not disrupt the existing functionality.</p>
+		<p>To put this into perspective, for a typical web-based application, maintenance can consume up to 70-80% of the total cost of software development, 
+		with a significant portion of this effort devoted to managing changes. Poorly managed changes can lead to cascading failures, where a simple bug 
+		fix or new feature implementation inadvertently impacts other parts of the system, resulting in additional fixes and further delays.</p>
+		
+		<section id="introduction-goal">
+			<h3>Goal</h3>
+			<p>The ideal goal in managing application evolution is to create a software system that is both resilient and adaptable to change, with minimal 
+			disruption to existing functionality. This system should enable rapid and efficient integration of new features, swift resolution of bugs, 
+			and seamless adoption of new technologies, all while maintaining high levels of reliability, cybersecurity and performance. 
+			The ultimate objective is to ensure that the application remains robust, scalable, and easy to maintain over its entire lifecycle, reducing 
+			the total cost of ownership and maximizing the value delivered to users and stakeholders.</p>
+			<p>Aeonics is a comprehensive framework designed to facilitate the seamless evolution of software applications. It is built around the core 
+			principles of modularity, loose coupling, and separation of concerns, providing a structured approach to managing change throughout an 
+			application's lifecycle. By using Aeonics as an application server and coding framework, development teams can systematically design and 
+			maintain applications that are inherently adaptable, reducing the complexity and risk associated with changes and software evolution.</p>
+		</section>
+	
+		<section id="introduction-principles">
+			<h3 id="principles">Core Principles</h3>
+			<p>While there are numerous other facets and considerations crucial to effective software design and maintenance, the three principles discussed 
+			hereafter provide a solid foundation. By focusing on modularity, loose coupling, and separation of concerns, we establish a strong structural 
+			framework that supports these other important aspects and sets the stage for a more robust and adaptable application architecture.</p>
+		
+			<h4>Modularity</h4>
+			<p>Modularity refers to the design principle of breaking down a software application into smaller, self-contained units or modules. 
+			Each module is designed to perform a specific function or set of related functions and can be developed, tested, and maintained 
+			independently of other modules. This approach allows for greater flexibility and scalability, as individual modules can be updated 
+			or replaced without affecting the rest of the system.</p>
+			<p>Modularity simplifies change management by isolating changes to specific parts of the application. 
+			When a new feature needs to be added, or a bug needs to be fixed, the modification is confined to a particular module, reducing 
+			the risk of unintended side effects on other parts of the system. This containment minimizes the scope of testing required, 
+			accelerates the development process, and reduces the likelihood of introducing new defects in other parts of the application.</p>
+			<p>Moreover, modularity supports parallel development efforts, enabling different teams to work on separate modules simultaneously 
+			without causing conflicts. This parallelism can lead to faster delivery times and more efficient use of resources.</p>
+		
+			<h4>Loose Coupling</h4>
+			<p>Loose coupling refers to a design principle that minimizes the dependencies between different components in a system. When components 
+			are loosely coupled, they can interact through a predefined contract without needing to know each other's internal details. This 
+			separation allows each component to be modified or replaced independently, which increases flexibility and adaptability.</p>
+			<p>In a loosely coupled system, components only reference each other indirectly, for instance using an identifier. 
+			This allows them to operate independently. However, it is essential to recognize that this independence can introduce uncertainty, 
+			as one component may not know whether the other component is available or even exists when needed.</p>
+			<p>Generally, loosely coupled systems provide simplification at compile time because the code is constructed based on assumptions.
+			This principle helps managing changes efficiently because it limits the ripple effect that a modification in one part of the system can have 
+			on other parts. By minimizing dependencies, loose coupling ensures that changes in one module do not require extensive modifications 
+			to other modules. However, it implies that additional care be taken regarding error management, because these assumptions may not 
+			validate at runtime. Defensive coding remains useful and proves more robust in the long term.</p>
+			
+			<h4>Lazy Loading and Late Binding</h4>
+			<p>Loose coupling facilitates other techniques which further enhance system flexibility.
+			Lazy loading delays the initialization of resources until they're needed, improving performance by preventing unnecessary operations. 
+			Late binding postpones the determination of specific methods or functions until runtime, allowing systems to adapt dynamically to 
+			changes without altering existing code.</p>
+			<p>These two principles that complement loose coupling help to optimize the runtime performance and footprint of the application by loading
+			and using only required components or modules when and if necessary.</p>
+
+			<h4>Separation of Concerns</h4>
+			<p>Separation of concerns is a design principle that advocates for dividing a software application into distinct sections, each addressing a 
+			specific concern or aspect of the system. Concerns can be understood as different aspects of the system, such as business logic, data access, 
+			security, or else. By clearly delineating these concerns, developers can manage each aspect independently.</p>
+			<p>Separation of concerns aids in change management by organizing code in a way that changes to one aspect of the system have minimal or 
+			no impact on other aspects. For instance, changes to the storage type should not require changes to the business logic layer, and vice versa.
+			This isolation allows developers to focus on one area at a time, making the codebase more understandable, maintainable, and less prone to errors.</p>
+			<p>In addition, it enables the use of specialized teams or individuals to work on different concerns. A team of security experts can work on 
+			improving the authentication, while another team focuses on monitoring the system, all without stepping on each other's toes. 
+			This clear delineation of responsibilities further streamlines the development and maintenance processes.</p>
+			
+			<h4>Cross-Cutting Concerns</h4>
+			<p>Even with a well-implemented separation of concerns, certain pieces of logic — such as security, logging, and error handling — need to be 
+			managed consistently across various components. These are known as cross-cutting concerns, and addressing them in a standardized manner 
+			takes separation of concerns a step further.</p>
+			<p>By centralizing these concerns into dedicated, reusable modules or services, redundancy is eliminated, and consistency is ensured throughout 
+			the application. This approach not only simplifies maintenance but also enhances the overall stability and coherence of the system. For example, 
+			a unified logging framework applied across all components ensures that changes in logging formats or policies are made once, without needing 
+			to update each individual component. This standardization streamlines development and ensures that critical aspects like security and error 
+			handling are handled uniformly, reinforcing the application's robustness and reliability.</p>
+		</section>
+	
+		<section id="introduction-runtime">
+			<h3>Runtime Boundary</h3>
+			<p>While modularity, loose coupling, and separation of concerns provide a solid foundation for managing change in software applications, 
+			these concepts primarily apply during the design and coding phases of the application lifecycle. The biggest challenge, therefore, is to 
+			extend these principles and push the boundaries typically constrained to compile-time into the realm of runtime. The concepts of serverless 
+			and low-code address challenges traditionally tackled at the infrastructure and operational levels, enabling even greater flexibility, 
+			scalability, and efficiency in managing the application lifecycle.</p>
+		
+			<h4>Serverless</h4>
+			<p>The physical context in which an application runs can significantly impact its behavior: how the system is started and deployed, 
+			how files are transferred, how authentication to a local or remote machine is handled, and more. Depending on factors not known at 
+			the design phase — or which may change later on — the application's code might need to handle these elements differently, creating 
+			additional complexities for maintainers as they navigate varying configuration requirements.</p>
+			<p>These infrastructure-related concerns can conflict with the flexibility and ease of maintenance that are carefully addressed in 
+			the application's code.</p>	
+			<p>The serverless paradigm offers a solution by abstracting away these infrastructure concerns, allowing developers to focus solely 
+			on writing code that delivers business value and managing all operational tasks through a unified interface. Developers can deploy 
+			functions or services without needing to worry about the specifics of the underlying environment.</p>
+			<p>Serverless architectures simplify change management by decoupling the application from its underlying infrastructure. This 
+			decoupling allows changes to the application's code to be deployed without the need for extensive infrastructure planning or 
+			reconfiguration. The system manages the hardware resources automatically, ensuring that business applications run efficiently 
+			and effectively.</p>
+			<p>Additionally, serverless architectures promote the use of microservices, where individual functions or services are developed 
+			and deployed independently. This approach aligns with the principles of modularity and loose coupling, enhancing the application's 
+			resilience to change and making it easier to manage and maintain over time.</p>
+		
+			<h4>Low-code</h4>
+			<p>The low-code paradigm takes the principles of modularity, loose coupling, and separation of concerns a step further by enabling 
+			applications to be built and modified using configurable and reusable components at runtime, rather than relying on traditional 
+			compile-time processes. In a low-code environment, users can assemble applications from a library of pre-built modules or components, 
+			configuring them through visual interfaces to reflect the desired business logic. This approach helps structure the application 
+			into independent workflows that form a coherent response to business requirements.</p>
+			<p>Low-code platforms align seamlessly with the principles of modularity and separation of concerns by allowing both business users 
+			and developers to configure and modify applications without needing to write or recompile code. This separation between application 
+			logic and the underlying codebase reduces dependency on developers for making changes and enables faster iteration cycles.</p>
+			<p>By moving configuration and customization to runtime, low-code platforms empower non-technical users to take an active role in 
+			the development and maintenance process. This democratization of application development reduces bottlenecks associated with 
+			traditional development processes and allows for quicker adaptations to changing business requirements.</p>
+		</section>
+	
+		<section id="introduction-framework">
+			<h3 id="framework">A New Framework</h3>
+			<p>In the continually evolving landscape of software development, Aeonics was created to address some of the persistent challenges and complexities 
+			found in existing frameworks. While many of these frameworks offer robust features, they often come with trade-offs, such as dependency on numerous 
+			third-party libraries, intermediate code generation, and a lack of truly integrated modular design. These factors can lead to increased maintenance
+			burdens, potential security risks, and operational inefficiencies.</p>
+		
+			<h4>Portability</h4>
+			<p>Built in Java, a language recognized for its portability and strong support for serverless architectures, Aeonics leverages these strengths 
+			while introducing new concepts aimed at mitigating the limitations of traditional frameworks.</p>
+			<p>Java's portability makes it a natural fit for serverless environments, where cross-platform compatibility is essential. Aeonics extends this 
+			capability by offering a lightweight, modular approach that aims to reduce the need for traditional container-based deployments. The application 
+			server within Aeonics is itself a modular component, allowing for new modules to be deployed at runtime with minimal overhead, which contrasts 
+			with the often complex processes associated with heavier platforms.</p>
+		
+			<h4>Entity Model</h4>
+			<p>Rather than relying solely on conventional interfaces, classes, and inheritance, Aeonics introduces new concepts designed to facilitate the 
+			development of low-code entities that are both self-documenting and tightly integrated with the required business logic. This approach seeks to
+			balance the benefits of modularity with the cohesiveness of microservices, while still respecting the principles of separation of concerns. The 
+			goal is to create a system where related functionalities are grouped together, making the system easier to manage and evolve over time.</p>
+		
+			<h4>Dependencies</h4>
+			<p>A significant challenge in many frameworks is the reliance on numerous third-party libraries and the complexity they introduce. While these 
+			libraries can enhance functionality, they also add layers of complexity, from longer compilation times to more intricate deployment processes.
+			Additionally, frameworks that rely on intermediate code generation or reflection can obscure source code and complicate troubleshooting.</p>
+			<p>Aeonics seeks to address these issues by minimizing external dependencies and avoiding intermediate code generation. This minimalist approach aims to reduce complexity, enhance security, and make the development process more straightforward and maintainable.</p>
+		
+			<h4>Fill the Gap</h4>
+			<p>Aeonics was developed to provide an integrated framework that emphasizes simplicity, modularity, and long-term maintainability. Rather than 
+			competing directly with existing frameworks, Aeonics offers an alternative approach designed to reduce the complexities often associated with 
+			infrastructure management, extensive dependencies, and complex code generation processes. By focusing on these core principles, Aeonics aims to 
+			support developers in building applications that are secure, scalable, and adaptable to the changing demands of modern software development.</p>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="overview">Overview and Terminology</h2>
+		<p>The Aeonics framework is built on a set of core concepts and components that provide the foundation for its flexibility, modularity, and 
+		runtime management. Understanding these elements provides the required keys for effectively working within the framework and leveraging 
+		its full potential. In this section, we introduce the fundamental building blocks and explain how they interact to form a cohesive system 
+		that enables entity creation, management, and interaction across modules.</p>
+		
+		<section id="overview-actors">
+			<h3>Actors</h3>
+			<p>The Aeonics framework operates through a set of key actors, each contributing to different stages of the development, integration, 
+			and deployment processes. Below is an explanation of the various actors and their respective roles in the Aeonics ecosystem.</p>
+			<img src="images/actors.png" alt="Actors" style="width: 80ch;" />
+			
+			<h4>Aeonics (Framework Provider)</h4>
+			<p>Aeonics serves as the core provider of the framework. It supplies the foundational modules, libraries, and architecture necessary 
+			for the development and deployment of applications. The core components provided by Aeonics are designed to be modular, lightweight, 
+			and extensible, ensuring that developers and integrators can build on top of this foundation with ease.</p>
+			
+			<h4>Developers</h4>
+			<p>Developers from the community are responsible for creating new plugins and extensions that interact with the 
+			Aeonics core. Their primary task is to enhance and extend the base framework by building reusable components, thereby enriching the 
+			ecosystem. These plugins are designed to be seamlessly integrated into the Aeonics core, ensuring smooth interactions with both 
+			existing and newly developed applications. Developers write and compile code in their favourite IDE.</p>
+			
+			<h4>Integrators</h4>
+			<p>The integrator's role is to configure and assemble the plugins and core components provided by developers and Aeonics. This includes 
+			selecting, configuring, and deploying applications built on top of Aeonics to ensure they meet the specific requirements of end-users. 
+			Integrators act as the bridge between the development phase and final application deployment, ensuring that all elements of the framework 
+			work harmoniously in the target environment. Integrators configure the system using the management web interface.</p>
+			
+			<h4>End Users</h4>
+			<p>The end users interact with the applications built and deployed on the Aeonics framework. These users benefit from the modularity and 
+			scalability of the applications, which are tailored to meet specific business or operational needs. While the end user does not directly 
+			interact with the framework itself, they are the ultimate beneficiaries of its capabilities through the use of the deployed applications.</p>
+		</section>
+		
+		<section id="overview-item">
+			<h3>Item, Template, Entity</h3>
+			<p>In the Aeonics framework, understanding the core components and their relationships is essential to effectively leveraging its capabilities. 
+			The key concepts — Item, Template, and Entity — form the foundation of how the framework operates, enabling the creation, management, and 
+			interaction with runtime instances in a consistent and flexible manner.</p>
+			<img src="images/item.png" alt="Item, Template, Entity" style="width: 60ch;" />
+		
+			<h4>Entity</h4>
+			<p>Entities are the fundamental runtime objects within the Aeonics framework. They represent the operational instances that modules and 
+			applications interact with during execution. An entity could be anything from a user session, a workflow process, to a business rule. Essentially 
+			any runtime component that plays a role in the application's functionality.</p>
+			<p>However, entities are not instantiated directly. This approach ensures that the underlying complexity of entity creation is abstracted away, providing a more modular and decoupled design. Instead of directly instantiating entities, the framework relies on <em>Templates</em> to manage their creation and configuration.</p>
+			
+			<h4>Template</h4>
+			<p>A Template in the Aeonics framework is a blueprint that defines how an entity should be configured, created, and updated. Templates are pivotal 
+			as they allow for a flexible and abstract way to generate entities without exposing the specific details of the underlying class implementations. 
+			This abstraction is achieved by allowing Templates to accept a flexible, JSON-like data structure for configuring new instances. This data 
+			structure is dynamic, enabling the implementation to selectively utilize only the relevant parameters necessary for entity creation.</p>
+			<p>Templates also play a critical role in maintaining the integrity and consistency of the framework. They enforce minimal documentation, 
+			ensuring that every entity generated within the system is properly described and categorized. This not only aids in maintaining a clear 
+			understanding of the system's architecture but also facilitates easier debugging, extension, and maintenance of the framework over time.</p>
+			<p>The template is also essential in maintaining loose coupling within the system. By using the factory pattern, the template ensures that 
+			the final implementation of the entity can be changed without affecting the rest of the system.</p>
+			
+			<h4>Item</h4>
+			<p>An Item is a conceptual wrapper that ties together the entity and its corresponding template. This ensures that every entity has a documented 
+			and accessible creation process, and it simplifies the management of entities within your system. By working with items, you can seamlessly 
+			switch between templates and entities, ensuring that the right instance is created and registered as needed.</p>
+			<p>This triad of concepts — Item, Template, and Entity — forms the backbone of the Aeonics framework, enabling a structured, scalable, and
+			maintainable approach to managing runtime instances within an application.</p>
+		</section>
+		
+		<section id="overview-registry">
+			<h3>Registry, Factory</h3>
+			<p>In the Aeonics framework, the concepts of Registry and Factory are essential for managing the lifecycle of entities and facilitating 
+			interaction between modules. These components provide the necessary infrastructure to support loose coupling, late binding, and runtime 
+			flexibility, which are key to the low-code approach.</p>
+			<img src="images/registry.png" alt="Registry, Factory" style="width: 60ch;" />
+			
+			<h4>Factory</h4>
+			<p>The Factory serves as a global repository for all templates within the framework. It is a centralized store where templates 
+			are registered and organized by entity category, making it easy to locate and utilize the appropriate template when creating new entities. 
+			Modules request a template for a certain entity type, and use it to create new instances of entities as needed. This approach promotes 
+			modularity and flexibility, as it allows different parts of the system to evolve independently while still being able to 
+			interact effectively.</p>
+			<p>The Factory ensures that the creation of entities remains consistent and aligned with the overall design principles of the framework.</p>
+			
+			<h4>Registry</h4>
+			<p>The Registry is the central repository where all runtime entities within the system are registered and organized by category. Entities 
+			are referenced by their unique ID, which allows any module to access and interact with an entity without needing to know its specific 
+			implementation details. By providing a unified access point, the Registry supports loose coupling between modules, enabling them to operate independently while still being able to collaborate when necessary.</p>
+			<p>The interplay between the Factory and Registry allows for a highly decoupled system design, where modules can be developed, compiled, 
+			and maintained independently of one another. This design not only simplifies development but also ensures that the system can adapt to 
+			changes and extensions with minimal disruption.</p>
+		</section>
+		
+		<section id="overview-xgress">
+			<h3>Origin, Action, Destination</h3>
+			<p>At its core, any software application can be viewed as an event-driven system that reacts to inputs, processes data, and produces outputs. 
+			The Aeonics framework models this fundamental concept through a structured sequence of entities, specifically the Origin, Action, and Destination
+			entities. These entities represent distinct phases of data processing within the framework, enabling the decomposition of workflows into modular, 
+			low-code, reusable components.</p>
+			<img src="images/flow2.png" alt="Origin, Action, Destination" style="width: 60ch;" />
+			
+			<h4>Origin</h4>
+			<p>The Origin entity is the starting point in the data processing chain. It is responsible for acquiring the initial data that drives the 
+			subsequent workflow. The Origin can function in multiple ways depending on the application's requirements:
+				<ul>
+					<li><strong>Active Acquisition</strong>: The Origin entity actively fetches data from a source, such as an API call, database query, 
+					or file system operation.</li>
+					<li><strong>Passive Acquisition</strong>: The Origin entity passively waits for data to be pushed to it, such as through a web hook, 
+					message queue, or user input.</li>
+					<li><strong>Automated Task</strong>: The Origin can also represent an automated task that triggers data acquisition at regular intervals, 
+					such as a scheduled job or a time-based event.</li>
+				</ul>
+			</p>
+			<p>The flexibility of the Origin entity allows it to adapt to various data acquisition methods, making it a versatile component in the system. 
+			By abstracting the data acquisition process into a distinct entity, the framework promotes the separation of concerns, enabling the Origin to 
+			be developed, tested, and maintained independently from other parts of the application.</p>
+			
+			<h4>Action</h4>
+			<p>Once the data has been acquired by the Origin, it is passed along to one or more Action entities. The Action entity represents a step in the 
+			data processing chain, where the data is transformed, analyzed, or enriched before being passed to the next step, or it can also be filtered out.</p>
+			<p>Actions can be chained together to form complex processing pipelines, with each Action entity focusing on a specific transformation or 
+			operation. This modular approach allows developers to compose workflows from a set of reusable components, each responsible for a discrete 
+			part of the processing logic. By breaking down the workflow into individual Action entities, the framework makes it easier to manage, 
+			modify, and extend application behavior without introducing unnecessary complexity.</p>
+			
+			<h4>Destination</h4>
+			<p>The final step in the data processing chain is the Destination entity, which is responsible for delivering the processed data to its final 
+			endpoint depending on the nature of the application.</p>
+			<p>The Destination entity completes the workflow by ensuring that the processed data reaches its intended target, fulfilling the application's
+			purpose. Like the Origin and Action entities, Destinations are designed to be modular and reusable, allowing them to be easily swapped out or 
+			reconfigured as the application's requirements evolve.</p>
+			<p>In summary, the Origin, Action, and Destination entities are the building blocks of the Aeonics framework's approach to event-driven 
+			application design. These entities allow developers to focus on data-centric operations with a simple breakdown into steps that will be 
+			assembled at runtime.</p>
+		</section>
+		
+		<section id="overview-queue">
+			<h3>Topic, Queue</h3>
+			<p>Building on the core entities of Origin, Action, and Destination, the Aeonics framework uses the concepts of Topic and Queue to manage the 
+			flow of data between the Origin and the rest of the workflow. By leveraging the principles of publish/subscribe and queuing, the system ensures 
+			that data is processed in an organized, decoupled, and resilient manner.</p>
+			<img src="images/queue.png" alt="Topic, Queue" style="width: 60ch;" />
+			
+			<h4>Topic</h4>
+			<p>In the Aeonics framework, a Topic acts as a logical channel through which data is published by an Origin entity. When data is acquired by 
+			an Origin, it is published to a designated Topic. They are used to categorize or discriminate data based on a custom routing key. This 
+			categorization allows different parts of the system to subscribe to specific Topics, ensuring that only relevant data is processed by each 
+			subsequent component.</p>
+			<p>The use of Topics aligns with the pub/sub model, where publishers (Origins) and subscribers (Queues) are decoupled, allowing modules to 
+			handle only the data they are interested in. This selective data flow reduces unnecessary processing and enhances the efficiency of the 
+			overall system.</p>
+			
+			<h4>Queue</h4>
+			<p>The Queue is a key component that subscribes to one or more Topics, effectively acting as an intermediary between the data publication and 
+			its subsequent processing by Action entities. Queues are responsible for managing the flow of data within the system, ensuring that it is 
+			processed according to the defined policies. These policies can include prioritization, rate limiting, or retry mechanisms, depending on the 
+			specific needs of the application.</p>
+			<p>In essence, Queues provide a controlled environment for processing data, where data can be buffered, ordered, and managed to prevent 
+			bottlenecks and ensure that each piece of data is handled appropriately. The Queue subscribes to the relevant Topics, collects the data, and 
+			then forwards it to the corresponding Action entities for further processing.</p>
+			<p>Within the Aeonics framework, Topics and Queues are themselves entities that can be extended and customized. Just like other entities, 
+			Topics and Queues are created using a Template from the Factory and reside in the Registry. It means that they benefit from the same modularity,
+			extensibility, and governance that apply to all other entities in the framework. This design allows developers to create specialized Topics or 
+			Queues tailored to specific application needs, further enhancing the framework's ability to support new technologies.</p>
+		</section>
+		
+		<section id="overview-data">
+			<h3>Message, Data</h3>
+			<p>Within the system, the process of data acquisition and flow is driven by Messages that are injected into the system by the Origin entity. 
+			These Messages define how information is transported and processed throughout the framework. A Message is not just a simple container for data; 
+			it encapsulates the routing key for the publish/subscribe system, and additional metadata for contextual insight.</p>
+			
+			<h4>Message</h4>
+			<p>A Message is an object (not an Entity) that contains several components:
+				<ul>
+					<li><strong>Content</strong>: The payload of the message, encapsulated in a Data object, which carries the actual information 
+					that needs to be processed.</li>
+					<li><strong>Key</strong>: A key used within the pub/sub system to direct the message to the appropriate subscribers. 
+					This allows the system to route messages based on Topics, ensuring that only relevant Queues receive and process the message.</li>
+					<li><strong>Metadata</strong>: Contextual information that provides additional details about the message, or any other relevant 
+					attributes that might be useful for processing or auditing purposes.</li>
+					<li><strong>User</strong>: The user that is linked or at the source of the message. It can be used to perform security 
+					checks or auditing.</li>
+				</ul>
+			</p>
+			
+			<h4>Data</h4>
+			<p>At the heart of each Message is the Data object, which represents the actual payload of the message. The Data object is a flexible, 
+			schema-less container designed to hold information regardless of its specific type, aligning closely with the JSON notation. 
+			This abstraction allows developers to focus on the meaning and utility of the value rather than on the specific technicalities of 
+			its underlying binary representation or format.</p>
+			<p>Java, being a strongly typed language, typically requires precise data types such as String, Integer, or Double to represent different 
+			forms of data. However, Aeonics abstracts this complexity through the Data class, which can accommodate scalar values, key-value pairs, 
+			or lists of elements in a manner similar to JSON. This flexibility allows developers to store and retrieve information without the need 
+			for a rigidly defined class structure.</p>
+			<p>The Data class allows developers to retrieve values in the expected form by performing automatic coersion to various native types.
+			This ensures that developers can easily fetch values from the Data object without worrying about type mismatches or complex parsing logic.</p>
+			<p>While the Data object provides great flexibility, it does not enforce a strict contract regarding the types of values it can contain. 
+			This lack of type safety may feel uncomfortable for developers accustomed to traditional, strongly typed systems where every piece of data 
+			has a predefined structure. Developers should understand the expected data format by design, ensuring 
+			that compliant values are passed and processed correctly.</p>
+			<p>The absence of rigid structure does not mean chaos. The framework encourages the fail-fast principle, where the system should quickly 
+			identify and report any issues arising from non-compliant data while resorting to late-evaluation principle to avoid unnecessary computations
+			against invalid input.</p>
+			<p>The flexibility of the Data object also makes the system adaptable. As workflows evolve or new data types are introduced, the schema-less 
+			nature of the Data object allows for rapid adjustments without the need to refactor large parts of the system. This adaptability ensures 
+			that the Aeonics framework can scale and evolve with the needs of the application while maintaining its low-code and flexible 
+			design principles.</p>
+		</section>
+		
+		<section id="overview-managers">
+			<h3>Managers</h3>
+			<p>In the Aeonics framework, Managers are specialized entities designed to handle cross-cutting concerns that are essential for the robust 
+			operation and management of an application. Cross-cutting concerns are aspects of a system that affect multiple modules and components, such 
+			as configuration, security, logging, and scheduling. By encapsulating these concerns within Manager entities, the Aeonics framework ensures 
+			that they are addressed in a consistent, modular, and extensible manner.</p>
+			<img src="images/managers.png" alt="Managers" style="width: 50ch;" />
+			<p>The system does not impose a fixed set of Managers; rather, it allows for the creation of new Manager entities as needed. This extensibility 
+			ensures that as new cross-cutting concerns arise, they can be addressed within the same consistent framework. Developers can model any new concern 
+			as a Manager entity, integrating it seamlessly into the application's architecture. Meanwhile, Aeonics comes with a set of built-in Managers that 
+			cover the most common cross-cutting concerns encountered in application development:
+				<ul>
+					<li><strong>Config</strong>: Manages global configuration settings shared across the entire application.</li>
+					<li><strong>Executor</strong>: Handles the execution of tasks and processes, coordinating how and when actions are 
+					carried out within the system.</li>
+					<li><strong>Lifecycle</strong>: Triggers the different application stages like startup and shutdown.</li>
+					<li><strong>Logger</strong>: Provides centralized logging capabilities.</li>
+					<li><strong>Monitor</strong>: Oversees system performance and health.</li>
+					<li><strong>Network</strong>: Manages network communication, connections, and raw data transfer.</li>
+					<li><strong>Scheduler</strong>: Handles time-based operations, such as scheduled tasks and cron jobs.</li>
+					<li><strong>Security</strong>: Oversees access control, authentication, and other security-related concerns based on a 
+					delegated provider model.</li>
+					<li><strong>Snapshot</strong>: Manages the capture and restoration of application states at specific points in time.</li>
+					<li><strong>Timeout</strong>: Enables to track elements that are time-sensitive.</li>
+					<li><strong>Translator</strong>: Manages textual translations and localization within the application to ensure all modules
+					are talking the same language.</li>
+					<li><strong>Vault</strong>: Provides secure storage for sensitive data, such as credentials and encryption keys.</li>
+				</ul>
+			</p>
+			<p>By treating Managers as entities within the same ecosystem as other components, Aeonics maintains a high degree of modularity and 
+			consistency. Each Manager can be registered, configured, and managed through the same mechanisms as other entities, ensuring that 
+			cross-cutting concerns are integrated seamlessly into the broader framework.</p>
+		</section>
+		
+		<section id="overview-security">
+			<h3>Security model</h3>
+			<p>The Aeonics framework integrates a robust and flexible security model that aligns with its overarching principles of modularity, loose 
+			coupling, and runtime flexibility. Like other components within the system, the security model is composed of entities, each playing a 
+			distinct role in managing authentication, authorization, and access control. At the heart of this model is the Security manager, which 
+			serves as the central access point for security-related operations.</p>
+			<p>The Security manager is responsible for the general security functions within the system. It handles essential tasks such as hashing, 
+			encryption, and decryption, ensuring that sensitive data is processed securely. It also handles authorization with the evaluation of 
+			security policies. However, the authentication process is delegated to specialized Providers. This delegation allows for a modular 
+			approach to security, where different providers can implement specific authentication mechanisms, tailored to the needs of the application.</p>
+			<img src="images/security2.png" alt="Security model" style="width: 60ch;" />
+			
+			<h4>User</h4>
+			<p>The User entity represents a login within the system. This login could correspond to a physical person, a service, or a device, 
+			depending on how the Provider defines and manages it. Each user is characterized by a unique login name and may have additional 
+			attributes, such as roles or group memberships, that influence their access permissions.</p>
+			
+			<h4>Group</h4>
+			<p>The Group entity represents a collection of users. Groups are a powerful way to manage access control at scale, as all users within a group automatically inherit the roles and permissions assigned to that group. This hierarchical structure simplifies the management of permissions, especially in complex systems with many users. By default, there cannot be groups within a group.</p>
+			
+			<h4>Role</h4>
+			<p>A Role is an entity representing a specific set of permissions or grants that can be assigned to a user or a group. Roles are a 
+			fundamental part of the access control system, allowing users to inherit permissions based on their roles within the system.</p>
+			
+			<h4>Provider</h4>
+			<p>The Provider entity represents an authentication provider responsible for managing user logins. A single user can authenticate 
+			through multiple providers, offering different login possibilities. This allows for a diverse and adaptable authentication strategy, 
+			where users can have various credentials and access methods depending on the provider used.</p>
+			
+			<h4>Rule</h4>
+			<p>A Rule entity defines the conditions under which access is granted or denied. Rules can be based on various factors, such as user 
+			attributes, group memberships, roles, or other combinations of conditions. Rules allow for fine-grained control over access, enabling 
+			the system to enforce complex security policies tailored to specific scenarios.</p>
+			
+			<h4>Policy</h4>
+			<p>A Policy entity represents the action to be taken based on the evaluation of rules: either to accept or deny access. Policies can be 
+			targeted at specific users, groups, or roles, and are typically scoped to particular resources or actions within the system. 
+			The Security manager uses these policies to determine whether a user should be granted or denied access to a particular resource.</p>
+			<p>The evaluation of policies within the Security manager is performed in a systematic, three-stage process to ensure clarity and 
+			avoid conflicts:
+				<ol>
+					<li><strong>Explicit Allow Check</strong>: The security manager first queries all relevant policies to determine if the user is 
+					explicitly allowed to perform the requested action. If no allow policy is found, the user is not explicitly granted access.</li>
+					<li><strong>Explicit Deny Check</strong>: In the second stage, the security manager checks for any explicitly denied policies that 
+					apply to the user. If a deny policy is found, it explicitly prevents access.</li>
+					<li><strong>Decision Compilation</strong>: The final decision is compiled based on the results of the first two stages. 
+					Access is granted if the user is explicitly allowed and not explicitly denied. This binary evaluation process ensures that 
+					there are no conflicts in policy enforcement, access is either clearly granted or denied based on the presence or absence 
+					of relevant policies.</li>
+				</ol>
+			</p>
+			
+			<h4>Token</h4>
+			<p>The Token entity represents access credentials that encapsulates a list of policy scopes. Once a user is authenticated, the token 
+			becomes the primary credential for accessing the system. The exact format of the token is left open to implementation, allowing for 
+			either opaque, meaningless content or structured formats like JWT, depending on the needs of the application. Tokens are issued and
+			managed by the Security manager.</p>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="runtime">Runtime Mechanics</h2>
+		<p>This section explains the operational flow of the Aeonics framework. It covers how the server starts, how modules are loaded, the various 
+		phases of the application lifecycle, and the task execution model.</p>
+		
+		<section id="runtime-plugins">
+			<h3>Plugins</h3>
+			<p>The concept of Plugin refers to the modules of the application. Each plugin is a Java module provided as a <code>jar</code> file. 
+			To be recognized as an active component of the system, it must provide an implementation of the Plugin class. If no such implementation is 
+			found, then it is considered as a static helper library.</p>
+			<p>The boot loader for the application does not contain any specific functionality beyond the concept of a plugin. The main class is responsible 
+			for loading all available plugins from the designated directory. Once all plugins are loaded, their <code>start()</code> method is invoked to trigger 
+			the initialization process. In order to integrate seamlessly into the global scope of the system, all plugins should comply with the 
+			lifecycle of the application.</p>
+		</section>
+		
+		<section id="runtime-lifecycle">
+			<h3>Lifecycle</h3>
+			<p>The application Lifecycle refers to the various phases that the application undergoes as it starts, runs, and shuts down. 
+			These phases are managed by the Lifecycle manager as events, and plugins can register callback handlers to execute logic at specific 
+			points. In their <code>start()</code> method, Plugins can hook each phase at different stages: before, during (on), or 
+			after a particular phase is triggered.</p>
+			<p>The Lifecycle manager functions as a global event bus, distributing events for each phase. Handlers are executed only once per phase to prevent unintended behavior in case the same phase is triggered multiple times. While the phases typically occur in a sequential order, they are treated as events, not as persistent application states.</p>
+			<img src="images/lifecycle.png" alt="Lifecycle" style="width: 70ch;" />
+			
+			<h4>Boot</h4>
+			<p>The BOOT phase is the initial stage of the application lifecycle. During this phase, the application's core environment is set up, but no 
+			plugins or modules are loaded yet, and no events are triggered. This phase is essentially the preparatory step where the system gets ready for 
+			the next stages. Although no handlers are executed here, the BOOT phase sets the foundation for all subsequent phases.</p>
+			
+			<h4>Load</h4>
+			<p>The LOAD phase begins after all plugins have been preloaded. During this phase, the core components of the system, such as the Registry, 
+			Factory, and managers, are initialized. This phase is crucial for ensuring that all foundational services and components are ready for use. 
+			Plugins typically use this phase to perform initialization tasks that are independent of other plugins or systems and register Templates in the
+			Factory. The application is not fully configured at this point, but the core infrastructure is in place.</p>
+			
+			<h4>Config</h4>
+			<p>The CONFIG phase is responsible for loading the application's configuration and initializing entities. During this phase, the system's 
+			Config manager is populated, and the Registry is updated with restored entities or default settings. Plugins can perform tasks related to
+			configuration or further populate the Registry with their own entities during this phase. By the end of this phase, the application's 
+			configuration is complete, and all registered entities are available for use.</p>
+			
+			<h4>Run</h4>
+			<p>The RUN phase is where the system is fully operational. All components are initialized, entities are running, and the system is actively 
+			handling tasks. During this phase, the network services and any background execution tasks are started, allowing plugins and modules to perform 
+			their business logic. This phase represents the normal operating state of the application, where plugins can interact with each other and with 
+			the system as a whole.</p>
+			
+			<h4>Shutdown</h4>
+			<p>The SHUTDOWN phase is triggered when the system is requested to stop. During this phase, the system begins to wind down by terminating 
+			tasks, closing network connections, and stopping active entities. Plugins can execute any final cleanup or shutdown logic during this phase, 
+			ensuring that resources are released properly. Once this phase is complete, the application will fully stop, and all components will be offline.</p>
+		</section>
+		
+		<section id="runtime-execution">
+			<h3>Execution</h3>
+			<p>In the Aeonics framework, task execution is primarily driven by an event-driven architecture, which simplifies much of the complexity 
+			traditionally associated with managing task scheduling and system resource allocation. At the heart of this architecture are the 
+			Origin entities, which are typically started in the background during the Lifecycle RUN phase. 
+			When data is available, they publish this data into a Topic. From that point, the system's event-handling capabilities take over, 
+			triggering the execution of subsequent tasks to process the new data.</p>
+			<p>Thanks to this design, the system can remain idle when no active processing is required, consuming minimal resources. The real work 
+			begins only when events are generated, and at that point, processing cascades from the Origin entities down to the appropriate tasks. 
+			This asynchronous event-driven model enables Aeonics to efficiently host many entities and model vrarious business workflows in the 
+			same system with very little overhead, only scaling resource use as required.</p>
+			
+			<h4>Types of Tasks</h4>
+			<p>The Executor manager recognizes four types of tasks that can be scheduled or prioritized differently.
+				<ul>
+					<li><strong>Background</strong>: These tasks have the lowest priority and typically involve long-running operations. Managers or 
+					monitoring processes, like Origin entities, often run as background tasks, allowing the system to focus on more urgent work 
+					while background tasks continue running unobtrusively.</li>
+					<li><strong>Normal</strong>: The majority of processing tasks fall into this category. These tasks are designed to execute quickly 
+					and efficiently, freeing up the CPU for other processes as soon as they complete. This category includes event handlers that 
+					process the data published by Origin entities.</li>
+					<li><strong>Priority</strong>: Critical tasks that must be executed immediately, regardless of the state of other tasks. These 
+					tasks bypass normal queuing mechanisms to ensure that they are handled as soon as possible.</li>
+					<li><strong>I/O</strong>: These tasks involve operations that require little CPU power, such as file I/O or network communications. 
+					By running these tasks in parallel with normal tasks, the system can maximize resource utilization without overloading the CPU.</li>
+				</ul>
+			</p>
+			<p>While the framework provides a highly abstracted execution model that allows tasks to run automatically in response to events, it also 
+			offers developers the ability to extend and customize task execution when necessary. Tasks are executed asynchronously, and developers 
+			can take advantage of the <code>.then()</code> method style to chain tasks together, ensuring that dependent operations are executed 
+			in sequence.</p>
+			<p>However, in most cases, developers do not need to worry about manually managing asynchronous execution. The low-code nature of Aeonics 
+			encapsulates tasks within a predefined execution context, abstracting away the complexity of task management. Entities are already defined 
+			within their appropriate task contexts, meaning execution is implicitly handled by the framework without additional developer intervention.</p>
+			<p>This approach allows developers to focus on building business logic and workflows rather than dealing with the intricacies of scheduling, 
+			threading, or parallelism. The event-driven and task-oriented architecture ensures that execution flows naturally based on the needs of 
+			the system, reducing the cognitive load on developers.</p>
+			
+			<h4>Backpressure</h4>
+			<p>As tasks are triggered by events and processed by the system, Aeonics employs a double queuing mechanism to manage task flow and prevent 
+			resource overload. This mechanism, introduced by the Executor Manager and supported by Queue entities, implements a natural backpressure 
+			system that ensures the framework can process data efficiently under heavy workloads.</p>
+			<p>Backpressure is crucial for maintaining system stability, as it prevents the injection of new tasks into the system when resources are 
+			already fully utilized. Since task injection itself is managed as a separate task, the system can throttle the flow of new events when 
+			necessary, preventing resource contention and avoiding performance degradation.</p>
+			<p>This built-in throttling mechanism grants Aeonics predictable stability under load. As the system becomes busier, it intelligently manages 
+			task execution, leveraging the multithreading capabilities of the underlying hardware, something single-threaded event-loop systems struggle 
+			to do effectively. While event-loop models can handle asynchronous tasks, they do not scale well across multi-core machines, and classic 
+			thread-per-request models often lead to resource exhaustion under high loads. By preventing overload and balancing task execution across 
+			multiple threads, Aeonics ensures efficient resource utilization while avoiding the pitfalls of both extremes.</p>
+		</section>
+	</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - Frontend Framework (AFF)</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="index.html">&lt; Back to documentation</a><br /><br />
+	
+	<a class="h2" href="#introduction">Introduction</a>
+	<a class="h3" href="#intro-conventions">Conventions</a>
+	
+	<a class="h2" href="#concepts">Concepts</a>
+	<a class="h3" href="#concepts-architecture">Architecture</a>
+	<a class="h3" href="#concepts-navigate">Navigation</a>
+	<a class="h3" href="#concepts-node">Page construction</a>
+	<a class="h3" href="#concepts-ajax">Fetching data</a>
+	<a class="h3" href="#concepts-translate">Translations</a>
+	<a class="h3" href="#concepts-modal">Popups</a>
+	<a class="h3" href="#concepts-notify">Notifications</a>
+	
+	<a class="h2" href="#class">Classes</a>
+	<a class="h3" href="#class-ae">ae</a>
+	<a class="h3" href="#class-ajax">Ajax</a>
+	<a class="h3" href="#class-app">App</a>
+	<a class="h3" href="#class-cookie">Cookie</a>
+	<a class="h3" href="#class-modal">Modal</a>
+	<a class="h3" href="#class-node">Node</a>
+	<a class="h3" href="#class-notify">Notify</a>
+	<a class="h3" href="#class-page">Page</a>
+	<a class="h3" href="#class-translator">Translator</a>
+	
+	<a class="h2" href="#advanced">Advanced</a>
+	<a class="h3" href="#advanced-scope">Scope</a>
+	<a class="h3" href="#advanced-escape">Escaping</a>
+	<a class="h3" href="#advanced-preload">Preloading</a>
+	
+	<a class="h2" href="#example">Example</a>
+</nav>
+<main>
+	<h1>Aeonics Frontend Framework (AFF)</h1>
+	
+	<div>
+		<h2 id="introduction">Introduction</h2>
+		<p>This documentation is intended for developers, UX and UI designers, devops, fullstack engineers or whomever has sufficient background knowledge
+			to understand it. It exposes various details about the Aeonics Frontend Framework system, the overall principles as well as the motivation behind some
+			architectural software choices.</p>
+		<p>The content of this guide is protected by intellectual property rights and is subject to the Aeonics Commercial License Agreement.
+			The information contained in this documentation is provided as-is without any guarantee of correctness nor any other sort, 
+			it is provided in good faith and is regularly checked and updated. If some content is not clear, outdated or misleading, please let us
+			know and we will try to fix it. Some fine internal details are voluntarily omitted from this guide, if you need more information about 
+			a specific aspect, please contact us.</p>
+		<p>The form and language used in this guide is non-formal and intended for trained professionals, therefore some technical details may be omitted
+			and/or the examples provided may not work or compile as-is. If you see ways to improve this guide or if you believe some notions would benefit 
+			from more details, please let us know.</p>
+		<p>The sections used in this guide are organized based on logical order, it is important to understand the key concepts before diving into the fine 
+			details because the approach and methodology promoted in this guide may seem unconventional. Aeonics focuses on efficiency which is defined
+			as the ability to accomplish sufficient result with the least amount of effort, time or resources. Throughout this guide, we encourage you 
+			to focus on the most relevant functionalities first and keep your technical debt with those time-consuming details for later, if those ever occur.</p>
+		
+		<section id="intro-conventions">
+			<h3>Conventions</h3>
+			<p>In this document, you will encounter different notations. Words highlighted in <strong>blue</strong> or <em>orange</em> are special keywords
+				that are important. Other words with a <code>grey background</code> means that it references a technical term or a code-specific keyword.</p>
+			<p>There are also some code samples or configuration bits that are displayed in separate blocks. The color and header of the block provides
+				some context on how to read the content.</p>
+			<pre class="json">This block type contains JSON information</pre>
+			<pre class="js">This block type contains Javascript code</pre>
+			<pre class="html">This block type contains HTML code</pre>
+			<pre class="css">This block type contains CSS code</pre>
+			<pre>This block type contains other unspecified information</pre>
+			<p class="todo">This documentation is constantly evolving, so sections or paragraphs highlighted in yellow means that some
+				additional content should be delivered soon...</p>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="concepts">Concepts</h2>
+		<p>The AFF is designed to build web applications that interact with REST services through a Single Page Application (SPA).
+			The SPA approach aligns with the Aeonics system concepts because it minimizes the amount of processing to be performed at the server side
+			to render a page. The application is thus more fluid and can provide better user experience.</p>
+		<p>The concept of SPA implies that all the visual rendering and the user interactions are managed at the frontend level. This means that 
+			the logical construction of the application is performed by the frontend whilst the backend only provides raw data content.</p>
+		<p>HTML is an XML construct that is interpreted by the browser, it works in par with Javascript and CSS. By abstracting all DOM creation and
+			manipulations in Javascript, we minimize the use of HTML to work with their (programming) object counterpart.</p>
+		<p>There are many existing frontend frameworks such as <code>React</code>, <code>Angular</code> or <code>Vue.js</code> so why propose <em>AFF</em> ?</p>
+		<ul>
+			<li><strong>Customizability</strong>: Some developers may want more control over the design and functionality of their website or application, and using an existing framework may not allow them to fully customize it to their liking easily.</li>
+			<li><strong>Performance</strong>: Some existing frameworks can be quite large and complex, and using them can result in slower performance or less efficient code.</li>
+			<li><strong>Learning curve</strong>: Depending on the framework, there may be a steep learning curve involved in using it, which can be a deterrent for some developers. Often, frameworks may require specific skills independent from the underlying programming language.</li>
+			<li><strong>WYWIWYR</strong>: Many frameworks will require to proceed through a compilation step that will generate the output JS/CSS. This means that the code that you write is harder to
+				troubleshoot and requires either a specific development environment or a continuous integration system which will slow down your ability to see reflected changes in real time, which
+				is particularly helpful for frontend applications.</li>
+		</ul>
+		<p>The AFF is therefore extremely light, close to native Javascript, and compatible with all modern browsers without intermediate steps. 
+			It will focus on managing the DOM in a similar fashion to how HTML is working. 
+			It means that there are no custom components or high level classes that will complexify your understanding of how the page is
+			being rendered.</p>
+		
+		<img src="images/aff.png" alt="Frontent Architecture Components" style="width: 550px;" />
+		
+		<p>The wireframe and behavior of the frontend is typically designed by the UX/UI team to model what the application should look like.
+			This design is then translated into <em>CSS</em> that will focus on the visual aspect of elements, and <em>Javascript</em> that will organize these elements
+			and manage the user interactions. The Javascript part is built using the AFF and will interact with the Aeonics backend system to fetch data to render or send
+			other data as required.</p>
+		
+		<section id="concepts-architecture">
+			<h3>Architecture</h3>
+			<p>A typical web application built with AFF will be composed of 3 components: one HTML entry point, CSS files for styling, and the Javascript business logic: 
+				<strong>one file per view</strong>. There is no need to create services, custom router logic, partial views that will mix Javascript with HTML and CSS, other
+				custom components and such. The goal is to Keep It Simple Stupid (KISS).
+				The framework contain the fundamental blocks that you will need to build any web application, and you may create your own classes or utilities if required
+				although it is not mandatory.</p>
+			<p>The file structure is as follows:</p>
+			<ul>
+				<li class="file"><em>index.html</em> : this is the web app entry point</li>
+				<li class="folder"><em>css</em> : this folder contains all the CSS files</li>
+				<li class="folder"><em>js</em> : this folder contains all the javascript files
+					<ul>
+						<li class="folder"><em>locale</em> : this folder contains the translations in different languages</li>
+						<li class="folder"><em>pages</em> : this folder contains the javascript for each page view</li>
+					</ul></li>
+				<li class="folder"><em>img</em> : this folder contains all the images and other assets</li>
+			</ul>
+			<p>You may create other folders as required to translate the design of the application into a usable web app. Although remember to keep it as simple and intuitive as possible.</p>
+			
+			<h4>HTML Entry Point</h4>
+			<p>There is only one required entry point, one web application implies only one HTML page. Although, multiple web applications may coexist to provide complementary information.
+				I.e.: one web app for the public website and one web app for the private area. These are 2 different web applications although they form a whole.
+				<br />The minimum requirement for the entry point is to require the <a href="#class-app">App</a> module. If you want to specify other meta tags, feel free to
+				adjust the HTML of this entry point by providing a page title or enabling PWA.</p>
+			<pre class="html">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;script type="module"&gt;
+        import('./js/ae.js').then(({default: ae}) =&gt;
+        {
+            ae.ready.then(() =&gt; { ae.require('App'); });
+        });
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;&lt;/body&gt;
+&lt;/html&gt;</pre>
+
+			<h4>CSS files</h4>
+			<p>The AFF includes several default CSS files placed in the <code>css</code> folder. For a better understanding, the <strong>core</strong> CSS 
+				files are prefixed with <code>ae.</code> and <em>page</em> specific styles are prefixed by <code>page.</code>.
+				Meanwhile, you can use your preferred conventions. None of the default CSS files are mandatory, those are provided for convenience as a starting point.</p>
+			<ul>
+				<li><strong>ae.app.css</strong>: this stylesheet is used by the <a href="#class-app">App</a> module and contains the base elements.</li>
+				<li><strong>ae.modal.css</strong>: this stylesheet is used by the <a href="#class-modal">Modal</a> module to display popups to the user.</li>
+				<li><strong>ae.notify.css</strong>: this stylesheet is used by the <a href="#class-notify">Notify</a> module to display notifications.</li>
+				<li><strong>ae.tab.css</strong>: this stylesheet can be used to display tabs in the application.</li>
+				<li><em>page.login.css</em>: this stylesheet is optionally used to display the login page.</li>
+				<li><em>page.template.css</em>: this stylesheet is optionally used to display the basic app layout.</li>
+			</ul>
+			<p>Remember, we do not write HTML. Thus, you can include CSS files using the AFF in Javascript:</p>
+			<pre class="js">
+// this will load the file from the /css folder
+ae.require('page.foo.css');
+
+// this will include any URL provided
+ae.require('http://example.com/foo.css');</pre>
+			<p>It will return a <code>Promise</code> that will resolve when the file is loaded.</p>
+			
+			<h4>Javascript files</h4>
+			<p>Javascript files are included in the form of standard Javascript modules. The main classes are located directly in the <code>/js</code> folder.
+				Then, <strong>each view (page) of the application is loaded from a matching Javascript file</strong> in the <code>/js/pages</code> folder.
+				This way, you will never ever wonder which file is responsible for which page of the application.</p>
+			<p>I.e.: the URL <code>/#customer</code> will automatically include the file <code>/js/pages/customer.js</code>.
+				If there are sub-path components in the URL, it will load the matching file <code>/#app/foo/bar</code> will load the file <code>/js/pages/app/foo/bar.js</code>.</p>
+			
+			<p>Each page should import its own dependencies, the framework will ensure that these will only be loaded once and only when required.
+				You can include Javascript files like this:</p>
+			<pre class="js">
+// this will load the file /js/App.js
+ae.require('App');</pre>
+			<p>If your dependencies also have their own dependencies, those will be loaded automatically. This will ensure that you only care for what you use explicitly.</p>
+		</section>
+		
+		<section id="concepts-navigate">
+			<h3>Navigation</h3>
+			<p>The AFF uses hash-based navigation. This means that every time the hash <code>#</code> changes, the system will try to load a corresponding view.
+				Each view is an instance of the <a href="#class-page">Page</a> class.</p>
+			<p>Hash-based navigation is preferable because it is native to the browser and happens client-side only and does not require to mess with the browser
+				behavior and history.</p>
+			<p>To trigger navigation, you can simply use a link, or redirect in javascript:</p>
+			<pre class="html">
+&lt;a href="#my_view"&gt;foo&lt;/a&gt;</pre>
+			<pre class="js">
+location.href = '#my_view';</pre>
+			<p>Each view matches a javascript file of the same name. This allows to clearly identify which code is loaded and executed. You can also easily organize
+				your code in logical sections: one per view.</p>
+			<pre>#my_view -> /js/pages/my_view.js</pre>
+		</section>
+		
+		<section id="concepts-node">
+			<h3>Page construction</h3>
+			<p>The DOM is composed of HTML tags called nodes. This is totally unrelated to <code>Node.js</code>.</p>
+			<p>The goal of the AFF is to create and manipulate nodes to render the page dynamically. The AFF therefore uses the <a href="#class-node">Node</a> class to <em>mimic the
+				HTML notation</em>. A node has a <strong>tag name</strong>, some <strong>attributes</strong> and <strong>event listeners</strong>, and finally some <strong>content</strong>.</p>
+			<p>The AFF <a href="#class-node">Node</a> class will return a true native HTMLElement, so all standard Javascript behavior applies just as if the node was created using <code>document.createElement()</code>.</p>
+			<pre class="html">
+&lt;p class="foo"&gt;bar&lt;/p&gt;</pre>
+			<pre class="js">
+Node.p({className: 'foo'}, 'bar');</pre>
+			<p>When an attribute is a function, it means that it is an event listener. This is the equivalent of <code>addEventListener()</code>:</p>
+			<pre class="html">
+&lt;p class="foo" onclick="foo();"&gt;bar&lt;/p&gt;</pre>
+			<pre class="js">
+Node.p({className: 'foo', click: function() { foo(); }}, 'bar');</pre>
+			<p>Nodes can have child elements too, this is just a shortcut to <code>appendChild()</code>. If a child element is an array, it is unfolded.</p>
+			<pre class="html">
+&lt;p class="foo"&gt;
+	&lt;span&gt;text1&lt;/span&gt;
+	&lt;span&gt;text2&lt;/span&gt;
+&lt;/p&gt;</pre>
+			<pre class="js">
+Node.p({className: 'foo'}, [
+	Node.span("text1"),
+	Node.span("text2"),
+]);</pre>
+			<pre class="js">
+Node.p([
+	"Some",
+	Node.span("content:"),
+	[1,2,3].map((e) => { return Node.span("Number "+e); })
+]);</pre>
+<pre class="html">
+&lt;p&gt;
+	Some
+	&lt;span&gt;content:&lt;/span&gt;
+	&lt;span&gt;Number 1&lt;/span&gt;
+	&lt;span&gt;Number 2&lt;/span&gt;
+	&lt;span&gt;Number 3&lt;/span&gt;
+&lt;/p&gt;</pre>
+			<p>That's about it! Now you have the ability to easily and concisely manipulate the page rendering based on your input data. The behavior is as intuitive as possible
+				and matches closely the output HTML using plain standard and lightweight Javascript native browser objects.</p>
+			<pre class="js">
+var ul = Node.ul();
+for( var i = 0; i &lt; 10; i++ )
+	ul.append(Node.li("Item " + i));</pre>
+			
+			<h4>Inline CSS</h4>
+			<p>It is recommended to use class names and CSS selectors as much as possible to avoid mixing the logical page construction with how it is displayed.
+				However, if you need to specify some inline style definitions, you can specify it just like a sub-attribute.</p>
+			<pre class="js">
+Node.p({style: {fontSize: '3em'}}, 'text content');</pre>
+			
+			<h4>Dataset</h4>
+			<p>You will very often need to remember some data associated with a DOM node. You can use the standard dataset property of the nodes to store <em>String</em> values.
+				For performance reasons, avoid storing too much data in the element dataset and avoid caching too much data in Javascript. Favor multiple calls to the 
+				REST API to retreive the latest information when needed.</p>
+			<pre class="js">
+var p = Node.p({dataset: {foo: 'bar'}}, 'text content');
+p.dataset.foo; // 'bar'</pre>
+		</section>
+		
+		<section id="concepts-ajax">
+			<h3>Fetching data</h3>
+			<p>The principle of a Single Page Application is to fetch and send data in the background and refresh only relevant sections of the same page.</p>
+			<p>The AFF <a href="#class-ajax">Ajax</a> class provides a simple way to interact with the Aeonics REST API:</p>
+			<pre class="js">
+Ajax.get('/api/endpoint').then((result) =>
+{
+	var data = result.response;
+}, (error) =>
+{
+	var code = error.status;
+});</pre>
+
+		<pre class="js">
+Ajax.post('/api/endpoint', {data: form}).then((result) =>
+{
+	// ok
+}, (error) =>
+{
+	// not ok
+});</pre>
+
+			<p>The second argument of the <a href="#class-ajax">Ajax</a> methods accepts the following parameters:</p>
+			<ul>
+				<li><strong>method</strong>: the HTTP method to use.</li>
+				<li><strong>timeout</strong>: the number of milliseconds a request can take before automatically being terminated.</li>
+				<li><strong>withCredentials</strong>: whether or not cross-site requests should be made using credentials such as cookies or authorization headers.</li>
+				<li><strong>mimeType</strong>: the MIME type to be used when interpreting the response.</li>
+				<li><strong>responseType</strong>: how to interpret the response. It may be necessary to specify the value <code>blob</code> when downloading documents.</li>
+				<li><strong>noCache</strong>: if true, the current timestamp will be appended to the request using the <code>v</code> parameter.</li>
+				<li><strong>headers</strong>: a list of custom headers.</li>
+				<li><strong>user</strong>: if set, it will send the <code>Authorization: Basic</code> header.</li>
+				<li><strong>password</strong>: if set, it will send the <code>Authorization: Basic</code> header.</li>
+				<li><strong>data</strong>: the request parameters to send. It can be a Javascript ket/value pair object, in case of POST requests, it can be an HTML form element,
+					or a plain string to send as-is (i.e.: JSON).</li>
+			</ul>
+		</section>
+		
+		<section id="concepts-translate">
+			<h3>Translations</h3>
+			<p>The web is international by nature, it is important to localize the textual content to match the user language. Meanwhile, it is a real pain
+				to provide the same content in multiple languages. To that end, the AFF includes the <a href="#class-translator">Translator</a> class that will lookup
+				sentences in the <code>/js/locales</code> folder by keywords.</p>
+			<p>At the start of the application, the translator will try to guess the user preferred language based on the cookies or the browser language.
+				If the language could not be identified, it will fallback to <strong>English</strong> (en). This is why an English translation should always be provided.</p>
+			<p>The translator will load the specified file from a folder that matches the locale:</p>
+			<pre class="js">
+Translator.locale; // discovered language: 'fr'
+
+// will load /js/locales/fr/my_translations.js
+Translator.load('my_translations');
+// if that file does not exist, it will try to load it in 'en': /js/locales/en/my_translations.js</pre>
+			<p>A translation file is as simple as a Javascript object (or JSON):</p>
+			<pre class="js">
+export default {
+	'translation_key': "The translated value, it &lt;em&gt;may&lt;/em&gt; contain HTML too.",
+	'hello': "Bonjour {}"
+}</pre>
+			<p>To get the translated text, you can use the <code>Translator.get()</code> method. The first argument is the translation key, and all remaining arguments
+				will replace the <code>{}</code> in the text in order of appearence.</p>
+			<pre class="js">
+var text = Translator.get('hello', 'Diego'); // 'Bonjour Diego'</pre>
+		</section>
+		
+		<section id="concepts-modal">
+			<h3>Popups</h3>
+			<p>The default browser prompt windows have limited capabilities, can barely be styled, and will block the background execution of the page.
+				Therefore, we need to offer the same capabilities in a user-friendly way.</p>
+			<p>The AFF <a href="#class-modal">Modal</a> class has various methods to manage popup elements within the application:</p>
+			<pre class="js">
+Modal.alert("Sample message");</pre>
+			<p>Multiple popups can be stacked when necessary, and you can customize the content entirely using the <code>custom()</code> function.
+				The return value is a Promise that will resolve when the popup is closed, and that you can manually resolve using the <code>ok()</code> method,
+				or reject with the <code>nok()</code> method.</p>
+			
+			<pre class="js">
+var m = Modal.custom(Node.p("foo"));
+m.then(() => { /* closed */ });
+
+m.ok(); // will close the popup successfully</pre>
+
+			<p>The returned Promise also contains a <code>dom</code> property that is the HTML element of the popup. This might be handy in some cases.</p>
+		</section>
+		
+		<section id="concepts-notify">
+			<h3>Notifications</h3>
+			<p>It is important to provide some feedback to the users about what is going on and inform them about the status of any operation.
+				To that end, the AFF uses the <a href="#class-notify">Notify</a> class and a special <code>.wait</code> CSS selector.</p>
+			
+			<h4>Wait</h4>
+			<p>When an operating is in progress (rendering or waiting for an <a href="#class-ajax">Ajax</a> request to complete), you should add a class name to
+				the area or container in which the content will appear. When the <code>.wait</code> CSS class name is added to an element, its content will be entirely hidden
+				and user interactions will be prevented. The user has nothing else to do other than wait, explicited by a visual indication (spinning wheel).</p>
+			
+			<pre class="js">
+var div = Node.div();
+div.classList.add('wait');
+
+setTimeout(() => { div.classList.remove('wait'); }, 5000);</pre>
+			<p>If you need to block the entire screen to prevent the user from clicking-frenzy all around, you can either apply the <code>.wait</code> class on the 
+				entire document, or use a <a href="#class-modal">Modal</a> popup.</p>
+			<pre class="js">
+document.classList.add('wait'); // will block the entire page but may not be very user-friendly
+setTimeout(() => { document.classList.remove('wait'); }, 5000);
+
+var m = Modal.custom(Node.div({className: 'wait'}), false); // more user friendly
+setTimeout(() => { m.ok(); }, 5000);</pre>
+
+			<h4>Feedback</h4>
+			<p>When an operation happens in the background, it is preferable to provide some feedback to the user about the completion or failure.
+				The AFF has a default friendly notification mechanism that is very easy to trigger:</p>
+			<pre class="js">
+if( success ) Notify.success("Operation complete");
+else Notify.error("Operation failed");</pre>
+			<p>You can refer to the <a href="#class-notify">Notify</a> class for more possibilites.</p>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="class">Classes</h2>
+		<p>The AFF is very concise and includes only a few classes to work with as well as one generic bootstraper to start the system.</p>
+		
+		<section id="class-ae">
+			<h3>ae</h3>
+			<p>This is the main bootstraper file that should be included in the HTML entry point.</p>
+			
+			<h4>Events</h4>
+			<p>It registers three useful events at the document level:</p>
+			<ul>
+				<li><em>enter</em>: triggered when the <code>enter</code> (13) key is pressed.</li>
+				<li><em>escape</em>: triggered when the <code>esc</code> (27) key is pressed.</li>
+				<li><em>delete</em>: triggered when the <code>del</code> (46) key is pressed.</li>
+			</ul>
+			
+			<h4>Extensions</h4>
+			<p>It will also add a <code>last</code> getter on the <code>Array</code> object which will simplify the way to retreive the last element of an array.</p>
+			<pre class="js">
+var last = ["foo", 42, "bar"].last; // "bar"</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<p>It will register the <code>ae</code> object at the global level with the following members:</p>
+			<ul>
+				<li><em>ready</em>: a Promise that will resolve when the document is in the <code>complete</code> ready state. This is used in the main HTML entry point.</li>
+				<li><strong>require(...modules)</strong>: will load the specified Javascript and CSS files and return a Promise that will resolve when all are loaded.
+					The promise result will contain an array of all specified modules. The loaded modules are not visible outside of the function scope.
+					<pre class="js">
+ae.require('Translator', 'style.css').then(([Translator]) =>
+{
+	// the Translator module will be loaded from /js/Translator.js and the class will be mapped to the Translator variable
+	// the style.css file will be loaded from /css/style.css and will not be mapped to a local variable (useless)
+	
+	Translator.get('foo');
+});
+
+Translator.get('bar'); // error: Translator is unknown here because it is outside the function scope</pre>
+					If you require multiple classes, they will be available in order as such:</li>
+					<pre class="js">ae.require('App', 'Page', 'Notify').then(([App, Page, Notify]) => {});</pre>
+				<li><strong>safeHtml(text)</strong>: will replace all <code>&gt; &lt; &amp; &quot;</code> by their HTML entities equivalent.</li>
+				<li><strong>urlValue(key)</strong>: returns the value of the query string parameter in the URL. The value can be specified before the page hash (standard)
+					or after (custom) which provides greater flexibility.
+					<pre class="js">
+// url: /path?a=b#page?c=d
+var a = ae.urlValue('a'); // -> 'b'
+var c = ae.urlValue('c'); // -> 'd'</pre></li>
+			</ul>
+		</section>
+		
+		<section id="class-ajax">
+			<h3>Ajax</h3>
+			<p>This class can be used to fetch or send data in the background. It will return a Promise that will resolve or reject based on the result of the operation.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method.</p>
+			<pre class="js">
+ae.require('Ajax').then(([Ajax]) => {
+	Ajax.post('/url');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><strong>get(url, options)</strong>: this method is a shorthand for <code>fetch()</code> with the method set to <code>GET</code>.</li>
+				<li><strong>post(url, options)</strong>: this method is a shorthand for <code>fetch()</code> with the method set to <code>POST</code>.</li>
+				<li><strong>put(url, options)</strong>: this method is a shorthand for <code>fetch()</code> with the method set to <code>POST</code>.</li>
+				<li><strong>delete(url, options)</strong>: this method is a shorthand for <code>fetch()</code> with the method set to <code>POST</code>.</li>
+				<li><strong>fetch(url, options)</strong>: performs a background asynchronous request using <code>XMLHttpRequest</code>. See <a href="#concepts-ajax">Fetching data</a>
+					for more details.</li>
+				<li><em>authorization</em>: if set, this is the default <code>Authorization</code> header value that will be sent for every request.</li>
+			</ul>
+		</section>
+		
+		<section id="class-app">
+			<h3>App</h3>
+			<p>This class will automatically setup the page navigation system and start the application. The following steps are performed in order:</p>
+			<ol>
+				<li>Register the <code>hashchange</code> handler to load pages automatically.</li>
+				<li>Load the <code>login</code> page (<code>/js/pages/login.js</code>). If the login page does not exist, proceed to next step. If the login page exists,
+					proceed only when the page show Promise resolves (see <a href="#class-page">Page</a>). This is the opportunity to require a login before loading
+					any additionnal content. The template page will not be loaded yet.</li>
+				<li>Load the <code>template</code> page (<code>/js/pages/template.js</code>). If the template page does not exist, proceed to next step. If the template page exists,
+					proceed only when the page show Promise completes (resolve or reject). This is the opportunity to build the overall application layout and
+					set the main page container (see <a href="#class-page">Page</a>).</li>
+				<li>Navigate to the requested page based on the URL hash. If no URL hash is specified, it will fallback to the <code>home</code> page (<code>/js/pages/home.js</code>).</li>
+			</ol>
+			<h4>Usage</h4>
+			<p>You should not use this class manually, it should be loaded only once in the main HTML entry point. Although, it is recommended to include the 
+				<code>ae.app.css</code> stylesheet initially too.</p>
+			
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><em>current</em>: a reference to the current page being displayed. You should not set this property manually.</li>
+				<li><em>container</em>: the root HTML element in which pages should be rendered. The application container is typically defined in the template page
+					<code>/js/pages/template.js</code> which is automatically loaded by the <code>App</code> class.</li>
+			</ul>
+		</section>
+		
+		<section id="class-cookie">
+			<h3>Cookie</h3>
+			<p>This class helps manage cookie entries.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method.</p>
+			<pre class="js">
+ae.require('Cookie').then(([Cookie]) => {
+	Cookie.set('foo', 'bar');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><strong>get(name)</strong>: returns the value of the speified cookie variable. If the specified name does not exist or is not visible due to other
+					security constraints, it will return null.
+					<pre class="js">var foo = Cookie.get('foo');</pre></li>
+				<li><strong>set(name, value, path)</strong>: sets a cookie variable to the specified value. It will bind the value to the current hostname and will
+					make it available to the specified path only (or <code>/</code> if unspecified). The value is set to last 365 days.
+					<pre class="js">Cookie.set('foo', 'bar');</pre></li>
+				<li><strong>unset(name, path)</strong>: removes a cookie value. The path must match the original set path (or <code>/</code> if unspecified).
+					<pre class="js">Cookie.unset('foo');</pre></li>
+			</ul>
+		</section>
+		
+		<section id="class-modal">
+			<h3>Modal</h3>
+			<p>This class can be used to create popup windows.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method and include the default stylesheet.</p>
+			<pre class="js">
+ae.require('Modal', 'ae.modal.css').then(([Modal]) => {
+	Modal.alert('foo');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><strong>alert(message)</strong>: shows a popup with the specified message and a single OK button to close it. 
+					The message can be text content, a single <a href="#class-node">Node</a>, or an array of Nodes.
+					The popup is not escapable (see <code>custom</code>).
+					The return value is a Promise that resolves when the user clicks the button.
+					<pre class="js">Modal.alert('foo').then(() => { });</pre></li>
+				<li><strong>confirm(message, buttons, escapable)</strong>: shows a popup to force the user to choose between any of the provided options.
+					The message can be text content, a single <a href="#class-node">Node</a>, or an array of Nodes.
+					The buttons must be an ordered array of labels to display as buttons. If not set, <code>OK</code> and <code>CANCEL</code> are used.
+					The popup can be made escapable (see <code>custom</code>) but it is not by default.
+					The return value is a Promise that resolves with the index of the button clicked (0 = first button, 1 = second button,...).
+					<pre class="js">Modal.confirm('foo', ).then((index) => { });</pre></li>
+				<li><strong>prompt(message, form)</strong>: shows a popup to collect data from the user.
+					The message can be text content, a single <a href="#class-node">Node</a>, or an array of Nodes.
+					The form can be a <code>&lt;form&gt;</code> HTML element or a single default value that will be presented to the user in a text field.
+					The popup will expose one <code>OK</code> button and one <code>CANCEL</code> button.
+					The popup is escapable (see <code>custom</code>) as if the user clicked on the cancel button.
+					The return value is a Promise that will resolve with the <code>&lt;form&gt;</code> or will reject upon cancellation.
+					<pre class="js">Modal.prompt('foo', 'default_value').then((form) => { });</pre></li>
+				<li><strong>custom(nodes, escapable)</strong>: shows a custom popup.
+					The nodes property can be text content, a single <a href="#class-node">Node</a>, or an array of Nodes.
+					The escapable property specifies if the user can close the popup either by clicking the cross in the top-right corner, by clicking
+					outside of the popup area, or pressing the escape key.
+					The return value is a Promise that resolves when the popup is closed by invoking the <code>ok()</code> method, or that rejects if the popup
+					is closed by invoking the <code>nok()</code> method (or if the popup is escaped).
+					The returned Promise contains also a <code>dom</code> property which is the underlying HTML element of the popup.
+					<pre class="js">var popup = Modal.custom('foo', false);
+popup.ok(); // close the popup</pre></li>
+			</ul>
+		</section>
+		
+		<section id="class-node">
+			<h3>Node</h3>
+			<p>This class is a shorthand to construct browser native HTML elements. It allows for a concise and intuitive syntax that mimics the HTML notation.
+				It is recommended that you use the Node class to construct the page rendering. Most used HTML tags have a dedicated function, for other tags, you can use the
+				<code>create()</code> function.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method.</p>
+			<pre class="js">
+ae.require('Node').then(([Node]) => {
+	Node.div('foo');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><strong>a(attributes, content)</strong>: creates a <code>&lt;a&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>aside(attributes, content)</strong>: creates a <code>&lt;aside&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>br(attributes, content)</strong>: creates a <code>&lt;br&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>button(attributes, content)</strong>: creates a <code>&lt;button&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>canvas(attributes, content)</strong>: creates a <code>&lt;canvas&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>checkbox(attributes, content)</strong>: creates a <code>&lt;input&gt;</code> HTML element of type <code>checkbox</code> with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>circle(attributes, content)</strong>: creates a SVG <code>&lt;circle&gt;</code> HTML element of type <code>checkbox</code> with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>code(attributes, content)</strong>: creates a <code>&lt;code&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>defs(attributes, content)</strong>: creates a SVG <code>&lt;defs&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>div(attributes, content)</strong>: creates a <code>&lt;div&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>em(attributes, content)</strong>: creates a <code>&lt;em&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>fieldset(attributes, content)</strong>: creates a <code>&lt;fieldset&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>footer(attributes, content)</strong>: creates a <code>&lt;footer&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>form(attributes, content)</strong>: creates a <code>&lt;form&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>h1(attributes, content)</strong>: creates a <code>&lt;h1&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>h2(attributes, content)</strong>: creates a <code>&lt;h2&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>h3(attributes, content)</strong>: creates a <code>&lt;h3&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>h4(attributes, content)</strong>: creates a <code>&lt;h4&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>header(attributes, content)</strong>: creates a <code>&lt;header&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>hr(attributes, content)</strong>: creates a <code>&lt;hr&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>img(attributes, content)</strong>: creates a <code>&lt;img&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>input(attributes, content)</strong>: creates a <code>&lt;input&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>label(attributes, content)</strong>: creates a <code>&lt;label&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>li(attributes, content)</strong>: creates a <code>&lt;li&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>linearGradient(attributes, content)</strong>: creates a SVG <code>&lt;linearGradient&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>main(attributes, content)</strong>: creates a <code>&lt;main&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>nav(attributes, content)</strong>: creates a <code>&lt;nav&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>ol(attributes, content)</strong>: creates a <code>&lt;ol&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>option(attributes, content)</strong>: creates a <code>&lt;option&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>p(attributes, content)</strong>: creates a <code>&lt;p&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>path(attributes, content)</strong>: creates a SVG <code>&lt;path&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>pre(attributes, content)</strong>: creates a <code>&lt;pre&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>radio(attributes, content)</strong>: creates a <code>&lt;input&gt;</code> HTML element of type <code>radio</code> with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>section(attributes, content)</strong>: creates a <code>&lt;section&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>select(attributes, content)</strong>: creates a <code>&lt;select&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>span(attributes, content)</strong>: creates a <code>&lt;span&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>stop(attributes, content)</strong>: creates a SVG <code>&lt;stop&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>strong(attributes, content)</strong>: creates a <code>&lt;strong&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>svg(attributes, content)</strong>: creates a <code>&lt;svg&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>table(attributes, content)</strong>: creates a <code>&lt;table&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>tbody(attributes, content)</strong>: creates a <code>&lt;tbody&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>td(attributes, content)</strong>: creates a <code>&lt;td&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>text(attributes, content)</strong>: creates a SVG <code>&lt;text&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>textarea(attributes, content)</strong>: creates a <code>&lt;textarea&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>th(attributes, content)</strong>: creates a <code>&lt;th&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>thead(attributes, content)</strong>: creates a <code>&lt;thead&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>tr(attributes, content)</strong>: creates a <code>&lt;tr&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				<li><strong>ul(attributes, content)</strong>: creates a <code>&lt;ul&gt;</code> HTML element with the specified attributes and content (see <code>create()</code>).</li>
+				
+				<li><strong>create(tag, attributes, content)</strong>: creates a native HTML element of the specified tag name.
+					The attributes parameter should be a Javascript object with the node's attributes and event handlers. The content parameter should be
+					either a string that is interpreted as the innerHTML (be careful to <a href="#advanced-escape">Escaping</a>), or an HTML element, or an array of elements.
+					See <a href="#concepts-node">Page construction</a> for more details.</li>
+			</ul>
+		</section>
+		
+		<section id="class-notify">
+			<h3>Notify</h3>
+			<p>This class can be used to display some feedback to the user about the status of a background operation.
+				The notification disapears automatically after 3 seconds and multiple notifications can be shown at the same time.
+				Using the default provided style, notifications appear in the bottom left corner.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method and include the default stylesheet.</p>
+			<pre class="js">
+ae.require('Notify', 'ae.notify.css').then(([Notify]) => {
+	Notify.success('Operation complete');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><strong>info(message)</strong>: shows a notification with the provided message using <code>info</code> level.
+					<pre class="js">Notify.info("Welcome back");</pre></li>
+				<li><strong>warning(message)</strong>: shows a notification with the provided message using <code>warning</code> level.
+					<pre class="js">Notify.warning("Please fill all the fields");</pre></li>
+				<li><strong>success(message)</strong>: shows a notification with the provided message using <code>success</code> level.
+					<pre class="js">Notify.success("Saved");</pre></li>
+				<li><strong>error(message)</strong>: shows a notification with the provided message using <code>error</code> level.
+					<pre class="js">Notify.error("Operation failed");</pre></li>
+				<li><strong>show(message, level)</strong>: displays the specified message in a notification. The goal is only to provide some feedback to the user.
+					If the notification is clicked, it disapears. If the notification is hovered, it stays still. Otherwise it disapears after 3 seconds.
+					The notification level is the CSS class name that will be applied to the notification, you can style any level of your choosing.
+					<pre class="js">Notify.show("Foo bar", "debug");</pre></li>
+			</ul>
+		</section>
+		
+		<section id="class-page">
+			<h3>Page</h3>
+			<p>Pages are views of the application that are loaded automatically by the <a href="#class-app">App</a> class. In order to implement a view, you should
+				extend the base <code>Page</code> and place it in a specific file in the <code>/js/pages</code> folder. 
+				A page is a <code>&lt;section&gt;</code> HTML element that is appended to the <code>App.container</code> element.
+				The page loading mechanism happens in the following order:</p>
+			<ol>
+				<li>If there is a previous page displayed, its <code>hide()</code> method is called. Upon completion, the previous page's <code>dom</code> is removed from
+					the application container.</li>
+				<li>The current page's <code>show()</code> method is called, this is where you should build or refresh the elements of the page to display. Upon completion,
+					the page's <code>dom</code> is appended to the application container.</li>
+				<li>If another page is requested, the process repeats.</li>
+			</ol>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method. If your own page requires specific styling, include it too.
+				A custom page should use the following snippet:</p>
+			<pre class="js">
+let ae = globalThis.ae;
+var x = new Promise((ok, nok) =>
+{
+	ae.require('Page', 'page.custom.css').then(([Page]) =>
+	{
+		var page = new Page();
+		Object.assign(page, 
+		{
+			show: function() { ... },
+			hide: function() { ... }
+		});
+		
+		ok(page);
+	}, (e) => { nok(e); });
+});
+
+export { x as default };</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><em>dom</em>: this property is read-only. It represents the page <code>&lt;section&gt;</code> that will be displayed in the application. You can
+					append your own elements to it to render the view to your liking.</li>
+				<li><strong>show()</strong>: this method is called before the page <code>dom</code> is added to the application. You should construct the page rendering in 
+					this function. The function should return a Promise that resolves when the view is ready to be displayed.</li>
+				<li><strong>hide()</strong>: this method is called before the <code>dom</code> is removed from the application. You may implement your own cleanup mechanism
+					in this fuction. The function should return a Promise that resolves when this page is ready to be removed.</li>
+			</ul>
+		</section>
+		
+		<section id="class-translator">
+			<h3>Translator</h3>
+			<p>This class can be used to load translation files and retreive the text associated with a keyword. See <a href="#concepts-translate">Translations</a> for more details.</p>
+			
+			<h4>Usage</h4>
+			<p>You can import this class using the <code>ae.require()</code> method.</p>
+			<pre class="js">
+ae.require('Translator').then(([Translator]) => {
+	Translator.get('foo');
+});</pre>
+
+			<h4>Methods &amp; Properties</h4>
+			<ul>
+				<li><em>locale</em>: the locale of the user (2 lower case characters: 'en', 'fr', 'es', ...).
+					<pre class="js">var locale = Translator.locale;</pre></li>
+				<li><strong>load(name)</strong>: loads a translation file from the <code>/js/locales/[locale]/</code> folder depending on the locale of the user.
+					If the specified file does not exist for the user locale, an attempt is made to load the same file in <code>en</code>.
+					<pre class="js">Translator.load('foo'); // will load /js/locales/[locale]/foo.js</pre></li>
+				<li><strong>append(translation)</strong>: adds some translations to the active set. The translation parameter must be a key/value pair object.
+					<pre class="js">Translation.append({'key': 'value'});</pre></li>
+				<li><strong>get(key, ...)</strong>: retreives the translation of the specified key in the current loaded <code>Translator.locale</code>.
+					The value may contain <code>{}</code> placeholders that will be substituted with the additionnal parameters provided, in order.
+					<pre class="js">var text = Translator.get('foo', 'bar'); // "Hello {}" -> "Hello bar"</pre></li>
+				<li><strong>change(locale)</strong>: sets the user prefered locale in the cookie and reloads the application entirely.</li>
+			</ul>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="advanced">Advanced</h2>
+		
+		<section id="advanced-scope">
+			<h3>Scope</h3>
+			<p>Function enclosing scope can be challenging in Javascript. The <code>this</code> keyword might not be the expected object when dealing with event listeners.
+				For this reason, we are personally using the variable name <code>self</code> to refer to the enclosing class. It helps identify if we are refering to
+				the node itself or the class in which it was defined.</p>
+			<pre class="js">
+class Example {
+	foo() {
+		var self = this; // self = Example class
+		
+		Node.p({click: function(event) {
+			this.className = 'clicked'; // this = p node
+			
+			self.bar(); // self = Example class
+		});
+	}
+	
+	bar() { }
+}
+			</pre>
+		</section>
+		
+		<section id="advanced-escape">
+			<h3>Escaping</h3>
+			<p>Do not ever ever display the content of user input or value from a REST API directly in HTML because it could contain XSS or other undesirable content.</p>
+			<p>When you need to display text content, you should either use the <code>ae.safeHtml()</code> method, or include it in the <code>.textContent</code> of the element.
+				You should avoid at all cost to set the <code>innerHTML</code> property.</p>
+			<pre class="js">
+var attack = "&lt;/div&gt;&lt;script&gt;...";
+
+var div = Node.div(ae.safeHtml(attack));
+div.textContent = attack;
+</pre>
+
+			<p>Additionnally, if you need to display informative content (i.e.: error text) originating from a REST API, you should ideally use a translation. This
+				is because the backend is agnostic of the user language and will most probably respond in engligh using technical terms which may not be the 
+				preferred way to communicate with the user. This means that the REST API should return well-known values so that frontend applications have a limited
+				set of translations to provide.</p>
+			
+			<pre class="js">
+Ajax.get('/url').then((result) => { }, (error) =>
+{
+	Notify.error(Translator.get(error.response.cause));
+});</pre>
+		</section>
+		
+		<section id="advanced-preload">
+			<h3>Preloading</h3>
+			<p>The AFF will load dependencies and CSS files automatically from the list of <code>require()</code>'d elements.
+				Although, the dependencies of a page can only be known once it has loaded, which will most likely introduce some delay in order to completely
+				load all dependencies.</p>
+			<p>Therefore, it is preferable to repeat the known intermediate dependencies in your own pages (just in case) and force a preload in the main HTML entry point.
+				Even if only the <a href="#class-app">App</a> is required by default, it may be a good idea to load necessary common resources as early as possible.</p>
+			<pre class="html">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;script type="module"&gt;
+        import('./js/ae.js').then(({default: ae}) =&gt;
+        {
+            // preload css
+            ae.require('ae.app.css', 'ae.modal.css', 'ae.notify.css', 'page.login.css', 'page.template.css').catch(() =&gt; {});
+            ae.ready.then(() =&gt;
+            {
+                // preload classes
+                ae.require('Translator', 'Cookie', 'Modal', 'Node', 'Notify', 'Ajax', 'Page', 'App').then(([Translator]) =&gt;
+                {
+                    // preload locales
+                    Translator.load('default');
+                }); 
+            });
+        });
+    &lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;&lt;/body&gt;
+&lt;/html&gt;</pre>
+		</section>
+	</div>
+	
+	<div>
+		<h2 id="example">Example</h2>
+		<p>Here is an example of a page view that fetches a list of customers from a REST endpoint. When the refresh button is clicked, the page content refreshes dynamically.
+			The REST API returns customer data in the following form:</p>
+		<pre class="json">[
+	{id: 1, name: "Diego"},
+	{id: 2, name: "Foo"},
+	{id: 3, name: "Bar"}
+]</pre>
+
+		<p>The requirement is to display the list of customers in a <code>&lt;ul&gt;</code> element and also have a refresh <code>&lt;button&gt;</code> to reload the list.</p>
+		<ul>
+			<li>The <code>show()</code> function will check if the page is initialized and force a refresh.</li>
+			<li>The <code>init()</code> function will construct the basic layout and add it to the page <code>dom</code>. It is initially empty.</li>
+			<li>The <code>refresh()</code> function will clear the list content, load data and add one list item for each customer.</li>
+			<li>There is no need for the <code>hide()</code> function in this case.</li>
+		</ul>
+		
+		<pre class="js">
+let ae = globalThis.ae;
+var x = new Promise((ok, nok) =>
+{
+    ae.require('Page', 'Node', 'Ajax', 'Translator', 'Modal', 'Notify', 'page.example.css').then(([Page, Node, Ajax, Translator, Modal, Notify]) =>
+    {
+        var page = new Page();
+        Object.assign(page, 
+        {
+            show: function()
+            {
+                // if the page has never loaded, construct some default wireframe
+                if( this.dom.children.length == 0 ) this.init();
+                
+                // refresh the content but allow the promise to return directly
+                var self = this;
+                setTimeout(function() { self.refresh(); }, 1);
+                
+                return Promise.resolve();
+            },
+            init: function()
+            {
+                // construct the wireframe with no content. The refresh() method will insert content in the list.
+                var self = this;
+                this.dom.append(
+                    Node.button({click: () => { self.refresh(); }}, Translator.get('refresh')),
+                    Node.ul({id: 'customer_list'})
+                );
+            },
+            refresh: function()
+            {
+                // add a wait indication to the list
+                var ul = this.dom.querySelector('#customer_list');
+                ul.classList.add('wait');
+                
+                // remove all previous content
+                while( ul.firstChild ) ul.lastChild.remove();
+                
+                // get the list of customers from the REST API
+                var self = this;
+                Ajax.get('/api/customer/list').then((result) =>
+                {
+                    // add all customers to the list
+                    result.response.forEach((customer) =>
+                    {
+                        ul.appendChild(Node.li({dataset: {id: customer.id}},
+                        [
+                            Node.p(ae.safeHtml(customer.name))
+                        ]));
+                    });
+                    
+                    // remove the wait indication
+                    ul.classList.remove('wait');
+                }, (error) =>
+                {
+                    // display an error notification
+                    Notify.error(Translator.get('failed'))
+                    div.classList.remove('wait');
+                });
+            }
+        });
+        
+        ok(page);
+    }, (e) => { nok(e); });
+});
+
+export { x as default };</pre>
+	</div>
+</main>
+</body>
+</html>

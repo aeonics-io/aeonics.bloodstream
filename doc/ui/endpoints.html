@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Web Endpoints</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#call">Call an Endpoint</a>
+	<a class="h2" href="#custom">Custom Endpoints</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Web Endpoints</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page lists all registered web endpoints (usually REST API) that are deployed in the system. You can test them live and even create new
+			endpoints directly within this web interface.</p>
+		<p>You can use the search bar on the top left of the page to quickly find the endpoint you want.</p>
+		<p>Just remember that not all endpoints are meant to be used as-is and may require more complex logic to produce meaningful results.</p>
+		<img src="../images/ui/page-endpoints.png" alt="Screenshot" style="max-width: 100%;" />
+		
+		<p>In the list, you can quickly identify the HTTP operation that is linked to an endpoint: <code>GET</code>, <code>POST</code>, <code>PUT</code>, or
+			<code>DELETE</code>. However, the system supports any other method, even custom ones.</p>
+		<img src="../images/ui/page-endpoints2.png" alt="Screenshot" style="width: 40ch;" />
+		
+		<p>When you click on an endpoint, it expands and provides more detail.</p>
+		<img src="../images/ui/page-endpoints3.png" alt="Screenshot" style="width: 60ch;" />
+		
+		<p>Most endpoints are built-in so the only option is to call them, but others are custom and you can edit pr remove them too.</p>
+		<img src="../images/ui/page-endpoints4.png" alt="Screenshot" style="width: 70ch;" />
+		
+		<p>When you click on a parameter (blue tag), the complete description is displayed.</p>
+		<img src="../images/ui/page-endpoints5.png" alt="Screenshot" style="width: 60ch;" />
+	</div>
+	
+	<div>
+		<h2 id="call">Call an Endpoint</h2>
+		<p>When you expand an endpoint, you can click on the "<em>Call this Endpoint</em>" button. This will open the prompt for the parameters.</p>
+		<img src="../images/ui/page-endpoints6.png" alt="Screenshot" style="width: 50ch;" />
+		<p>All possible parameter of the endpoint will be listed, and you can also choose the desired authentication method.</p>
+		<p>The result is displayed as text (usually JSON) or downloaded directly if it cannot be displayed. The result window shows the response code 
+			(200 means success), the total time to call the endpoint including the network connection, and the server-side processing time.</p>
+		<img src="../images/ui/page-endpoints7.png" alt="Screenshot" style="width: 50ch;" />
+	</div>
+	
+	<div>
+		<h2 id="custom">Custom Endpoints</h2>
+		<p>You can create custom endpoints dynamically from the web interface using the buttons on the top right of the page.
+			If you create custom endpoints, do not forget to <em>create a snapshot</em> to persist your changes.</p>
+		<img src="../images/ui/page-endpoints8.png" alt="Screenshot" style="width: 25ch;" />
+		<p>You can upload an existing file with the endpoint definition by clicking on the <strong>upload</strong> button. Otherwise, the <strong>wizard</strong>
+			button will prompt you for the basic information.</p>
+		<img src="../images/ui/page-endpoints9.png" alt="Screenshot" style="width: 50ch;" />
+		<p>You must choose the HTTP method, the path to your endpoint, and ideally document what it does. The next screen shows the editable code template
+			of your endpoint. You can modify it to your liking and press the <strong>deploy</strong> button. The endpoint should be available within seconds.</p>
+		<img src="../images/ui/page-endpoints10.png" alt="Screenshot" style="width: 50ch;" />
+		<p>You may not get it right the first time. If a compilation error happens, it will be displayed with the line number.</p>
+		<img src="../images/ui/page-endpoints11.png" alt="Screenshot" style="width: 50ch;" />
+		<p>Custom endpoints can be called like other endpoints. You can also update the code and redeploy it, or remove it entirely. In that case, a confirmation
+			is required.</p>
+		<img src="../images/ui/page-endpoints12.png" alt="Screenshot" style="width: 50ch;" /><br />
+		<img src="../images/ui/page-endpoints13.png" alt="Screenshot" style="width: 50ch;" />
+	</div>
+</main>
+</body>
+</html>

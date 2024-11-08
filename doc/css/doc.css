@@ -1,0 +1,53 @@
+@font-face { font-family: 'p'; font-style: normal; font-weight: 200; font-display: swap; src: url(../fonts/p200.woff2) format('woff2'); }
+@font-face { font-family: 'p'; font-style: normal; font-weight: 600; font-display: swap; src: url(../fonts/p600.woff2) format('woff2'); }
+@font-face { font-family: 'r'; font-style: normal; font-weight: 300; font-display: swap; src: url(../fonts/r300.woff2) format('woff2'); }
+@font-face { font-family: 'r'; font-style: normal; font-weight: 700; font-display: swap; src: url(../fonts/r700.woff2) format('woff2'); }
+
+:root {
+	--black: #1C1B21; --blackrgb: 28, 27, 33;
+	--orange: #FB8136; --orangergb: 251, 129, 54;
+	--blue: #36B0FB; --bluergb: 54, 176, 251;
+	--white: #ffffff; --whitergb: 255, 255, 255;
+	font-family: r, sans-serif;
+	font-weight: 300;
+	color: var(--black);
+	background-color: var(--white);
+}
+main, nav { counter-reset: h2; }
+.h2, h2 { counter-reset: h3; }
+.h3, h3 { counter-reset: h4; }
+.h2:before, h2:before { counter-increment: h2; content: counter(h2) ". "; }
+.h3:before, h3:before { counter-increment: h3; content: counter(h2) "." counter(h3) ". "; }
+.h4:before, h4:before { counter-increment: h4; content: counter(h2) "." counter(h3) "." counter(h4) ". "; }
+.direct { padding-left: 6ch; display: list-item; list-style-position: inside; }
+
+nav { position: fixed; left: 0; top: 0; bottom: 0; width: 350px; background-color: var(--black); color: var(--white); padding: 16px; overflow: auto; z-index: 1; box-sizing: border-box; box-shadow: 0px 0px 20px 2px var(--black); }
+nav a { display: block; margin-bottom: 5px; color: var(--white); text-decoration: none; }
+nav a:hover { color: var(--orange); }
+nav .h3 { padding-left: 3ch; }
+
+main { position: fixed; left: 350px; right: 0; top: 0; bottom: 0; overflow: auto; color: var(--black); background-color: var(--white); padding: 32px; line-height: 1.4em; }
+main h1 { font-family: p, sans-serif; color: var(--black); padding: 24px 0; font-size: 2rem; font-weight: 600; }
+main h2 { font-family: p, sans-serif; color: var(--orange); padding: 24px 0; padding-bottom: 6px; font-size: 1.6rem; font-weight: 200; border-bottom: 1px solid var(--orange); margin-bottom: 24px; }
+main h3 { font-family: p, sans-serif; color: var(--orange); padding: 24px 24px; font-size: 1.25rem; font-weight: 200; margin-bottom: 24px; }
+main h4 { font-family: p, sans-serif; color: var(--black); padding: 0; font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+main li { list-style-position: inside; margin-bottom: 8px; }
+
+strong { color: var(--blue); font-style: normal; font-weight: 300; }
+em { color: var(--orange); font-style: normal; font-weight: 300; }
+pre { background-color: rgba(var(--blackrgb), 0.1); padding: 8px; line-height: 1.2em; white-space: pre-wrap; }
+code { display: inline-block; background-color: rgba(var(--blackrgb), 0.1); padding: 0 4px; }
+pre.json::before, pre.java::before, pre.shell::before, pre.config::before, pre.js::before, pre.html::before, pre.css::before { line-height: normal; display: block; position: absolute; top: -15px; padding: 2px 16px; color: var(--white); left: -1px; font-size: 10px; font-weight: 700; }
+pre.json { border-left: 2px solid red; position: relative; margin-top: 25px; } pre.json::before { content: "JSON"; background-color: red; }
+pre.java { border-left: 2px solid green; position: relative; margin-top: 25px; } pre.java::before { content: "JAVA"; background-color: green; }
+pre.shell { border-left: 2px solid navy; position: relative; margin-top: 25px; } pre.shell::before { content: "SHELL"; background-color: navy; }
+pre.config { border-left: 2px solid purple; position: relative; margin-top: 25px; } pre.config::before { content: "CONFIG"; background-color: purple; }
+pre.js { border-left: 2px solid green; position: relative; margin-top: 25px; } pre.js::before { content: "JAVASCRIPT"; background-color: green; }
+pre.html { border-left: 2px solid purple; position: relative; margin-top: 25px; } pre.html::before { content: "HTML"; background-color: purple; }
+pre.css { border-left: 2px solid navy; position: relative; margin-top: 25px; } pre.css::before { content: "CSS"; background-color: navy; }
+
+.file::before { content: ""; display: inline-block; margin-right: 8px; height: 20px; width: 20px; background-image: url(../images/file.svg); background-size: contain; background-repeat: no-repeat; vertical-align: middle; }
+.folder::before { content: ""; display: inline-block; margin-right: 8px; height: 20px; width: 20px; background-image: url(../images/folder.svg); background-size: contain; background-repeat: no-repeat; vertical-align: middle; }
+li.file, li.folder { list-style: none; margin-bottom: 3px; }
+
+.todo { background-color: #FFFF33; }

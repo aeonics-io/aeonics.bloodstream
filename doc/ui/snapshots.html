@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Snapshots</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#manager">Snapshot Manager</a>
+	<a class="h2" href="#available">Available snapshots</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Snapshots</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page allows to create, upload, download or restore snapshots. The snapshots include all config parameters, the entire registry and
+			other information that are requested by specific plugins. The snapshots do not contain internal entities, the plugins themselves, the web applications,
+			the definition of the managers nor other security settings. The goal is to replicate the setup from one system to another 
+			or rollback a modification if needed.</p>
+		<p>The top left search bar allows to quickly find the desired snapshot.</p>
+		<img src="../images/ui/page-snapshot.png" alt="Screenshot" style="max-width: 100%;" />
+		
+		<p>To upload an existing snapshot on the system, use the <strong>upload</strong> button on the top right of the page.</p>
+		<p>To create a new snapshot from the current setup, use the <strong>create</strong> button on the top right of the page.</p>
+	</div>
+	
+	<div>
+		<h2 id="manager">Snapshot Manager</h2>
+		<p>The first section of the page displays information about the current snapshot manager and the latest snapshot available.
+			When the system reboots, the latest snapshot is loaded automatically unless specified otherwise.</p>
+		<p>The name of the currently loaded snapshot is set in the <em>aeonics.manager.snapshot &gt; current</em> configuration parameter.</p>
+		<img src="../images/ui/page-snapshot2.png" alt="Screenshot" style="width: 50ch;" />
+	</div>
+	
+	<div>
+		<h2 id="available">Available snapshots</h2>
+		<p>The second section of the page lists all available snapshots in this system. They are ordered by <em>date</em>.
+			For each of them, you have the possibility to <strong>restore</strong>, <strong>download</strong>, or <strong>remove</strong> the
+			related snapshot.</p>
+		<img src="../images/ui/page-snapshot1.png" alt="Screenshot" style="width: 50ch;" />
+		<p>When you restore a snapshot, the entire configuration and registry will be replaced. Therefore, you will probably have to login again
+			so that changes are taken into account.</p>
+		<img src="../images/ui/page-snapshot3.png" alt="Screenshot" style="width: 50ch;" />
+		<p>You will also have to confirm each action. Removing a snapshot is permanent and cannot be undone.</p>
+		<img src="../images/ui/page-snapshot4.png" alt="Screenshot" style="width: 50ch;" />
+	</div>
+</main>
+</body>
+</html>

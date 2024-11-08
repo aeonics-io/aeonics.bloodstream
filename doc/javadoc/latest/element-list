@@ -1,0 +1,11 @@
+module:aeonics.boot
+aeonics
+module:aeonics.core
+aeonics.data
+aeonics.entity
+aeonics.entity.security
+aeonics.manager
+aeonics.template
+aeonics.util
+module:aeonics.http
+aeonics.http

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Statistics</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#activity">System activity</a>
+	<a class="h2" href="#metrics">Metrics</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Statistics</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This management interface page displays various performance metrics related to the system.
+			In the center, you can find system activity information for each internal thread for the current hour, day and year.
+			On the right, some instantaneous metrics are displayed and refreshed every second.</p>
+		<img src="../images/ui/page-statistics.png" alt="Screenshot" style="max-width: 100%;" />
+	</div>
+	
+	<div>
+		<h2 id="activity">System activity</h2>
+		<p>The system activity is displayed for each internal thread and is averaged per time period: 10s for the hourly graph, 1h for the daily graph,
+			and 1day for the yearly graph. It provides a history of the ratio of processor time used by the thread.</p>
+		<pre>That is, 
+if the thread used the CPU actively during 5 second in the last 10 seconds, 
+then its ratio is 50%.</pre>
+		<p>There are 3 different aspects you can analyze:</p>
+		<ul>
+			<li><strong>Active</strong>: the total CPU time that a thread spent in active computation.</li>
+			<li><strong>Blocked</strong>: the approximate elapsed time that a thread was blocked by some condition or by another thread and could not
+				use the CPU actively.</li>
+			<li><strong>Awaiting</strong>: the approximate elapsed time that a thread spent idle willingly or because there was no task to perform.</li>
+		</ul>
+		<p>Except for rounding errors, the sum of all three metrics should always give you 100% as a thread is either idle, active or blocked.</p>
+		<img src="../images/ui/page-statistics2.png" alt="Screenshot" style="width: 80ch;" />
+		<p>On the right of the graph, a secondary axis displays the network activity (upload and download) in MB.</p>
+	</div>
+	
+	<div>
+		<h2 id="metrics">Metrics</h2>
+		<p>On the right of the page, you can find additional metrics about the system:</p>
+		<img src="../images/ui/page-statistics3.png" alt="Screenshot" style="width: 80ch;" />
+		<ul>
+			<li><strong>Current CPU usage</strong>: this is the current total processor usage of the JVM. This includes everything about Aeonics but does
+				not account for other systems running on the same machine.</li>
+			<li><strong>Total CPU time this hour</strong>: this is a cumulated sum of the activity of all threads in the current clock hour.</li>
+			<li><strong>System uptime</strong>: the number of hours, minutes, seconds that the system is running since last reboot.</li>
+			<li><strong>Memory usage (heap)</strong>: the amount of RAM that Aeonics uses.</li>
+			<li><strong>Memory usage (non-heap)</strong>: the amount of unmonitored RAM that is part of the JVM.</li>
+			<li><strong>Committed memory</strong>: the amount of virtual memory that is guaranteed tobe available to the JVM.</li>
+			<li><strong>Tasks executed since boot</strong>: the incremental number of tasks that have been executed on the system since last reboot.</li>
+			<li><strong>Tasks pending</strong>: the number of tasks that are pending processing (enqueued).</li>
+			<li><strong>Average execution time</strong>: the average task execution time. This is the total latency, not the CPU execution time.</li>
+		</ul>
+	</div>
+</main>
+</body>
+</html>

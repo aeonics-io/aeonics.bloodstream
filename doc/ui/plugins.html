@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Aeonics - UI / Plugins</title>
+	<meta name="language" content="en">
+	<link rel="stylesheet" href="../css/doc.css" />
+</head>
+<body>
+<nav>
+	<a href="../quickstart.html#ui-pages">&lt; Back to Quick Start</a><br /><br />
+	
+	<a class="h2" href="#description">Description</a>
+	<a class="h2" href="#deploy">Deploy</a>
+	<a class="h2" href="#undeploy">Undeploy</a>
+</nav>
+<main>
+	<h1>Management Interface Page: Plugins</h1>
+	
+	<div>
+		<h2 id="description">Description</h2>
+		<p>This page allows to deploy or undeploy plugins.</p>
+		<p>Whenever a change in plugins is performed, it is necessary to <strong>reboot</strong> the system to account for the new setup.</p>
+		<p><em>Important note:</em> during the reboot process, the process on the server will be terminated. <em>It will only restart if the system is setup
+			as a service or has other mechanism to restart the process.</em> If the system is not configured to restart automatically, the system will not restart
+			and you will not be able to use it until a manual restart is performed.</p>
+		<img src="../images/ui/page-plugins.png" alt="Screenshot" style="max-width: 100%;" />
+		
+		<p>Each plugin in the system is listed and shows basic information.</p>
+		<img src="../images/ui/page-plugins2.png" alt="Screenshot" style="width: 70ch;" />
+	</div>
+	
+	<div>
+		<h2 id="deploy">Deploy</h2>
+		<p>Using the top right deploy button, you can upload a plugin file. If the plugin has the same file name as an existing plugin, it will overwrite it.</p>
+		<img src="../images/ui/page-plugins3.png" alt="Screenshot" style="width: 25ch;" />
+		
+		<p>After a plugin is successfully uploaded, the system needs to be rebooted. A confirmation prompt is shown to reboot immediately, or later.</p>
+		<img src="../images/ui/page-plugins4.png" alt="Screenshot" style="width: 60ch;" />
+		
+		<p>If you choose to reboot later, you can reboot at any time using the top right <em>reboot</em> button.</p>
+		<img src="../images/ui/page-plugins5.png" alt="Screenshot" style="width: 60ch;" />
+		
+		<p>In any case, once the system reboots, it will be offline for a few seconds. The system will attempt to reconnect and displays an information
+			dialog. When the connection is available again, the page will reload automatically.</p>
+		<img src="../images/ui/page-plugins6.png" alt="Screenshot" style="width: 60ch;" />
+	</div>
+	
+	<div>
+		<h2 id="undeploy">Undeploy</h2>
+		<p>You have the possibility to remove an existing plugin by clicking on the undeploy button at the bottom right corner of the information section.</p>
+		<img src="../images/ui/page-plugins7.png" alt="Screenshot" style="width: 15ch;" />
+		<p><em>Note that the functionalities offered by a plugin will no longer be available if you undeploy it.</em></p>
+		
+		<p>A confirmation prompt is always displayed to avoid accidental deletions.</p>
+		<img src="../images/ui/page-plugins8.png" alt="Screenshot" style="width: 60ch;" />
+		
+		<p>Like in the deploy case, the system needs to be rebooted. A confirmation prompt is shown to reboot immediately, or later.</p>
+		<img src="../images/ui/page-plugins4.png" alt="Screenshot" style="width: 60ch;" />
+	</div>
+</main>
+</body>
+</html>
