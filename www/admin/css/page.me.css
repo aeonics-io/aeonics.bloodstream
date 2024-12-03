@@ -1,0 +1,35 @@
+
+section.me {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+}
+
+section.me .action { text-align: right; }
+section.me .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.me .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+section.me h1 { display: block; text-align: center; margin: 2rem; }
+section.me h2 { text-align: left; font-size: 1.1rem; font-weight: normal; padding: 1rem; }
+section.me section { 
+	background: #ffffff10;
+	margin-bottom: 0.5rem;
+}
+section.me section > div { height: 0; overflow: hidden; }
+section.me section.open > div { height: auto; overflow: auto; }
+
+section.me section .detail { padding: 1rem 1rem 2rem 1rem; }
+section.me section .detail p { padding: 0.5rem 0; display: flex; }
+section.me section .detail a { color: var(--blue); }
+section.me section .detail .title, section.me section .detail .value, section.me section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+section.me section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+section.me section .detail .text { color: var(--white); flex: 1; }
+section.me section .detail .value { color: var(--orange); font-family: monospace; flex: 1; }
+section.me section .detail .value .tag { 
+	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
+	margin-right: 0.5rem; margin-bottom: 0.2rem; color: #ccc; text-decoration: none;
+}
+section.me section .detail .value .tag:hover { color: var(--blue); }

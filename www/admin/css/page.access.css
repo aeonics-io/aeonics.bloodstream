@@ -1,0 +1,83 @@
+
+section.access {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+	position: relative;
+}
+
+section.access h1 { display: block; text-align: center; margin: 2rem; }
+section.access > h1 + p { text-align: justify; padding: 0 4rem 1rem 4rem; }
+
+section.access .hidden { display: none !important; }
+section.access .search {
+	position: absolute; top: 0; left: 0; white-space: nowrap; padding: 0.5rem 2rem;
+}
+section.access .search input { text-align: left; width: 8rem; display: inline-block;
+	color: #fff;
+	background: transparent;
+	margin: 0;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+}
+section.access .search .icon {
+	display: inline-block; padding: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	border-bottom: 2px solid #aaa;
+}
+section.access .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.access .tabcontent { position: relative; }
+section.access .tabcontent > .action { text-align: right; }
+section.access .tabcontent > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.access .tabcontent > .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+section.access .tabcontent ul { margin: 0; list-style: none; padding: 0; margin-top: 1rem; }
+section.access .tabcontent li { 
+	display: inline-block; padding: 0.5rem 1rem; margin: 0.3rem; border: 1px solid #fff3; border-radius: 2rem; background-color: var(--black);
+	cursor: pointer;
+}
+section.access .tabcontent li:hover { border-color: var(--blue); color: var(--blue); }
+
+#tab_security_targets li::before {
+	display: inline-block; margin-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+#access_tab_users li::before { content: '\e7fd'; }
+#access_tab_groups li::before { content: '\e7ef'; }
+#access_tab_roles li::before { content: '\ea67'; }
+#access_tab_providers li::before { content: '\e84f'; }
+
+#policyList section { 
+	background: #ffffff10;
+	margin-bottom: 0.5rem;
+}
+#policyList section h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+#policyList section h2::before {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	content: '\e5cc';
+	rotate: z 0deg;
+	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	display: inline-block; margin: 1rem; 
+}
+#policyList section.open h2::before {
+	rotate: z 90deg;
+}
+#policyList section > div { height: 0; overflow: hidden; }
+#policyList section.open > div { height: auto; overflow: auto; }
+#policyList section .allow { color: var(--green); }
+#policyList section .deny { color: var(--red); }
+#policyList section .allow, #policyList section .deny { 
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	margin-right: 1rem;
+}
+#policyList section .detail { padding: 1rem 1rem 2rem 1rem; }
+#policyList section .detail p, .configInfo p { padding: 0.5rem; display: flex; }
+#policyList section .detail p:hover { background-color: #ffffff10; }
+#policyList section .detail .title, .configInfo .title,
+#policyList section .detail .value, .configInfo .value,
+#policyList section .detail .text, .configInfo .text { display: inline-block; font-size: 0.8rem; vertical-align: top; word-break: break-word; }
+#policyList section .detail .title, .configInfo .title { width: 30%; min-width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+#policyList section .detail .text, .configInfo .text { color: var(--orange); flex: 1; }

@@ -1,0 +1,45 @@
+
+section.plugins {
+	padding: 3rem;
+	overflow: auto;
+	height: 100vh;
+}
+
+section.plugins h1 { display: block; text-align: center; margin: 2rem; }
+section.plugins > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
+
+section.plugins .action { text-align: right; }
+section.plugins .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.plugins .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+section.plugins section { 
+	background: #ffffff10;
+	margin-bottom: 0.5rem;
+}
+section.plugins section h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+section.plugins section h2::before {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	content: '\e5cc';
+	rotate: z 0deg;
+	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	display: inline-block; margin: 1rem; 
+}
+section.plugins section.open h2::before {
+	rotate: z 90deg;
+}
+section.plugins section > div { height: 0; overflow: hidden; }
+section.plugins section.open > div { height: auto; overflow: auto; }
+
+section.plugins section .detail { padding: 1rem 1rem 2rem 1rem; }
+section.plugins section .detail p { padding: 0.5rem 0; display: flex; }
+section.plugins section .detail .title, section.plugins section .detail .value, section.plugins section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+section.plugins section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+section.plugins section .detail .text { color: var(--orange); flex: 1; }
+section.plugins section .detail .value { color: var(--blue); font-family: monospace; flex: 1; }
+section.plugins section .detail .value .tag { 
+	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
+	margin-right: 0.5rem; margin-bottom: 0.2rem; color: #ccc;
+}

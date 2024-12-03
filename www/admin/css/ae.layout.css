@@ -1,0 +1,97 @@
+
+:root {
+	font-size: clamp(16px, 1.1vw, 40px);
+}
+
+main#main_container {
+	position: fixed; z-index: 1;
+	top: 0; left: 0; bottom: 0; right: 0;
+	padding: 0rem 0rem 0rem 5rem;
+}
+
+#layout {
+	display: flex;
+	flex-flow: row wrap;
+}
+
+nav {
+	position: fixed; z-index: 2;
+	top: 0; left: 0; bottom: 0;
+	padding: 1rem 0;
+	max-width: 5rem;
+	background-color: #26252D;
+	border-right: 1px solid #302E38;
+	transition: max-width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	overflow-y: hidden; overflow-x: hidden;
+}
+
+nav:hover { max-width: 30rem; overflow-y: auto; overflow-x: hidden; }
+nav:hover li { color: #fff; }
+
+nav ol { list-style: none; margin: 0; padding: 0; }
+nav li { 
+	display: block; margin: 0; padding: 0.8rem 1.7rem; cursor: pointer; overflow: hidden; 
+	color: transparent; transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	white-space: nowrap;
+}
+nav ol:nth-of-type(1) { border-left: 2px var(--orange) solid; }
+nav ol:nth-of-type(2) { border-left: 2px var(--blue) solid; }
+nav ol:nth-of-type(3) { border-left: 2px var(--green) solid; }
+nav ol:nth-of-type(1) li.selected { background: var(--orange) !important; }
+nav ol:nth-of-type(2) li.selected { background: var(--blue) !important; }
+nav ol:nth-of-type(3) li.selected { background: var(--green) !important; }
+
+nav li:hover { background: #42404F; }
+nav li .icon { display: inline-block; margin-right: 1rem; color: #fff; font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important; }
+nav li { color: transparent; }
+
+nav p { text-align: center; padding: 1rem 0 0.5rem 0; margin-bottom: 0.5rem; border-bottom: 1px solid var(--blue); color: transparent;
+	transition: color 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); white-space: nowrap; text-overflow: ellipsis;
+}
+nav:hover p { color: var(--white); }
+
+nav aside .icon {
+	display: inline-block; margin-right: 1rem; color: #fff; font-family: material !important; font-feature-settings: "liga" 1; 
+	line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	background-color: #fff3; border-radius: 10rem; padding: 0.5rem; font-size: 2rem; margin-left: 1rem; margin-bottom: 0.8rem;
+}
+nav aside {
+	cursor: pointer; overflow: hidden; white-space: nowrap; color: transparent; padding-right: 0.8rem;
+}
+nav:hover aside { color: #fff; }
+
+#entity_editor h2 { text-align: center; font-size: 1.2rem; }
+#entity_editor h2 + p { color: var(--orange); font-size: 0.8rem; line-height: 1rem; }
+#entity_editor ul { list-style: none; margin: 0; padding: 0; }
+#entity_editor li { background-color: #ffffff10; padding: 1rem; margin: 1rem 0; }
+#entity_editor li:hover { background-color: #ffffff20; }
+#entity_editor li:hover h2 { color: var(--blue); }
+#entity_editor fieldset { margin: 1rem 0; text-align: left; }
+#entity_editor fieldset.required label::after { content: ' *'; color: var(--red); }
+#entity_editor fieldset label::before { 
+	content: '\e5cc'; display: inline-block; margin-right: 0.2rem; font-family: material !important; font-feature-settings: "liga" 1; 
+	vertical-align: -0.32rem; text-transform: none !important; font-size: 1.2rem;
+}
+#entity_editor fieldset.link label::before { content: '\e157'; }
+#entity_editor fieldset label { font-size: 0.8rem; }
+#entity_editor fieldset p { color: var(--blue); font-size: 0.8rem; line-height: 1rem; text-align: justify; }
+#entity_editor fieldset input { margin: 0.5rem 0; padding: 0.5rem; font-size: 0.8rem; font-family: monospace; }
+#entity_editor fieldset textarea { }
+#entity_editor fieldset select { }
+#entity_editor fieldset input[type="checkbox"] { }
+#entity_editor fieldset .relations { list-style: none; padding: 0; margin: 0.5rem 0 1rem 2rem }
+#entity_editor fieldset .relations li :last-child:hover { color: var(--orange); }
+#entity_editor fieldset .relations li :last-child {
+	font-family: material !important; font-feature-settings: "liga" 1;
+	margin-left: 0.5rem; font-size: 1.2rem; cursor: pointer;
+}	
+#entity_editor fieldset .relations li span { display: inline-block; vertical-align: middle; } 
+#entity_editor fieldset .relations li { 
+	display: inline-block; margin: 0; margin-left: 1rem; border-radius: 3rem; background-color: #fff3;
+	padding: 0.2rem 0.8rem; font-size: 0.8rem; margin-bottom: 0.3rem;
+}
+#entity_editor fieldset .relations > span:hover { color: var(--orange); background-color: #FB813630; }
+#entity_editor fieldset .relations > span { 
+	display: inline-block; font-family: material !important; font-feature-settings: "liga" 1; background-color: #fff3; 
+	border-radius: 3rem; margin-left: 1rem; cursor: pointer; text-align: center; padding: 0.2rem 0.4rem; font-size: 1.2rem; vertical-align: middle;
+}

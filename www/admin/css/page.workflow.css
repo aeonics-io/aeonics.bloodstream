@@ -1,0 +1,302 @@
+
+section.workflow {
+	padding: 3rem;
+	overflow: hidden;
+	height: 100vh;
+	position: relative;
+	--ws: calc((60vw - 5rem) / 100);
+}
+
+section.workflow > h1 { display: block; text-align: center; margin: 2rem; }
+section.workflow > h1 + p { text-align: justify; padding: 0 4rem 1rem 4rem; }
+section.workflow .hidden { display: none !important; }
+section.workflow > .search {
+	position: absolute; top: 0; left: 0; white-space: nowrap; padding: 0.5rem 2rem;
+}
+section.workflow > .search input { text-align: left; width: 8rem; display: inline-block;
+	color: #fff;
+	background: transparent;
+	margin: 0;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+}
+section.workflow > .search .icon {
+	display: inline-block; padding: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	border-bottom: 2px solid #aaa;
+}
+section.workflow > .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.workflow > .action { text-align: right; }
+section.workflow > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
+section.workflow > .action button .icon {
+	padding-right: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+}
+
+#flowList { list-style: none; margin: 0; padding: 0; }
+#flowList li { background: #ffffff10; margin: 0; margin-bottom: 0.5rem; padding: 0; }
+#flowList li h2 { text-align: left; font-size: 1.1rem; font-weight: normal; padding: 1rem; }
+#flowList li p { padding: 1rem; font-size: 0.8rem; color: var(--orange); }
+#flowList li h2 .actions { display: inline-block; margin-left: 3rem; }
+#flowList li h2 span { cursor: pointer; }
+#flowList li h2 span:hover { color: var(--blue); }
+#flowList li h2 .actions span { 
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	margin-right: 0.5rem;
+}
+
+#flowAddButton {
+	font-family: material !important; font-feature-settings: "liga" 1;
+	position: absolute; bottom: 2rem; left: 2rem; font-size: 1.5rem;
+	background-color: var(--orange); z-index: 10; width: 3rem; height: 3rem;
+	text-align: center; line-height: 3rem; border-radius: 3rem; cursor: pointer;
+	box-shadow: inset 0 3px 4px #ffffff30, inset 0 -5px 5px -5px #000;
+	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+#flowAddButton:hover { background-color: var(--blue); }
+
+
+section.workflow .flowTitle { position: absolute; top: 0rem; left: 0rem; padding: 0.5rem 2rem; z-index: 10; }
+section.workflow .flowTitle > span { display: inline-block; font-size: 1.4rem; font-family: material !important; font-feature-settings: "liga" 1; vertical-align: middle; cursor: pointer; }
+section.workflow .flowTitle > p { 
+	display: inline-block; font-size: 1.2rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem; min-width: 15ch;
+	max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; color: var(--orange); }
+section.workflow .flowTitle > span:hover { color: var(--blue); }
+section.workflow .flowTitle > span:last-of-type { margin-left: 0.5rem; }
+
+section.workflow .controls {
+	position: absolute; top: 4rem; left: 2rem; z-index: 10;
+	user-select: none;
+}
+
+section.workflow .controls span {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.5rem;
+	text-transform: none !important; display: block; 
+	width: 2.2rem; height: 2.2rem; line-height: 2.2rem; cursor: pointer;
+	text-align: center; margin-top: 3px; border-radius: 5px;
+	background-color: #fff1;
+}
+section.workflow .controls span:hover { color: var(--blue); }
+
+
+.chooseElementType { list-style: none; margin: 0; padding: 0; white-space: nowrap; }
+.chooseElementType li { 
+	display: inline-block; padding: 1rem; border-radius: 1rem; border: 1px solid transparent; 
+	text-align: center; cursor: pointer; min-width: 7rem; }
+.chooseElementType li:hover { border: 1px solid var(--orange); background: #FB813620; }
+.chooseElementType p { }
+.chooseElementType span { font-family: material !important; font-feature-settings: "liga" 1; font-size: 2.5rem; }
+
+
+/* ============== PLANE */
+
+section.workflow .mouseTarget { position: absolute; top: 0; left: 0; width: 100%; height: 100%; text-align: center; user-select: none; }
+section.workflow .zoomTarget { transition: .2s linear transform; }
+section.workflow .plane { background-color: var(--black); display: inline-block; }
+section.workflow .plane.dragging * { pointer-events: none; }
+
+/* ============== FLOW */
+
+section.workflow .flow {
+	--size: 10;
+	width: calc(var(--size) * 10 * var(--ws)); height: calc(var(--size) * 10 * var(--ws));
+	margin-top: 0; padding: 0;
+	background-color: #FB813630; 
+	border: calc(.23 * var(--ws)) solid var(--orange);
+	color: var(--white);
+	display: inline-block;
+	position: relative;
+	transform-origin: center center;
+	transform: rotateX(60deg) rotateZ(45deg);
+	transform-style: preserve-3d;
+	border-radius: calc(2 * var(--ws));
+	box-shadow:
+		calc(.35 * var(--ws)) calc(.35 * var(--ws)) 0 calc(.35 * var(--ws)) var(--orange),
+		calc(-.11 * var(--ws)) 0 calc(3.3 * var(--ws)) 0 rgba(251, 129, 54, 0.01),
+		calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) 0 rgba(251, 129, 54, 0.25);
+	transition:
+		1.4s ease-in-out transform,
+		.2s linear width,
+		.2s linear height;
+	z-index: 0;
+}
+
+section.workflow .flow::before, section.workflow .flow::after {
+	content: '';
+	display: block; position: absolute;
+	width: calc(var(--size) * 10 * var(--ws)); height: calc(var(--size) * 10 * var(--ws));
+	background-color: #FB813630; 
+	border: calc(.23 * var(--ws)) solid var(--orange);
+	border-radius: calc(2 * var(--ws));
+	z-index: -1; pointer-events: none;
+	transition:
+		1.4s ease-in-out top,
+		1.4s ease-in-out left,
+		1.4s ease-in-out opacity,
+		.2s linear width,
+		.2s linear height;
+}
+
+section.workflow .flow::after {
+	top: calc(10 * var(--ws)); left: calc(10 * var(--ws)); opacity: 0.25;
+}
+
+section.workflow .flow::before {
+	top: calc(20 * var(--ws)); left: calc(20 * var(--ws)); opacity: 0.1;
+}
+
+section.workflow .flat .flow::before, section.workflow .flat .flow::after {
+	top: 0; left: 0; opacity: 0;
+}
+
+section.workflow .flat .flow {
+	transform: rotateX(20deg) rotateZ(15deg);
+}
+
+section.workflow .flow aside {
+	cursor: ns-resize;
+	border-bottom: calc(.59 * var(--ws)) solid var(--orange);
+	border-right: calc(.59 * var(--ws)) solid var(--orange);
+	position: absolute; bottom: calc(.59 * var(--ws)); right: calc(.59 * var(--ws)); width: calc(3 * var(--ws)); height: calc(3 * var(--ws));
+	transition: 
+		.2s linear border-bottom,
+		.2s linear border-right;
+}
+section.workflow .flow aside:hover, section.workflow .flow aside.dragging { 
+	border-bottom: calc(.59 * var(--ws)) solid var(--white);
+	border-right: calc(.59 * var(--ws)) solid var(--white);
+}
+section.workflow .flat .flow aside { display: none; }
+
+section.workflow .flow.dragging * { pointer-events: none; }
+section.workflow .flow.dragging {
+	background-size: calc(10 * var(--ws)) calc(10 * var(--ws));
+	background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB4PSI5OSIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMTAwIiBmaWxsPSIjRkI4MTM2Ii8+PHJlY3QgeD0iMCIgeT0iOTkiIHdpZHRoPSIxMDAiIGhlaWdodD0iMSIgZmlsbD0iI0ZCODEzNiIvPjwvc3ZnPg==");
+    background-repeat: repeat;
+}
+
+section.workflow .flow.resizing {
+	border-color: var(--white) !important;
+	box-shadow:
+		calc(.35 * var(--ws)) calc(.35 * var(--ws)) 0 calc(.35 * var(--ws)) var(--white),
+		calc(-.11 * var(--ws)) 0 calc(3.3 * var(--ws)) 0 rgba(255, 255, 255, 0.01),
+		calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+/* ============== ITEM */
+
+section.workflow .item {
+}
+
+section.workflow .item {
+	display: inline-block;
+	margin-right: calc(.59 * var(--ws));
+	border: 0 solid var(--blue);
+	background: #3e6f90;
+	width: calc(8 * var(--ws)); height: calc(8 * var(--ws));
+	border-radius: calc(10 * var(--ws));
+	position: absolute;
+	text-align: center;
+
+	box-shadow:
+		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) var(--blue),
+		calc(-.11 * var(--ws)) 0 calc(2.15 * var(--ws)) 0 rgba(54, 176, 251, 0.01),
+		calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) 0 rgba(54, 176, 251, 0.25);
+	transition:
+		.2s ease-in-out transform,
+		.2s ease-in-out background,
+		.2s ease-in-out border,
+		.2s ease-in-out box-shadow,
+		.05s linear left,
+		.05s linear top;
+}
+
+section.workflow .item.dragging {
+	border: 0px solid #D21D50;
+	background: #D21D5080;
+	transform: translateY(calc(-1.19 * var(--ws))) translateX(calc(-1.19 * var(--ws)));
+	box-shadow:
+		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) #D21D50,
+		calc(-.11 * var(--ws)) 0 calc(2.15 * var(--ws)) 0 rgba(210, 29, 80, 0.3),
+		calc(3.34 * var(--ws)) calc(3.34 * var(--ws)) calc(2.15 * var(--ws)) calc(-1.19 * var(--ws)) rgba(210, 29, 80, 0.5);
+	z-index: 20 !important;
+}
+
+section.workflow .item span {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: calc(5 * var(--ws)); 
+	line-height: calc(8 * var(--ws)); text-transform: none !important;
+	color: #fff;
+}
+
+section.workflow .item { 
+	--row: 0;
+	--column: 0;
+	top: calc(var(--row) * 10 * var(--ws)); 
+	left: calc(var(--column) * 10 * var(--ws)); 
+	z-index: calc((var(--row) + var(--column) + 10) / 10);
+}
+
+
+/* ============== CONNECTOR */
+
+section.workflow .flow.dragging .connector { opacity: 0; }
+
+section.workflow .connector {
+	position: absolute;
+	height: calc(2 * var(--ws));
+	transform-origin: 0 50%;
+	background-color: #5FC0FC20;
+	z-index: 0;
+	will-change: transform;
+	transform-style: preserve-3d;
+	opacity: 1;
+	transition:
+		.05s linear transform,
+		.2s ease-in-out opacity;
+}
+
+section.workflow .connector:hover {
+	box-shadow: 0 0 2px 2px #5FC0FC;
+}
+
+section.workflow  .connector::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+
+  width: 0;
+  height: 0;
+  border-top: calc(1 * var(--ws)) solid transparent;
+  border-left: calc(2 * var(--ws)) solid #5FC0FC40;
+  border-bottom: calc(1 * var(--ws)) solid transparent;
+  
+  animation: a1 3s linear infinite;
+}
+
+section.workflow  .connector::after {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 0;
+  height: 0;
+  border-top: calc(1 * var(--ws)) solid transparent;
+  border-left: calc(2 * var(--ws)) solid #5FC0FC40;
+  border-bottom: calc(1 * var(--ws)) solid transparent;
+  
+  animation: a1 3s linear infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes a1 {
+    0% { left: 0; }
+    100% { left: 100%; }
+}
+
+#tooltip {
+	content: attr(data-tooltip); position: fixed; padding: 8px 12px;
+	background: rgba(0, 0, 0, 0.8);
+	color: white;
+	border-radius: 4px;
+	font-size: 12px;
+	pointer-events: none;
+	transform: translate(-50%, -100%);
+	white-space: nowrap;
+}
