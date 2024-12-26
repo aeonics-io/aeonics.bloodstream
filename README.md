@@ -1,6 +1,6 @@
 ## Plugin: "aeonics.bloodstream"
 
-This *Bloodstream Enterprise Suite* plugin provides 
+This Aeonics software plugin provides 
 - HTTP endpoints and functionalities for live system monitoring, troubleshooting, compliance and observability.
 - HTTP endpoints and entities for OAuth2 and OIDC security and single-sign-on capabilities.
 

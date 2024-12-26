@@ -135,6 +135,44 @@ public class Endpoints
 		.method("GET")
 		;
 	
+	private static final Endpoint.Rest.Type entity_template = new Endpoint.Rest() { }
+		.template()
+		.summary("Describe the template of an entity")
+		.description("This endpoint returns the description of the template from the specified entity.")
+		.add(new Parameter("category").optional(false).min(1).max(100)
+			.summary("The entity category")
+			.description("The entity category.")
+			.format(Parameter.Format.TEXT)
+			)
+		.add(new Parameter("id").optional(false)
+			.summary("The entity id")
+			.description("The entity id.")
+			.format(Parameter.Format.TEXT)
+			)
+		.create()
+		.<Rest.Type>cast()
+		.process((parameters) ->
+		{
+			if( !Registry.has(parameters.asString("category")) )
+				throw new HttpException(404);
+			
+			Entity e = Registry.of(parameters.asString("category")).get(parameters.asString("id"));
+			if( e == null )
+				throw new HttpException(404);
+			
+			if( !Factory.has(parameters.asString("category")) )
+				throw new HttpException(404);
+			
+			Template<?> t = Factory.of(parameters.asString("category")).get(e.type());
+			if( t == null )
+				throw new HttpException(404);
+			
+			return t.export(); 
+		})
+		.url(ROOT + "entity/template/{category}/{id}")
+		.method("GET")
+		;
+	
 	private static final Endpoint.Rest.Type factory_templates = new Endpoint.Rest() { }
 		.template()
 		.summary("Lists templates in the factory")
@@ -582,148 +620,4 @@ public class Endpoints
 		})
 		.url(ROOT + "integrity")
 		.method("GET");
-	
-	private static final Endpoint.Rest.Type flow = new Endpoint.Rest() { }
-		.template()
-		.summary("Fetch a flow")
-		.description("This endpoint returns all necessary information to visualize a data flow.")
-		.add(new Parameter("id").optional(false)
-			.summary("The flow id")
-			.description("The flow id.")
-			.format(Parameter.Format.TEXT)
-			)
-		.create()
-		.<Rest.Type>cast()
-		.process((parameters) ->
-		{
-			Flow.Type flow = Registry.of(Flow.class).get(parameters.asString("id"));
-			if( flow == null )
-				throw new HttpException(404);
-			
-			Data data = Data.map()
-				.put("id", flow.id())
-				.put("name", flow.name())
-				.put("notes", flow.valueOf("notes"))
-				.put("size", flow.valueOf("size"));
-			
-			Data links = Data.list();
-			Data entities = Data.list();
-			
-			for( Tuple<Entity, Data> t : flow.relations("origins") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("name", t.a.name())
-					.put("icon", t.a.<Origin.Type>cast().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("topics") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("actions") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("name", t.a.name())
-					.put("icon", t.a.<Action.Type>cast().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("actions") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-				
-				for( Tuple<Entity, Data> o : t.a.relations("destinations") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("destinations") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("name", t.a.name())
-					.put("icon", t.a.<Destination.Type>cast().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("queues") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("name", t.a.name())
-					.put("icon", t.a.<Queue.Type>cast().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("actions") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-				
-				for( Tuple<Entity, Data> o : t.a.relations("destinations") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("topics") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("name", t.a.name())
-					.put("icon", t.a.<Topic.Type>cast().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("queues") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			data
-				.put("links", links)
-				.put("entities", entities);
-			
-			return data;
-		})
-		.url(ROOT + "flow/{id}")
-		.method("GET")
-		;
 }

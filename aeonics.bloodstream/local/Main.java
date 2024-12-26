@@ -275,6 +275,7 @@ public class Main extends Plugin
 		
 		aeonics.endpoint.meta.Configuration.register();
 		aeonics.endpoint.meta.Endpoints.register();
+		aeonics.endpoint.meta.Flows.register();
 		aeonics.endpoint.meta.Plugins.register();
 		aeonics.endpoint.meta.Security.register();
 		aeonics.endpoint.meta.Snapshots.register();

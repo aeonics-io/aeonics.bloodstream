@@ -82,13 +82,13 @@ public class Plugins
 			{
 				String path = Manager.of(Config.class).get(aeonics.Plugin.class, "path").asString();
 				Path p = Path.of(path);
-				if( !Files.isDirectory(p) ) throw new Exception("Destination directory does not exist");
+				if( !Files.isDirectory(p) ) throw new IllegalArgumentException("Destination directory does not exist");
 				Path f = Path.of(params.asString("file")).normalize().getFileName();
 				p = p.resolve(f);
-				if( !Files.isRegularFile(p) ) throw new Exception("Target plugin does not exist");
+				if( !Files.isRegularFile(p) ) throw new IllegalArgumentException("Target plugin does not exist");
 				Files.delete(p);
 			}
-			catch(Exception e) { throw new HttpException(413, e); }
+			catch(IllegalArgumentException e) { throw new HttpException(413, e); }
 			return Data.map().put("success", true);
 		})
 		.url(ROOT + "plugin/{file}")
