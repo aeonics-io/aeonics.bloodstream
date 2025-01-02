@@ -1,14 +1,10 @@
 package aeonics.endpoint.meta;
 
 import aeonics.data.Data;
-import aeonics.entity.Action;
-import aeonics.entity.Destination;
 import aeonics.entity.Entity;
 import aeonics.entity.Flow;
-import aeonics.entity.Origin;
-import aeonics.entity.Queue;
+import aeonics.entity.Step;
 import aeonics.entity.Registry;
-import aeonics.entity.Topic;
 import aeonics.http.Endpoint;
 import aeonics.http.HttpException;
 import aeonics.http.Endpoint.Rest;
@@ -51,13 +47,13 @@ public class Flows
 			Data entities = Data.list();
 			Single<Boolean> found = Single.of(false);
 			
-			Registry.of(Origin.class).forEach(e ->
+			Registry.of(Step.class).forEach(e ->
 			{
 				found.a = false;
 				Registry.of(Flow.class).forEach(flow ->
 				{
 					if( found.a ) return;
-					for( Tuple<Entity, Data> t : flow.relations("origins") )
+					for( Tuple<Entity, Data> t : flow.relations("steps") )
 					{
 						if( t.a == null ) continue;
 						if( t.a == e ) found.a = true;
@@ -70,157 +66,12 @@ public class Flows
 						.put("id", e.id())
 						.put("category", e.category())
 						.put("name", e.name())
-						.put("icon", e.template().icon())
+						.put("icon", e.template().<Step.Template>cast().icon())
 						.put("x", 0)
 						.put("y", 0)
 					);
 					
-					for( Tuple<Entity, Data> o : e.relations("topics") )
-					{
-						links.add(Data.map()
-							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
-							.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-						);
-					}
-				}
-			});
-			
-			Registry.of(Action.class).forEach(e ->
-			{
-				found.a = false;
-				Registry.of(Flow.class).forEach(flow ->
-				{
-					if( found.a ) return;
-					for( Tuple<Entity, Data> t : flow.relations("actions") )
-					{
-						if( t.a == null ) continue;
-						if( t.a == e ) found.a = true;
-						
-					}
-				});
-				
-				if( !found.a )
-				{
-					entities.add(Data.map()
-						.put("id", e.id())
-						.put("category", e.category())
-						.put("name", e.name())
-						.put("icon", e.template().icon())
-						.put("x", 0)
-						.put("y", 0)
-					);
-					
-					for( Tuple<Entity, Data> o : e.relations("actions") )
-					{
-						links.add(Data.map()
-							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
-							.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-						);
-					}
-					
-					for( Tuple<Entity, Data> o : e.relations("destinations") )
-					{
-						links.add(Data.map()
-							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
-							.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-						);
-					}
-				}
-			});
-			
-			Registry.of(Destination.class).forEach(e ->
-			{
-				found.a = false;
-				Registry.of(Flow.class).forEach(flow ->
-				{
-					if( found.a ) return;
-					for( Tuple<Entity, Data> t : flow.relations("destinations") )
-					{
-						if( t.a == null ) continue;
-						if( t.a == e ) found.a = true;
-					}
-				});
-				
-				if( !found.a )
-				{
-					entities.add(Data.map()
-						.put("id", e.id())
-						.put("category", e.category())
-						.put("name", e.name())
-						.put("icon", e.template().icon())
-						.put("x", 0)
-						.put("y", 0)
-					);
-				}
-			});
-			
-			Registry.of(Queue.class).forEach(e ->
-			{
-				found.a = false;
-				Registry.of(Flow.class).forEach(flow ->
-				{
-					if( found.a ) return;
-					for( Tuple<Entity, Data> t : flow.relations("queues") )
-					{
-						if( t.a == null ) continue;
-						if( t.a == e ) found.a = true;
-					}
-				});
-				
-				if( !found.a )
-				{
-					entities.add(Data.map()
-						.put("id", e.id())
-						.put("category", e.category())
-						.put("name", e.name())
-						.put("icon", e.template().icon())
-						.put("x", 0)
-						.put("y", 0)
-					);
-					
-					for( Tuple<Entity, Data> o : e.relations("actions") )
-					{
-						links.add(Data.map()
-							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
-							.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-						);
-					}
-					
-					for( Tuple<Entity, Data> o : e.relations("destinations") )
-					{
-						links.add(Data.map()
-							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
-							.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-						);
-					}
-				}
-			});
-			
-			Registry.of(Topic.class).forEach(e ->
-			{
-				found.a = false;
-				Registry.of(Flow.class).forEach(flow ->
-				{
-					if( found.a ) return;
-					for( Tuple<Entity, Data> t : flow.relations("topics") )
-					{
-						if( t.a == null ) continue;
-						if( t.a == e ) found.a = true;
-					}
-				});
-				
-				if( !found.a )
-				{
-					entities.add(Data.map()
-						.put("id", e.id())
-						.put("category", e.category())
-						.put("name", e.name())
-						.put("icon", e.template().icon())
-						.put("x", 0)
-						.put("y", 0)
-					);
-					
-					for( Tuple<Entity, Data> o : e.relations("queues") )
+					for( Tuple<Entity, Data> o : e.relations("links") )
 					{
 						links.add(Data.map()
 							.put("from", Data.map().put("id", e.id()).put("name", e.name()))
@@ -269,111 +120,19 @@ public class Flows
 			Data links = Data.list();
 			Data entities = Data.list();
 			
-			for( Tuple<Entity, Data> t : flow.relations("origins") )
+			for( Tuple<Entity, Data> t : flow.relations("steps") )
 			{
 				if( t.a == null ) continue;
 				entities.add(Data.map()
 					.put("id", t.a.id())
 					.put("category", t.a.category())
 					.put("name", t.a.name())
-					.put("icon", t.a.template().icon())
+					.put("icon", t.a.template().<Step.Template>cast().icon())
 					.put("x", t.b.get("x"))
 					.put("y", t.b.get("y"))
 				);
 				
-				for( Tuple<Entity, Data> o : t.a.relations("topics") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("actions") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("category", t.a.category())
-					.put("name", t.a.name())
-					.put("icon", t.a.template().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("actions") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-				
-				for( Tuple<Entity, Data> o : t.a.relations("destinations") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("destinations") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("category", t.a.category())
-					.put("name", t.a.name())
-					.put("icon", t.a.template().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("queues") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("category", t.a.category())
-					.put("name", t.a.name())
-					.put("icon", t.a.template().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("actions") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-				
-				for( Tuple<Entity, Data> o : t.a.relations("destinations") )
-				{
-					links.add(Data.map()
-						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
-						.put("to", Data.map().put("id", o.a.id()).put("name", o.a.name()))
-					);
-				}
-			}
-			
-			for( Tuple<Entity, Data> t : flow.relations("topics") )
-			{
-				if( t.a == null ) continue;
-				entities.add(Data.map()
-					.put("id", t.a.id())
-					.put("category", t.a.category())
-					.put("name", t.a.name())
-					.put("icon", t.a.template().icon())
-					.put("x", t.b.get("x"))
-					.put("y", t.b.get("y"))
-				);
-				
-				for( Tuple<Entity, Data> o : t.a.relations("queues") )
+				for( Tuple<Entity, Data> o : t.a.relations("links") )
 				{
 					links.add(Data.map()
 						.put("from", Data.map().put("id", t.a.id()).put("name", t.a.name()))
@@ -431,25 +190,13 @@ public class Flows
 				
 				if( data.isList("entities") )
 				{
-					flow.clearRelation("origins");
-					flow.clearRelation("topics");
-					flow.clearRelation("actions");
-					flow.clearRelation("queues");
-					flow.clearRelation("destinations");
+					flow.clearRelation("steps");
 					
 					for( Data e : data.get("entities") )
 					{
-						Entity target = null;
-						if( (target = Registry.of(Origin.class).get(e.asString("id"))) != null )
-							flow.addRelation("origins", target, Data.map().put("x", e.asInt("x")).put("y", e.asInt("y")));
-						else if( (target = Registry.of(Topic.class).get(e.asString("id"))) != null )
-							flow.addRelation("topics", target, Data.map().put("x", e.asInt("x")).put("y", e.asInt("y")));
-						else if( (target = Registry.of(Queue.class).get(e.asString("id"))) != null )
-							flow.addRelation("queues", target, Data.map().put("x", e.asInt("x")).put("y", e.asInt("y")));
-						else if( (target = Registry.of(Action.class).get(e.asString("id"))) != null )
-							flow.addRelation("actions", target, Data.map().put("x", e.asInt("x")).put("y", e.asInt("y")));
-						else if( (target = Registry.of(Destination.class).get(e.asString("id"))) != null )
-							flow.addRelation("destinations", target, Data.map().put("x", e.asInt("x")).put("y", e.asInt("y")));
+						Step.Type target = null;
+						if( (target = Registry.of(Step.class).get(e.asString("id"))) != null )
+							flow.step(target, e.asInt("x"), e.asInt("y"));
 					}
 				}
 			}
