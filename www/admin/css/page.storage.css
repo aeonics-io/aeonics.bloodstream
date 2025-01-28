@@ -21,15 +21,15 @@ section.storage .search input { text-align: left; width: 8rem; display: inline-b
 }
 section.storage .search .icon {
 	display: inline-block; padding: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.storage .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.storage .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
 section.storage .tabcontent > .action { text-align: right; }
 section.storage .tabcontent > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.storage .tabcontent > .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 
 section.storage .tab ul { margin: 0; list-style: none; padding: 0; }
@@ -38,7 +38,7 @@ section.storage .tab li h2 { text-align: left; font-size: 1.1rem; font-weight: n
 section.storage .tab li h2 .actions { display: inline-block; margin-left: 3rem; }
 section.storage .tab li h2 .actions span:hover { color: var(--blue); }
 section.storage .tab li h2 .actions span { 
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	margin-right: 0.5rem; cursor: pointer;
 }
 section.storage .tab li .detail { padding: 1rem 1rem 2rem 1rem; }
@@ -56,7 +56,7 @@ section.storage .tab li .detail a { color: var(--blue); }
 section.storage .tab li .detail .text { color: var(--orange); flex: 1; }
 section.storage .tab li .detail .icon { 
 	font-size: 1.3rem; color: var(--white); cursor: pointer; margin-right: 1rem;
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important; 
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
 section.storage section .detail .icon:hover { color: var(--blue); }
 
@@ -74,7 +74,7 @@ code-input#sql textarea::selection { background-color: #FB813660 !important; col
 #storageBrowser .addressBar { display: flex; align-items: center; }
 #storageBrowser .addressBar span.icon:hover { color: var(--blue); }
 #storageBrowser .addressBar span.icon {
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	padding: 0.2rem 0.5rem; cursor: pointer;
 }
 #storageBrowser .addressBar p { flex: 1; padding: 0.3rem 1rem; border-radius: 0.3rem; background-color: #ffffff10; margin-left: 1rem; }
@@ -85,7 +85,7 @@ code-input#sql textarea::selection { background-color: #FB813660 !important; col
 #storageBrowser li.selected { border-color: var(--blue); }
 #storageBrowser li::before {
 	display: inline-block; margin-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important; 
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
 #storageBrowser li.folder::before { content: '\e2c7'; color: var(--orange); }
 #storageBrowser li.file::before { content: '\e873'; }

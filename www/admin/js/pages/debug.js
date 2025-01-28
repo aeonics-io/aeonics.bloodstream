@@ -69,7 +69,7 @@ var x = new Promise((ok, nok) =>
 					if( list ) while( list.firstChild ) list.firstChild.remove();
 			
 					self.ws = new WebSocket(location.protocol.replace(/^http/i, "ws") + "//" + location.host + 
-						"/api/ws?subscribe=debug&filter=" + encodeURIComponent(form.filter.value),
+						"/api/ws?subscribe=10000000-1400000000000000&output=data&filter=" + encodeURIComponent(form.filter.value),
 						[Ajax.authorization.replace(/^Bearer /i, '')]);
 						
 					self.ws.addEventListener('open', () => 

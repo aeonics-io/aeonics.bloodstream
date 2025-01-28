@@ -72,7 +72,14 @@ class Node
 			else
 			{
 				if( !Array.isArray(content) ) content = [content];
-				for( var i = 0; i < content.length; i++ ) if( Array.isArray(content[i]) ) content.splice.apply(content, [i,1].concat(content[i]));
+				for( var i = 0; i < content.length; i++ )
+				{
+					if( Array.isArray(content[i]) )
+					{
+						content.splice.apply(content, [i,1].concat(content[i]));
+						i--;
+					}
+				}
 				n.append.apply(n, content.filter(c => c !== null));
 			}
 		}

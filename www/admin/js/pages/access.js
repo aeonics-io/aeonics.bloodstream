@@ -266,7 +266,6 @@ var x = new Promise((ok, nok) =>
 					
 					self.policies.forEach(p =>
 					{
-						console.log(p);
 						div.append(
 							Node.section({className: ''}, [
 								Node.h2({click: function() { this.parentNode.classList.toggle('open'); }}, [

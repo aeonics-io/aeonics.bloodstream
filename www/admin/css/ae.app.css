@@ -41,14 +41,18 @@ button {
 }
 button:focus { outline-width: 0; outline: none; }
 
+button:disabled {
+	cursor: not-allowed; pointer-events: none; background-color: #4448 !important; color: #fff8 !important;
+}
+
 button { background-color: transparent; position: relative; overflow: hidden; color: #FB8136; }
-button:before { 
+button::before { 
 	content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
 	background-color: #FB8136; opacity: 0; 
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
 }
-button:hover:before, button:focus:before { opacity: 0.12; }
-button:active:before { opacity: 0.26; }
+button:hover::before, button:focus::before { opacity: 0.12; }
+button:active::before { opacity: 0.26; }
 
 em { font-weight: normal; font-style: normal; color: var(--blue); }
 
@@ -64,3 +68,12 @@ button.raised {
 }
 button.raised:hover { color: rgba(255,255,255,0.8); }
 button.raised:active { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); color: rgba(255,255,255,0.6); }
+
+button.sensitive {
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); 
+	background-color: #D21D5030; position: relative; overflow: hidden;
+	color: #D21D50; display: block;
+}
+button.sensitive:hover { background-color: #D21D50d0; color: #fff; }
+button.sensitive:active { box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); color: rgba(255,255,255,0.6); }
+button.sensitive::before { background-color: #D21D50; }

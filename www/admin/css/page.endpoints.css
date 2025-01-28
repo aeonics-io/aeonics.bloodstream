@@ -22,10 +22,10 @@ section.endpoints .search input { text-align: left; width: 8rem; display: inline
 }
 section.endpoints .search .icon {
 	display: inline-block; padding: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.endpoints .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.endpoints .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
 
 #endpoint_list section { 
 	background: #ffffff10;
@@ -34,7 +34,7 @@ section.endpoints .search input:focus + .icon { color: var(--blue); border-botto
 }
 #endpoint_list section h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
 #endpoint_list section h2::before {
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	content: '\e5cc';
 	rotate: z 0deg;
 	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -89,7 +89,7 @@ section.endpoints .search input:focus + .icon { color: var(--blue); border-botto
 .endpoint_auth label { display: inline-block; vertical-align: middle; }
 .endpoint_tester .icon { 
 	margin-right: 1rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 }
 
 .pre, .pre + strong { font-family: monospace; }
@@ -102,5 +102,5 @@ section.endpoints .action { text-align: right; }
 section.endpoints .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.endpoints .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }

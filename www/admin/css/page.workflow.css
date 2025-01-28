@@ -1,11 +1,12 @@
 
 section.workflow {
 	padding: 3rem;
-	overflow: hidden;
+	overflow: auto;
 	height: 100vh;
 	position: relative;
 	--ws: calc((60vw - 5rem) / 100);
 }
+section.workflow.details { overflow: hidden; }
 
 section.workflow > h1 { display: block; text-align: center; margin: 2rem; }
 section.workflow > h1 + p { text-align: justify; padding: 0 4rem 1rem 4rem; }
@@ -22,15 +23,15 @@ section.workflow > .search input { text-align: left; width: 8rem; display: inlin
 }
 section.workflow > .search .icon {
 	display: inline-block; padding: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.workflow > .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.workflow > .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
 section.workflow > .action { text-align: right; }
 section.workflow > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.workflow > .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 
 #flowList { list-style: none; margin: 0; padding: 0; }
@@ -41,7 +42,7 @@ section.workflow > .action button .icon {
 #flowList li h2 span { cursor: pointer; }
 #flowList li h2 span:hover { color: var(--blue); }
 #flowList li h2 .actions span { 
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	margin-right: 0.5rem;
 }
 
@@ -64,10 +65,8 @@ section.workflow .flowTitle > p {
 section.workflow .flowTitle > span:hover { color: var(--blue); }
 section.workflow .flowTitle > span:last-of-type { margin-left: 0.5rem; }
 
-section.workflow .controls {
-	position: absolute; top: 4rem; left: 2rem; z-index: 10;
-	user-select: none;
-}
+section.workflow .controls { position: absolute; top: 4rem; left: 2rem; z-index: 10; user-select: none; }
+section.workflow .controls.tools { top: unset; bottom: 1rem; left: 2rem; z-index: 10; }
 
 section.workflow .controls span {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.5rem;
@@ -79,14 +78,16 @@ section.workflow .controls span {
 section.workflow .controls span:hover { color: var(--blue); }
 
 
-.chooseElementType { list-style: none; margin: 0; padding: 0; white-space: nowrap; }
+.chooseElementType { list-style: none; margin: 0; padding: 0; }
 .chooseElementType li { 
 	display: inline-block; padding: 1rem; border-radius: 1rem; border: 1px solid transparent; 
 	text-align: center; cursor: pointer; min-width: 7rem; }
 .chooseElementType li:hover { border: 1px solid var(--orange); background: #FB813620; }
 .chooseElementType p { }
+.chooseElementType p.description { font-size: 0.7rem; color: var(--orange); line-height: 1rem; }
 .chooseElementType span { font-family: material !important; font-feature-settings: "liga" 1; font-size: 2.5rem; }
-
+.chooseElementType.flex { display: flex; flex-flow: row wrap; justify-content: center; align-content: stretch; max-height: 50vh; overflow: auto; }
+.chooseElementType.flex li { flex: 0 0 30%; padding: 1rem 0.5rem; }
 
 /* ============== PLANE */
 
@@ -185,8 +186,7 @@ section.workflow .flow.resizing {
 
 /* ============== ITEM */
 
-section.workflow .item {
-}
+section.workflow .item { cursor: pointer; }
 
 section.workflow .item {
 	display: inline-block;
@@ -209,6 +209,21 @@ section.workflow .item {
 		.2s ease-in-out box-shadow,
 		.05s linear left,
 		.05s linear top;
+}
+
+section.workflow .item.preselected {
+	box-shadow:
+		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) var(--red),
+		calc(-.11 * var(--ws)) 0 calc(2.15 * var(--ws)) 0 rgba(210, 29, 80, 0.01),
+		calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) 0 rgba(210, 29, 80, 0.25);
+}
+
+section.workflow .item.selected {
+	box-shadow:
+		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) var(--red),
+		calc(-.11 * var(--ws)) 0 calc(2.15 * var(--ws)) 0 rgba(210, 29, 80, 0.01),
+		calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) 0 rgba(210, 29, 80, 0.25);
+	background: #90263a;
 }
 
 section.workflow .item.dragging {
@@ -241,6 +256,8 @@ section.workflow .item {
 
 section.workflow .flow.dragging .connector { opacity: 0; }
 
+section.workflow .connector { cursor: pointer; }
+
 section.workflow .connector {
 	position: absolute;
 	height: calc(2 * var(--ws));
@@ -253,6 +270,14 @@ section.workflow .connector {
 	transition:
 		.05s linear transform,
 		.2s ease-in-out opacity;
+}
+
+section.workflow .connector.selected {
+	box-shadow: 0 0 2px 2px #D21D50 !important;
+	background-color: #D21D5020;
+}
+section.workflow .connector.selected::before, section.workflow .connector.selected::after {
+	border-left-color: #D21D5040;
 }
 
 section.workflow .connector:hover {
@@ -291,12 +316,151 @@ section.workflow  .connector::after {
 }
 
 #tooltip {
-	content: attr(data-tooltip); position: fixed; padding: 8px 12px;
-	background: rgba(0, 0, 0, 0.8);
+	content: attr(data-tooltip); position: fixed; padding: 0.5rem 1rem;
+	background: rgba(0, 0, 0, 0.4);
 	color: white;
-	border-radius: 4px;
-	font-size: 12px;
+	border-radius: 0.3rem;
+	font-size: 0.8rem;
 	pointer-events: none;
-	transform: translate(-50%, -100%);
+	transform: translate(-50%, 0.5rem);
 	white-space: nowrap;
 }
+
+/* ====================== SIDE PANEL */
+
+#flowSidePanel { 
+	position: fixed; overflow: auto;
+	top: 0; right: -51vw; bottom: 0; z-index: 99;
+	padding: 2rem;
+	width: 50vw;
+	background-color: #26252D;
+	border-left: 1px solid #302E38;
+	transition: right 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#flowSidePanel aside {
+	position: absolute; top: 1rem; right: 1rem;
+	color: #ffffffaa; cursor: pointer;
+	font-family: material !important; font-feature-settings: "liga" 1;
+	font-size: 1.5rem;
+}
+#flowSidePanel aside:hover { color: #fff; }
+#flowSidePanel.open { right: 0; }
+
+#flowSidePanel h1 { text-align: center; margin-bottom: 2rem; font-size: 1.2rem; font-weight: 300; }
+#flowSidePanel h1 + p { text-align: justify; margin-bottom: 2rem; color: var(--orange); font-size: 0.8rem; line-height: 1rem; }
+
+#flowSidePanel h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
+#flowSidePanel section { 
+	background: #1C1B21;
+	margin-bottom: 0.5rem;
+}
+#flowSidePanel section h2::before {
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
+	content: '\e5cc';
+	rotate: z 0deg;
+	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	display: inline-block; margin: 1rem; 
+}
+#flowSidePanel section.open h2::before {
+	rotate: z 90deg;
+}
+#flowSidePanel section > div { height: 0; overflow: hidden; }
+#flowSidePanel section.open > div { height: auto; overflow: auto; }
+
+#flowSidePanel .itemicon, .pickchannel .itemicon, .linkbuilder .itemicon {
+	font-family: material !important; font-feature-settings: "liga" 1; display: inline-block; vertical-align: middle;
+	border-radius: 3rem; border: 2px solid var(--blue); background-color: #3e6f90; font-size: 1.5rem; width: 2rem; height: 2rem; text-align: center;
+	margin: 0 1rem; line-height: normal;
+}
+#flowSidePanel .channel, .pickchannel .channel, .linkbuilder .channel { 
+	display: inline-block; padding: 0.2rem 0.4rem; background-color: #fff2; border-radius: 0.3rem;
+	margin: 0 1rem; color: #ccc; font-family: monospace; font-size: 0.7rem; line-height: normal;
+}
+
+#flowSidePanel .detail > .channel { margin-left: 0; }
+#flowSidePanel hr { height: 0; border: 0; margin: 1rem; outline: none; }
+#flowSidePanel hr:last-child { display: none; }
+#flowSidePanel .detail { padding: 1rem 1rem 2rem 1rem; }
+#flowSidePanel .detail p { padding: 0.2rem 0; display: flex; }
+#flowSidePanel .detail .title, 
+#flowSidePanel .detail .value, 
+#flowSidePanel .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
+#flowSidePanel .detail .title { width: 8rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
+#flowSidePanel .detail .title.orange { color: var(--orange); }
+#flowSidePanel .detail .value { color: var(--white); flex: 1; }
+#flowSidePanel .detail a { color: var(--blue); }
+#flowSidePanel .detail .text { color: var(--orange); flex: 1; }
+#flowSidePanel .detail .icon { 
+	font-size: 1.3rem; color: var(--white); cursor: pointer; margin-right: 1rem;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
+}
+#flowSidePanel .detail .icon:hover { color: var(--blue); }
+#flowSidePanel .empty { text-align: center; color: #fffa; font-size: 0.8rem; padding: 1rem; }
+#flowSidePanel .detail .value .channel { margin-left: 0; }
+
+#flowSidePanel fieldset { margin: 1rem; text-align: left; padding: 0; border: 0; }
+#flowSidePanel fieldset label::before { 
+	content: '\e5cc'; display: inline-block; margin-right: 0.2rem; font-family: material !important; font-feature-settings: "liga" 1; 
+	vertical-align: -0.32rem; text-transform: none !important; font-size: 1.2rem;
+}
+#flowSidePanel fieldset label { font-size: 0.8rem; }
+#flowSidePanel fieldset p { color: var(--blue); font-size: 0.8rem; line-height: 1rem; text-align: justify; }
+#flowSidePanel fieldset input, #flowSidePanel fieldset select, #flowSidePanel fieldset textarea { 
+	clear: both; width: 100%; margin: 20px 0; padding: 10px;
+	background-color: transparent; border: 1px solid #ffffff40; color: #ffffff;
+}
+#flowSidePanel fieldset input { margin: 0.5rem 0; padding: 0.5rem; font-size: 0.8rem; font-family: monospace; }
+#flowSidePanel fieldset textarea { min-height: 130px; }
+#flowSidePanel fieldset select { }
+#flowSidePanel fieldset input[type="checkbox"] { width: auto; margin: 10px; vertical-align: middle; }
+
+#flowSidePanel .linkinfo + .linkinfo { margin-top: 5rem; }
+#flowSidePanel .linkinfo > table { margin: 2rem 0; }
+#flowSidePanel .linkinfo > table div { display: inline-block; text-align: center; vertical-align: middle; }
+#flowSidePanel .linkinfo > table p { max-width: 20ch; word-break: break-word; }
+#flowSidePanel table { width: 100%; table-layout: fixed; margin: 1rem 0; }
+#flowSidePanel table td:nth-child(1) { width: 50%; text-align: right; }
+#flowSidePanel table td:nth-child(2) { width: 8rem; text-align: center; white-space: nowrap; }
+#flowSidePanel table td:nth-child(2):empty { width: 2rem; }
+#flowSidePanel table td:nth-child(3) { width: 50%; text-align: left; }
+#flowSidePanel table td:nth-child(2)::before, #flowSidePanel table td:nth-child(2)::after {
+	font-family: material !important; font-feature-settings: "liga" 1; color: transparent;
+	content: '\ea50'; display: inline-block; vertical-align: middle; font-size: 1.5rem;
+}
+#flowSidePanel table .has_in::before, #flowSidePanel table .has_out::after { color: var(--white) !important; }
+
+#flowSidePanel .search { text-align: right; white-space: nowrap; margin-bottom: 1rem; }
+#flowSidePanel .search input { text-align: left; width: 8rem; display: inline-block;
+	color: #fff;
+	background: transparent;
+	margin: 0;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+}
+#flowSidePanel .search .icon {
+	display: inline-block; padding: 0.5rem;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
+	border-bottom: 2px solid #aaa;
+}
+#flowSidePanel .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+
+#flowSidePanel .stepList { list-style: none; margin: 0; padding: 0; padding-bottom: 1rem; }
+#flowSidePanel .stepList li { list-style: none; padding: 1rem; cursor: pointer; }
+#flowSidePanel .stepList li:hover { background: #fff2; }
+#flowSidePanel .stepList li h3 { font-weight: 200; font-size: 0.9rem; }
+#flowSidePanel .stepList li p { font-size: 0.7rem; color: var(--orange); padding-left: 4rem; }
+
+.linkbuilder { display: flex; align-items: stretch; align-content: stretch; }
+.linkbuilder > span { padding: 1rem; font-family: material !important; font-feature-settings: "liga" 1; font-size: 2.5rem; flex: 0 0; align-self: center; }
+.linkbuilder > div { flex: 1 1 50%; text-align: center; border-radius: 0.5rem; cursor: pointer; padding: 1rem; align-self: center; }
+.linkbuilder > div:hover { background-color: #fff2; }
+.linkbuilder > div > p { color: var(--orange); font-size: 0.9rem; text-transform: uppercase; }
+.modalbuttons { text-align: right; margin-top: 1rem; }
+
+.pickchannel { margin: 0; line-height: normal; padding: 0.5rem; border-radius: 0.5rem; }
+.pickchannel:hover { background: #fff2; }
+.pickchannel div { display: inline-block; text-align: center; vertical-align: middle; padding: 1rem; width: 50%; }
+.pickchannel p { max-width: 20ch; word-break: break-word; }
+.pickchannel .channel { cursor: pointer; color: var(--orange); margin: 0.3rem; }
+.pickchannel .channel:hover { background-color: #FB813622; }

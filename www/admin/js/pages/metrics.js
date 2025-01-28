@@ -111,7 +111,7 @@ var x = new Promise((ok, nok) =>
 					list.classList.remove('wait');
 					
 					self.ws = new WebSocket(location.protocol.replace(/^http/i, "ws") + "//" + location.host + 
-						"/api/ws?subscribe=monitor&filter=metrics",
+						"/api/ws?subscribe=10000000-2000000000000000&output=metrics&filter=metrics",
 						[Ajax.authorization.replace(/^Bearer /i, '')]);
 						
 					self.ws.addEventListener('open', () => 

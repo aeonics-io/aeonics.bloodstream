@@ -122,8 +122,8 @@ var x = new Promise((ok, nok) =>
 									Node.span(ae.safeHtml(s.name)),
 									Node.div({className: 'actions'},
 									[
-										Node.span({click: function() { self.remove(this.closest('li').dataset.id, 'storage'); }, title: Translator.get('remove')}, 'close'),
-										Node.span({click: function() { self.edit(this.closest('li').dataset.id, 'storage'); }, title: Translator.get('edit')}, 'edit'),
+										s.internal ? null : Node.span({click: function() { self.remove(this.closest('li').dataset.id, 'storage'); }, title: Translator.get('remove')}, 'close'),
+										Node.span({click: function() { self.edit(this.closest('li').dataset.id, 'storage'); }, title: Translator.get(s.readonly ? 'view' : 'edit')}, s.readonly ? 'visibility' : 'edit'),
 										Node.span({click: function() { self.browse(this.closest('li').dataset.id); }, title: Translator.get('browse')}, 'folder_open')
 									])
 								]),
@@ -163,8 +163,8 @@ var x = new Promise((ok, nok) =>
 									Node.span(ae.safeHtml(db.name)),
 									Node.div({className: 'actions'},
 									[
-										Node.span({click: function() { self.remove(this.closest('li').dataset.id, 'database'); }, title: Translator.get('remove')}, 'close'),
-										Node.span({click: function() { self.edit(this.closest('li').dataset.id, 'database'); }, title: Translator.get('edit')}, 'edit'),
+										db.internal ? null : Node.span({click: function() { self.remove(this.closest('li').dataset.id, 'database'); }, title: Translator.get('remove')}, 'close'),
+										Node.span({click: function() { self.edit(this.closest('li').dataset.id, 'database'); }, title: Translator.get(db.readonly ? 'view' : 'edit')}, db.readonly ? 'visibility' : 'edit'),
 										Node.span({click: function() { self.query(this.closest('li').dataset.id); }, title: Translator.get('query')}, 'database')
 									])
 								]),

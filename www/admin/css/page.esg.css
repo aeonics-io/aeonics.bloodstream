@@ -26,7 +26,7 @@ section.esg .card > div.positive { background-color: #29C64B; }
 section.esg .card > div.blue { background-color: var(--blue); }
 section.esg .card .icon {
 	background-color: #00000000;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	padding: 0.5rem 1rem;
 	flex: 0 0;
 }

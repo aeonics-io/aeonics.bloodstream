@@ -22,16 +22,16 @@ section.access .search input { text-align: left; width: 8rem; display: inline-bl
 }
 section.access .search .icon {
 	display: inline-block; padding: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.access .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.access .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
 section.access .tabcontent { position: relative; }
 section.access .tabcontent > .action { text-align: right; }
 section.access .tabcontent > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.access .tabcontent > .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 }
 
 section.access .tabcontent ul { margin: 0; list-style: none; padding: 0; margin-top: 1rem; }
@@ -43,7 +43,7 @@ section.access .tabcontent li:hover { border-color: var(--blue); color: var(--bl
 
 #tab_security_targets li::before {
 	display: inline-block; margin-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 #access_tab_users li::before { content: '\e7fd'; }
 #access_tab_groups li::before { content: '\e7ef'; }
@@ -56,7 +56,7 @@ section.access .tabcontent li:hover { border-color: var(--blue); color: var(--bl
 }
 #policyList section h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
 #policyList section h2::before {
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	content: '\e5cc';
 	rotate: z 0deg;
 	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -70,7 +70,7 @@ section.access .tabcontent li:hover { border-color: var(--blue); color: var(--bl
 #policyList section .allow { color: var(--green); }
 #policyList section .deny { color: var(--red); }
 #policyList section .allow, #policyList section .deny { 
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	margin-right: 1rem;
 }
 #policyList section .detail { padding: 1rem 1rem 2rem 1rem; }

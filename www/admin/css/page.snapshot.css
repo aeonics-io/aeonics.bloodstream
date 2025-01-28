@@ -22,16 +22,16 @@ section.snapshot .search input { text-align: left; width: 8rem; display: inline-
 }
 section.snapshot .search .icon {
 	display: inline-block; padding: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: bottom; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.snapshot .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--balue); }
+section.snapshot .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
 
 section.snapshot .action { text-align: right; }
 section.snapshot .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.snapshot .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 
 section.snapshot > h1 + p { text-align: justify; padding: 0 4rem 1rem 4rem; }
@@ -40,7 +40,7 @@ section.snapshot section h2 { text-align: left; font-size: 1.1rem; font-weight: 
 section.snapshot section h3 { text-align: left; font-size: 1.1rem; font-weight: normal; padding: 1rem; }
 section.snapshot section h3::before {
 	content: '\eb2c'; display: inline-block; margin-right: 1rem;
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 }
 section.snapshot section .detail { padding: 1rem 1rem 2rem 1rem; }
 section.snapshot section .detail p { padding: 0.5rem 0; display: flex; }
@@ -57,7 +57,7 @@ section.snapshot section .detail a { color: var(--blue); }
 section.snapshot section .detail .text { color: var(--orange); flex: 1; }
 section.snapshot section .detail .icon { 
 	font-size: 1.3rem; color: var(--white); cursor: pointer; margin-right: 1rem;
-	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.2em; text-transform: none !important; 
+	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
 section.snapshot section .detail .icon:hover { color: var(--blue); }
 

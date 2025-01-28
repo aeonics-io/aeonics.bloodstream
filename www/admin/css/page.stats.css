@@ -21,7 +21,7 @@ section.statistics {
 }
 
 section.statistics button.raised.icon {
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	display: inline-block; width: unset; width: unset; padding: 0.3rem 0.8rem; min-width: unset;
 }
 

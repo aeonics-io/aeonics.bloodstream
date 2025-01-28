@@ -337,8 +337,9 @@
 		
 		<section id="overview-queue">
 			<h3>Topic, Queue</h3>
-			<p>Building on the core entities of Origin, Action, and Destination, the Aeonics framework uses the concepts of Topic and Queue to manage the 
-			flow of data between the Origin and the rest of the workflow. By leveraging the principles of publish/subscribe and queuing, the system ensures 
+			<p>Building on the core entities of Origin, Action, and Destination, the Aeonics framework uses the concepts of Topic and Queue to better 
+			manage the pace of data flow. These two entities are a specific variation of an Action which
+			distributes (topic) or regulates (queue) data in a workflow. By leveraging the principles of publish/subscribe and queuing, the system ensures 
 			that data is processed in an organized, decoupled, and resilient manner.</p>
 			<img src="images/queue.png" alt="Topic, Queue" style="width: 60ch;" />
 			
@@ -352,7 +353,7 @@
 			overall system.</p>
 			
 			<h4>Queue</h4>
-			<p>The Queue is a key component that subscribes to one or more Topics, effectively acting as an intermediary between the data publication and 
+			<p>The Queue is a key component that generally subscribes to one or more Topics, effectively acting as an intermediary between the data publication and 
 			its subsequent processing by Action entities. Queues are responsible for managing the flow of data within the system, ensuring that it is 
 			processed according to the defined policies. These policies can include prioritization, rate limiting, or retry mechanisms, depending on the 
 			specific needs of the application.</p>

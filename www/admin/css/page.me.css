@@ -9,7 +9,7 @@ section.me .action { text-align: right; }
 section.me .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.me .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 
 section.me h1 { display: block; text-align: center; margin: 2rem; }

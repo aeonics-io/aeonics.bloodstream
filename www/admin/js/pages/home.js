@@ -163,7 +163,9 @@ var x = new Promise((ok, nok) =>
 						Node.div(Node.div({className: 'detail'}, [
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.id')),
-								Node.span({className: 'value'}, ae.safeHtml(entity.id))
+								Node.span({className: 'value'}, ae.safeHtml(entity.id)),
+								entity.category=='aeonics.entity.flow'?
+									Node.span({className: 'icon ref', click: function() { location.href='#workflow?flow=' + entity.id; }}, 'share'):null
 							]),
 							Node.p([
 								Node.span({className: 'title'}, Translator.get('info.entity.category')),

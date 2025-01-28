@@ -12,7 +12,7 @@ section.security section {
 	margin-bottom: 0.5rem;
 }
 section.security section h2::before {
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.3em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	content: '\e5cc';
 	rotate: z 0deg;
 	transition: rotate 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);

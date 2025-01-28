@@ -102,7 +102,6 @@ var x = new Promise((ok, nok) =>
 					}
 					else
 					{
-						// todo : check code timeout
 						var self = this;
 						var identities = [];
 						tokens.forEach((t) => { identities.push(Ajax.post("/oauth/session", {data: {signin_token: t}})); });

@@ -15,7 +15,7 @@ section.logs .action { text-align: right; }
 section.logs .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.logs .action button .icon {
 	padding-right: 0.5rem;
-	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4em; line-height: 1em; vertical-align: -0.25em; text-transform: none !important;
+	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.3rem; text-transform: none !important;
 }
 
 section.logs .logs_list { margin: 0; padding: 0; list-style: none; text-align: left; }

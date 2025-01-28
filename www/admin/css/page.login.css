@@ -16,8 +16,8 @@ section.login {
 #login_panel li { display: block; white-space: nowrap; cursor: pointer; border-radius: 50px; width: 100%; 
 	overflow: hidden; text-overflow: ellipsis; padding-right: 20px; 
 	position: relative; z-index: 1; }
-#login_panel p { font-size: 1.3em; font-weight: 300; padding-bottom: 35px; }
-#login_panel p.error { font-size: 1em; font-weight: 300; color: #f00; text-align: center; }
+#login_panel p { font-size: 1.4rem; font-weight: 300; padding-bottom: 35px; }
+#login_panel p.error { font-size: 1rem; font-weight: 300; color: #f00; text-align: center; }
 #login_panel li::before { 
 	display: inline-block; content: ''; vertical-align: middle; margin-right: 15px;
 	background-color: #ddd; width: 50px; height: 50px; border-radius: 50px;
@@ -33,4 +33,4 @@ section.login {
 #login_panel li.other::before { background-image: url('../images/other.svg'); }
 #login_panel li.provider::before { background-image: url('../images/provider.svg'); }
 
-#login_panel .warning { font-size: 1em; font-weight: 300; color: #777; text-align: left; padding-bottom: 30px; }
+#login_panel .warning { font-size: 1rem; font-weight: 300; color: #777; text-align: left; padding-bottom: 30px; }
