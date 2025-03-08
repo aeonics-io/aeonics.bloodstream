@@ -49,7 +49,7 @@ class Node
 	static circle(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'circle'), a, c); }
 	static path(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'path'), a, c); }
 	static defs(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'defs'), a, c); }
-	static linearGradient(a, c) { 		return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'), a, c); }
+	static linearGradient(a, c) { return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient'), a, c); }
 	static stop(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'stop'), a, c); }
 	static text(a, c) { 	return Node.create(document.createElementNS('http://www.w3.org/2000/svg', 'text'), a, c); }
 	
