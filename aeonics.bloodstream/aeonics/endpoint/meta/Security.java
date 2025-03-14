@@ -1,8 +1,12 @@
 package aeonics.endpoint.meta;
 
+import java.util.stream.StreamSupport;
+
 import aeonics.data.Data;
 import aeonics.entity.Entity;
+import aeonics.entity.Registry;
 import aeonics.entity.security.Group;
+import aeonics.entity.security.Multifactor;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
 import aeonics.http.HttpException;
@@ -63,7 +67,7 @@ public class Security
 				.put("anonymous", user == User.ANONYMOUS)
 				.put("groups", groups)
 				.put("roles", roles)
-				.put("mfa", TOTP.enrolled(user));
+				.put("mfa", StreamSupport.stream(Registry.of(Multifactor.class).spliterator(), false).anyMatch(m -> m.enrolled(user)));
 		})
 		.url("/api/security/me")
 		.method("GET")

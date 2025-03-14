@@ -12,6 +12,7 @@ import aeonics.entity.Entity;
 import aeonics.entity.Message;
 import aeonics.entity.Registry;
 import aeonics.entity.security.Group;
+import aeonics.entity.security.Multifactor;
 import aeonics.entity.security.Provider;
 import aeonics.entity.security.Role;
 import aeonics.entity.security.Token;
@@ -312,7 +313,14 @@ public class Endpoints
 				return redirectError(c, "access_denied", "Missing group membership", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
-			if( user.hasRole(Role.SUPERADMIN) || TOTP.enrolled(user) )
+			boolean totp = false;
+			for( Multifactor.Type m : Registry.of(Multifactor.class) )
+			{
+				if( m.appliesTo(user) || m.enrolled(user) )
+					totp = true;
+			}
+			
+			if( totp )
 			{
 				data.put("otp_user", user.id());
 				Common.Code.put(code, data);
@@ -391,7 +399,12 @@ public class Endpoints
 				return redirectError(c, "access_denied", "Tampered", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			
-			if( !TOTP.check(user, params.asString("otp")) )
+			boolean valid = false;
+			for( Multifactor.Type m : Registry.of(Multifactor.class) )
+				if( m.check(user, Data.map().put("otp", params.asString("otp"))) )
+					valid = true;
+			
+			if( !valid )
 			{
 				Common.Code.remove(code);
 				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), data.asString("flow").equals("implicit"));

@@ -103,7 +103,7 @@ var x = new Promise((ok, nok) =>
 				Promise.all([
 					Ajax.get('/api/meta/registry/aeonics.http.endpoint/entities'),
 					Ajax.get('/api/meta/factory/aeonics.http.endpoint/templates'),
-					Ajax.get('/api/jit/aeonics.http.endpoint')
+					Ajax.get('/api/admin/jit/aeonics.http.endpoint')
 				]).then((results) =>
 				{
 					self.endpoints = results[0].response;
@@ -528,7 +528,7 @@ var x = new Promise((ok, nok) =>
 						var data = {code: this.previousSibling.value};
 						if( !!id ) data.id = id;
 						
-						Ajax.post('/api/jit/entity', {data: data}).then((response) =>
+						Ajax.post('/api/admin/jit/entity', {data: data}).then((response) =>
 						{
 							Notify.success(Translator.get('endpoints.wizard.success'));
 							w.ok();

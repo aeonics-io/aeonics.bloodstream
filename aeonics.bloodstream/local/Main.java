@@ -62,32 +62,6 @@ public class Main extends Plugin
 				.format(Parameter.Format.TEXT)
 				.optional(false));
 		
-		// ===========================
-		// TOPT stuff
-		
-		c.declare(Security.class, new Parameter("otp.period")
-			.summary("OTP time window")
-			.description("The OTP time window in seconds.")
-			.rule(Parameter.Rule.DIGIT)
-			.format(Parameter.Format.NUMBER)
-			.defaultValue(30));
-		c.declare(Security.class, new Parameter("otp.digits")
-			.summary("OTP number of digits")
-			.description("The number of OTP code digits.")
-			.rule(Parameter.Rule.DIGIT)
-			.format(Parameter.Format.NUMBER)
-			.defaultValue(6));
-		c.declare(Security.class, new Parameter("otp.algorithm")
-			.summary("OTP algorithm")
-			.description("The name of the hash algorithm to use in OTP.")
-			.values("SHA1")
-			.format(Parameter.Format.SELECT)
-			.defaultValue("SHA1"));
-		c.declare(Security.class, new Parameter("otp.issuer")
-			.summary("OTP issuer name")
-			.description("The name of the OTP issuer to be displayed by MFA apps.")
-			.format(Parameter.Format.TEXT)
-			.defaultValue("Aeonics Bloodstream Enterprise Suite"));
 		c.declare(Security.class, new Parameter("otp.initialized")
 			.summary("Default OTP has been initialized")
 			.description("This parameter defines if the default MFA has already been initialized (true) or if it should done when starting the run phase (false)."
@@ -255,9 +229,11 @@ public class Main extends Plugin
 		{
 			// restrict access to /api/meta
 			Policy.Type policy = new Policy.Deny().template().create(Data.map().put("parameters", Data.map().put("scope", "http")));
-			policy.name("Deny /api/meta to non administrators");
+			policy.name("Deny /api/meta and /api/admin to non administrators");
 			policy.addRelation("rule", new Rule.And().template().create()
-				.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("parameters", Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true))))
+				.addRelation("rules", new Rule.Or().template().create()
+					.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("parameters", Data.map().put("property", "path").put("value", "/api/meta/#").put("wildcard", true))))
+					.addRelation("rules", new Rule.MatchContext().template().create(Data.map().put("parameters", Data.map().put("property", "path").put("value", "/api/admin/#").put("wildcard", true)))))
 				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("parameters", Data.map().put("role", Role.SUPERADMIN.id()))))));
 			
 			// set and save the monitoring storage
