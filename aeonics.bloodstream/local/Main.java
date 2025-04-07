@@ -248,7 +248,7 @@ public class Main extends Plugin
 		}
 		else
 			initialized = true;
-		
+
 		aeonics.endpoint.meta.Configuration.register();
 		aeonics.endpoint.meta.Endpoints.register();
 		aeonics.endpoint.meta.Flows.register();

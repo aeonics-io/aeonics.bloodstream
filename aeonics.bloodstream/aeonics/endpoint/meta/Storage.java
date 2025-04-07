@@ -123,7 +123,7 @@ public class Storage
 				if( !params.isMap("file") || params.get("file").isEmpty("name") )
 					throw new HttpException(413, "Missing file name, target path is a directory");
 				if( !path.endsWith("/") ) path += "/";
-				path += Path.of(params.get("file").asString("name")).normalize().getFileName();
+				path += Path.of("/" + params.get("file").asString("name")).normalize().getFileName();
 			}
 			
 			s.put(path, file);
@@ -156,7 +156,7 @@ public class Storage
 			aeonics.entity.Storage.Type s = Registry.of(aeonics.entity.Storage.class).get(params.asString("id"));
 			if( s == null ) throw new HttpException(413, "Unknown storage");
 			
-			String filename = Path.of(params.asString("path")).normalize().getFileName().toString();
+			String filename = Path.of("/" + params.asString("path")).normalize().getFileName().toString();
 			
 			return Data.map()
 				.put("isHttpResponse", true)

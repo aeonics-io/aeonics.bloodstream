@@ -63,9 +63,7 @@ public class TOTP
 				if( m.enrolled(user) )
 					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Already enrolled"));
 				
-				Data info = m.enroll(user, null);
-				m.forget(user);
-				return info;
+				return m.generate(user, null);
 			}
 			
 			throw new HttpException(500, Data.map().put("error", "server_error").put("error_description", "Multifactor provider not available")); 
@@ -140,12 +138,11 @@ public class TOTP
 				if( m.enrolled(user) )
 					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Already enrolled"));
 				
-				m.enroll(user, Data.map().put("secret", params.asString("secret")));
-				if( !m.check(user, Data.map().put("otp", params.asString("check"))) )
-				{
-					m.forget(user);
+				
+				if( !m.blank(user, Data.map().put("secret", params.asString("secret")), Data.map().put("otp", params.asString("check"))) )
 					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid verification code"));
-				}
+				
+				m.enroll(user, Data.map().put("secret", params.asString("secret")));
 				return Data.empty();
 			}
 			
