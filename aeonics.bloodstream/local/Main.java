@@ -61,6 +61,24 @@ public class Main extends Plugin
 				.description("The name or ID of the storage entity where monitoring data will be persisted. This is normally set by the system on startup, but it can be changed afterwards.")
 				.format(Parameter.Format.TEXT)
 				.optional(false));
+		c.declare(Monitor.class, new Parameter("path")
+				.summary("Monitor data storage path")
+				.description("The default storage location for the monitor data.")
+				.format(Parameter.Format.TEXT)
+				.optional(true)
+				.defaultValue("stats"));
+		c.declare(Security.class, new Parameter("path")
+				.summary("Security data storage path")
+				.description("The default storage location for the security data.")
+				.format(Parameter.Format.TEXT)
+				.optional(true)
+				.defaultValue("security"));
+		c.declare(RelyingParty.class, new Parameter("name")
+				.summary("Default Relying Party Name")
+				.description("The display name of the default relying party for authentication.")
+				.format(Parameter.Format.TEXT)
+				.optional(true)
+				.defaultValue("Local System"));
 		
 		c.declare(Security.class, new Parameter("otp.initialized")
 			.summary("Default OTP has been initialized")
@@ -237,11 +255,11 @@ public class Main extends Plugin
 				.addRelation("rules", new Rule.Not().template().create().addRelation("rule", new Rule.Role().template().create(Data.map().put("parameters", Data.map().put("role", Role.SUPERADMIN.id()))))));
 			
 			// set and save the monitoring storage
-			Storage.Type monitor = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", "stats"))).name("Monitor statistics");
+			Storage.Type monitor = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", Manager.of(Config.class).get(Monitor.class, "path")))).name("Monitor statistics");
 			c.set(Monitor.class, "storage", Data.of(monitor.id()));
 			
 			// set and save the security storage
-			Storage.Type securityStorage = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", "security"))).name("Security storage");
+			Storage.Type securityStorage = new Storage.File().template().create(Data.map().put("parameters", Data.map().put("root", Manager.of(Config.class).get(Security.class, "path")))).name("Security storage");
 			c.set(Security.class, "oidc.op.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "otp.initialized", Data.of(true));

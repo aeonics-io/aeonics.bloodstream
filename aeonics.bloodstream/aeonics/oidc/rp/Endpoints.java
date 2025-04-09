@@ -206,7 +206,8 @@ public class Endpoints
 					.put("headers", Data.map().put("Location", referer)
 						.put("Set-Cookie", 
 						"token=" + URLEncoder.encode(token, StandardCharsets.UTF_8) + 
-					 	";domain=" + hostname +
+					 	// if no domain, then the current domain is used.
+						// ";domain=" + hostname +
 						";SameSite=Lax" +
 						";max-age=" + Common.OP_ACCESS_TOKEN_TTL + 
 						";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) + 

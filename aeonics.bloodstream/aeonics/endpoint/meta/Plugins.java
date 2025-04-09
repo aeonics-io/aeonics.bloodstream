@@ -54,7 +54,7 @@ public class Plugins
 				if( !Files.isDirectory(p) ) throw new Exception("Destination directory does not exist");
 				
 				byte[] jar = params.get("file").asString("content").getBytes(StandardCharsets.ISO_8859_1);
-				Path f = Path.of("/" + params.get("file").asString("name")).normalize().getFileName();
+				Path f = Path.of(params.get("file").asString("name")).normalize().getFileName();
 				
 				Files.write(p.resolve(f), jar);
 			}
@@ -83,7 +83,7 @@ public class Plugins
 				String path = Manager.of(Config.class).get(aeonics.Plugin.class, "path").asString();
 				Path p = Path.of(path);
 				if( !Files.isDirectory(p) ) throw new IllegalArgumentException("Destination directory does not exist");
-				Path f = Path.of("/" + params.asString("file")).normalize().getFileName();
+				Path f = Path.of(params.asString("file")).normalize().getFileName();
 				p = p.resolve(f);
 				if( !Files.isRegularFile(p) ) throw new IllegalArgumentException("Target plugin does not exist");
 				Files.delete(p);
