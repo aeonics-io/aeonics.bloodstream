@@ -295,7 +295,7 @@ public class Main extends Plugin
 				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response")))
 				.addRelation("groups", Group.ADMINISTRATORS)
 				.addRelation("groups", Group.USERS)
-				.name("Local Provider")
+				.name(Manager.of(Config.class).get(RelyingParty.class, "name").asString())
 				.<RelyingParty.Type>cast();
 			OidcProvider.Type provider = new OidcProvider().template().create(Data.map().put("parameters", Data.map()
 				.put("wellknown", Common.OP_ISSUER_URL + "/.well-known/openid-configuration")
