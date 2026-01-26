@@ -19,6 +19,7 @@ import aeonics.entity.security.Token;
 import aeonics.entity.security.User;
 import aeonics.http.Endpoint;
 import aeonics.http.HttpException;
+import aeonics.manager.Logger;
 import aeonics.manager.Manager;
 import aeonics.manager.Security;
 import aeonics.oidc.Common;
@@ -1017,9 +1018,12 @@ public class Endpoints
 			{
 				if( p.active() && p.supports(username) )
 				{
-					user = p.authenticate(params);
-					if( user != null && user != User.ANONYMOUS )
-						break;
+					try {
+						user = p.authenticate(params);
+						if( user != null && user != User.ANONYMOUS )
+							break;
+					}
+					catch(Exception e) { Manager.of(Logger.class).fine(p.getClass(), e); }
 				}
 			}
 			
