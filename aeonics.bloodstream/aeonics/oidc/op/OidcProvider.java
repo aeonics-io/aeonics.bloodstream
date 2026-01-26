@@ -176,6 +176,11 @@ public class OidcProvider extends Provider
 			return Registry.of(User.class).get((u) -> data.asString("user").equals(u.id()));
 		}
 		
+		public User.Type populate(String user_id)
+		{
+			return null;
+		}
+		
 		public synchronized User.Type join(Data context, User.Type existing)
 		{
 			if( context == null || !context.isMap() || !context.containsKey("sub") || !context.asString("iss").equals(issuer()) ) return null;

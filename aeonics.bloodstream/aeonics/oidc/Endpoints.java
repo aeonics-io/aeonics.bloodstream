@@ -49,17 +49,23 @@ public class Endpoints
 			.description("The user login.")
 			.format(Parameter.Format.TEXT)
 			)
+		.add(new Parameter("force").optional(true).min(1).max(100)
+			.summary("Forced provider")
+			.description("If this parameter is specified, it forces to return only the specified provider.")
+			.format(Parameter.Format.TEXT)
+			)
 		.create()
 		.<Rest.Type>cast()
 		.process((parameters) ->
 		{
 			Data list = Data.list();
 			
-			boolean all = parameters.isEmpty("login");
+			boolean allUsers = parameters.isEmpty("login");
+			boolean allProviders = parameters.isEmpty("force");
 			
 			for( Provider.Type p : Registry.of(Provider.class) )
 			{
-				if( all || p.supports(parameters.asString("login")) )
+				if( p.valueOf("active").asBool() && (allUsers || p.supports(parameters.asString("login"))) && (allProviders || p.id().equals(parameters.asString("force"))) )
 				{
 					list.add(Data.map()
 						.put("id", p.id())

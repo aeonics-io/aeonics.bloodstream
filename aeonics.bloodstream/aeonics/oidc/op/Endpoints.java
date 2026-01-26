@@ -282,12 +282,9 @@ public class Endpoints
 			}
 			else
 			{
-				for( Provider.Type p : Registry.of(Provider.class) )
-				{
+				Provider.Type p = Registry.of(Provider.class).get(params.asString("provider"));
+				if( p != null && p.valueOf("active").asBool() )
 					user = p.authenticate(params.get("credentials"));
-					if( user != null && user != User.ANONYMOUS )
-						break;
-				}
 			}
 			
 			if( user == null || user == User.ANONYMOUS )
@@ -356,6 +353,12 @@ public class Endpoints
 			.summary("The authorization code")
 			.description("The authorization code that was obtained from the authorize flow.")
 			.optional(false)
+			.min(1)
+			.format(Parameter.Format.TEXT))
+		.add(new Parameter("provider")
+			.summary("The provider id")
+			.description("The id of the security provider that shall authenticate the user.")
+			.optional(true)
 			.min(1)
 			.format(Parameter.Format.TEXT))
 		.add(new Parameter("credentials")
@@ -1012,7 +1015,7 @@ public class Endpoints
 			
 			for( Provider.Type p : Registry.of(Provider.class) )
 			{
-				if( p.supports(username) )
+				if( p.active() && p.supports(username) )
 				{
 					user = p.authenticate(params);
 					if( user != null && user != User.ANONYMOUS )

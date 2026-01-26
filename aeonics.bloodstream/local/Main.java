@@ -26,6 +26,7 @@ import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
 import aeonics.manager.Security;
 import aeonics.manager.Timeout;
+import aeonics.manager.Vault;
 import aeonics.monitoring.Monitoring;
 import aeonics.oidc.Common;
 import aeonics.oidc.op.OidcProvider;
@@ -263,6 +264,9 @@ public class Main extends Plugin
 			c.set(Security.class, "oidc.op.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "token.storage", Data.of(securityStorage.id()));
 			c.set(Security.class, "otp.initialized", Data.of(true));
+			
+			// set the security storage to be the same as the security storage
+			c.set(Vault.class, "storage", Data.of(securityStorage.id()));
 		}
 		else
 			initialized = true;
