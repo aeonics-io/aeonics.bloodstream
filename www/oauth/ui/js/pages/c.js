@@ -1,6 +1,5 @@
 import { Page, Node, Ajax, Translator } from 'core';
-import { css, safeHtml } from 'core';
-css('theme');
+import { css, urlValue, safeHtml } from 'core';
 css('c');
 
 class ConsentPage extends Page
@@ -17,21 +16,21 @@ class ConsentPage extends Page
 	async show()
 	{
 		this.code = new URLSearchParams(window.location.search).get('code');
-
+		
 		this.dom.classList.add('consent');
 		this.dom.appendChild(Node.div({className: 'wait', id: 'consent_panel'}));
 		var self = this; setTimeout(function() { self.rule_0(); }, 1);
 		return Promise.resolve();
 	}
-
+	
 	updateCodeValidity()
 	{
-		var div = document.getElementById('consent_panel');
-
+		var div = this.dom;
+		
 		var left = Math.floor((this.code_ttl - (Date.now() - this.code_epoch))/1000);
 		var min = Math.floor(left / 60);
 		var sec = left % 60;
-
+		
 		if( left < 0 )
 		{
 			var searchParams = new URLSearchParams();
@@ -39,17 +38,17 @@ class ConsentPage extends Page
 			searchParams.set("error_description", Translator.get('code.validity.expired'));
 			location.href = 'error?' + searchParams.toString() + '#e';
 		}
-
+		
 		div.dataset.ttl = Translator.get('code.validity', (min > 0 ? min + 'min ' : '') + (sec > 0 ? sec + 's' : ''));
 		div.classList.toggle('__force_update');
 	}
-
+	
 	rule_0()
 	{
 		var self = this;
 		var div = document.getElementById('consent_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		Ajax.get("/oauth/codeinfo", {data: {code: this.code, verbose: "true"}}).then((response) =>
 		{
 			if( !response.response.signin_token )
@@ -60,19 +59,19 @@ class ConsentPage extends Page
 				location.href = 'error?' + searchParams.toString() + '#e';
 				return;
 			}
-
+			
 			var tokens = JSON.parse(localStorage.getItem('tokens') || "[]");
 			if( !tokens.includes(response.response.signin_token) )
 			{
 				tokens.push(response.response.signin_token);
 				localStorage.setItem('tokens', JSON.stringify(tokens));
 			}
-
+			
 			self.code_epoch = response.response.epoch;
 			self.code_ttl = response.response.ttl;
 			self.updateCodeValidity();
 			setInterval(() => { self.updateCodeValidity(); }, 1000);
-
+			
 			self.rule_1(response.response.name);
 		}, (error) =>
 		{
@@ -82,13 +81,13 @@ class ConsentPage extends Page
 			location.href = 'error?' + searchParams.toString() + '#e';
 		});
 	}
-
+	
 	rule_1(name)
 	{
 		var self = this;
 		var div = document.getElementById('consent_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		div.append(
 			Node.p(Translator.get("consent.title")),
 			Node.p({className: 'explain'}, Translator.get("consent.provider", safeHtml(name))),
@@ -115,7 +114,7 @@ class ConsentPage extends Page
 				div.lastChild.submit();
 			}}, Translator.get('consent.disagree'))
 		);
-
+		
 		div.classList.remove('wait');
 	}
 }

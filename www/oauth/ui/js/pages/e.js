@@ -1,15 +1,14 @@
 import { Page, Node, Translator } from 'core';
-import { css, safeHtml } from 'core';
-css('theme');
+import { css, urlValue, safeHtml } from 'core';
 css('e');
 
 class ErrorPage extends Page
 {
 	async show()
 	{
-		const error = new URLSearchParams(window.location.search).get('error');
-		const description = new URLSearchParams(window.location.search).get('error_description');
-
+		const error = urlValue('error');
+		const description = urlValue('error_description');
+		
 		this.dom.classList.add('error');
 		this.dom.appendChild(
 			Node.div({id: 'error_panel'}, [

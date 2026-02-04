@@ -1,18 +1,28 @@
 :root {
+	--black: #000000;
+	--white: #ffffff;
+	--blue: #747caa;
+	--green: #99ac1b;
+	--yellow: #ebb100;
+	--orange: #d86c39;
+	--pink: #d75d7f;
+}
+
+:root {
 	/* Page background (can be color or image) */
-	--oauth-bg: var(--background);
+	--oauth-bg: var(--white) url(../images/b2.jpg) center / cover fixed;
 
 	/* Login/consent/error panel background */
 	--oauth-panel-bg: var(--background);
 	
 	/* Back link color */
-	--oauth-back-link: #00c;
+	--oauth-back-link: var(--blue);
 	
 	/* Explanation text color */
 	--oauth-explain-text: var(--text);
 
 	/* Primary text color (used in panels) */
-	--oauth-text: var(--text);
+	--oauth-text: var(--pink);
 
 	/* Secondary text color (used for hints, onbehalf, etc.) */
 	--oauth-text-secondary: #888;
@@ -26,10 +36,10 @@
 	--oauth-error-details: #888;
 
 	/* Success/agree button color */
-	--oauth-success: #070;
+	--oauth-success: #00C28B;
 
 	/* Danger/disagree button color */
-	--oauth-danger: #b00;
+	--oauth-danger: #c20037;
 
 	/* Icon/avatar background color */
 	--oauth-icon-bg: #ddd;

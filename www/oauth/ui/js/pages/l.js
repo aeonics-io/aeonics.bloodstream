@@ -1,6 +1,5 @@
 import { Page, Node, Ajax, Translator } from 'core';
 import { css, urlValue, safeHtml } from 'core';
-css('theme');
 css('l');
 
 class LoginPage extends Page
@@ -33,25 +32,25 @@ class LoginPage extends Page
 	 * 4) redirect the consent screen
 	 *
 	 * ======================
-	 */
+	 */ 
 	async show()
 	{
-		this.code = new URLSearchParams(window.location.search).get('code');
-
+		this.code = urlValue('code');
+		
 		this.dom.classList.add('login');
 		this.dom.appendChild(Node.div({className: 'wait', id: 'login_panel'}));
 		var self = this; setTimeout(function() { self.rule_0(); }, 1);
 		return Promise.resolve();
 	}
-
+	
 	updateCodeValidity()
 	{
-		var div = document.getElementById('login_panel');
-
+		var div = this.dom;
+		
 		var left = Math.floor((this.code_ttl - (Date.now() - this.code_epoch))/1000);
 		var min = Math.floor(left / 60);
 		var sec = left % 60;
-
+		
 		if( left < 0 )
 		{
 			var searchParams = new URLSearchParams();
@@ -59,24 +58,24 @@ class LoginPage extends Page
 			searchParams.set("error_description", Translator.get('code.validity.expired'));
 			location.href = 'error?' + searchParams.toString() + '#e';
 		}
-
+		
 		div.dataset.ttl = Translator.get('code.validity', (min > 0 ? min + 'min ' : '') + (sec > 0 ? sec + 's' : ''));
 		div.classList.toggle('__force_update');
 	}
-
+	
 	rule_0()
 	{
 		var self = this;
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		Ajax.get("/oauth/codeinfo", {data: {code: this.code}}).then((response) =>
 		{
 			self.code_epoch = response.response.epoch;
 			self.code_ttl = response.response.ttl;
 			self.updateCodeValidity();
 			setInterval(() => { self.updateCodeValidity(); }, 1000);
-
+			
 			self.providerName = response.response.name;
 			self.rule_1();
 		}, (error) =>
@@ -85,9 +84,9 @@ class LoginPage extends Page
 			searchParams.set("error", error.response.error||'server_error');
 			searchParams.set("error_description", error.response.error_description||'Unspecified error.');
 			location.href = 'error?' + searchParams.toString() + '#e';
-		});
+		});	
 	}
-
+	
 	rule_1()
 	{
 		var tokens = JSON.parse(localStorage.getItem('tokens') || "[]");
@@ -122,19 +121,19 @@ class LoginPage extends Page
 						}
 					}
 				}
-
+				
 				if( ids.length == 0 ) { self.hasAccounts = false; self.rule_2(); }
 				else { this.hasAccounts = true; self.rule_1_display(ids); }
 			});
 		}
 	}
-
+	
 	rule_1_display(ids)
 	{
 		var self = this;
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		div.append(
 			Node.p(Translator.get("login.choose.account")),
 			Node.p({className: 'onbehalf'}, Translator.get("login.provider", safeHtml(this.providerName))),
@@ -145,13 +144,13 @@ class LoginPage extends Page
 		);
 		div.classList.remove('wait');
 	}
-
+	
 	rule_2()
 	{
 		var self = this;
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		Ajax.get("/oidc/local").then((local) =>
 		{
 			self.forced = self.forced || localStorage.getItem('force_provider');
@@ -173,13 +172,13 @@ class LoginPage extends Page
 			location.href = 'error?' + searchParams.toString() + '#e';
 		});
 	}
-
+	
 	rule_2_display(providers)
 	{
 		var self = this;
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		if( providers.length == 0 )
 		{
 			div.append(Node.p({className: 'error'}, Translator.get('login.error.empty')));
@@ -195,10 +194,10 @@ class LoginPage extends Page
 				Node.p(Translator.get("login.choose.provider")),
 				Node.p({className: 'onbehalf'}, Translator.get("login.provider", safeHtml(this.providerName))),
 			);
-
+			
 			if( this.hasAccounts )
 				div.append(Node.p({className: 'back', click: function() { self.rule_1(); }}, Translator.get('login.choose.account')));
-
+			
 			div.append(
 				Node.ul([
 					providers.map((p) => Node.li({className: 'provider' + (!!p.login_redirect ? '' : ' password'), dataset: {uri: p.login_redirect, id: p.id}, click: function() { self.rule_3(this.dataset.uri, this.dataset.id); }}, Node.span(safeHtml(p.name)))),
@@ -207,7 +206,7 @@ class LoginPage extends Page
 			div.classList.remove('wait');
 		}
 	}
-
+	
 	rule_3(uri, id)
 	{
 		if( uri && uri != "null" )
@@ -215,15 +214,15 @@ class LoginPage extends Page
 		else
 			this.rule_3_display(id);
 	}
-
+	
 	rule_3_display(id)
 	{
 		var self = this;
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
 		div.classList.remove('wait');
-
-		Node.append(div,
+		
+		Node.append(div, 
 		[
 			Node.p(Translator.get("login.auth.password")),
 			Node.p({className: 'onbehalf'}, Translator.get("login.provider", safeHtml(this.providerName))),
@@ -237,7 +236,7 @@ class LoginPage extends Page
 				var u = document.getElementById('form_login').value;
 				var p = document.getElementById('form_password').value;
 				if( !u || !p ) return;
-
+				
 				div.classList.add('wait');
 				var credentials = JSON.stringify({username: u, password: p});
 				div.append(Node.form({id: 'form_form', action: '/oauth/login', method: 'POST', enctype: 'application/x-www-form-urlencoded', style: {display: 'none'}}, [
@@ -249,13 +248,13 @@ class LoginPage extends Page
 			}}, Translator.get('login.login')),
 		]);
 	}
-
+	
 	rule_4(token)
 	{
 		var div = document.getElementById('login_panel');
 		while(div.firstChild) div.firstChild.remove();
 		div.classList.remove('wait');
-
+		
 		var credentials = JSON.stringify({signin_token: token});
 		div.append(Node.form({id: 'form_form', action: '/oauth/login', method: 'POST', enctype: 'application/x-www-form-urlencoded', style: {display: 'none'}}, [
 			Node.input({type: 'hidden', value: this.code, name: 'code'}),

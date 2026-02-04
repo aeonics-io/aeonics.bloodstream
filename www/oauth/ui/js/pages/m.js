@@ -1,7 +1,6 @@
-import { Page, Node, Ajax, Translator, Modal, Notify } from 'core';
-import { css, safeHtml } from 'core';
-import QRCode from '../qrcode.js';
-css('theme');
+import { Page, Node, Ajax, Translator, Notify, Modal } from 'core';
+import { css, urlValue, safeHtml } from 'core';
+import { QRCode } from '../qrcode.js';
 css('m');
 
 class MfaPage extends Page
@@ -22,21 +21,21 @@ class MfaPage extends Page
 	async show()
 	{
 		this.code = new URLSearchParams(window.location.search).get('code');
-
+		
 		this.dom.classList.add('mfa');
 		this.dom.appendChild(Node.div({className: 'wait', id: 'mfa_panel'}));
 		var self = this; setTimeout(function() { self.rule_0(); }, 1);
 		return Promise.resolve();
 	}
-
+	
 	updateCodeValidity()
 	{
-		var div = document.getElementById('mfa_panel');
-
+		var div = this.dom;
+		
 		var left = Math.floor((this.code_ttl - (Date.now() - this.code_epoch))/1000);
 		var min = Math.floor(left / 60);
 		var sec = left % 60;
-
+		
 		if( left < 0 )
 		{
 			var searchParams = new URLSearchParams();
@@ -44,24 +43,24 @@ class MfaPage extends Page
 			searchParams.set("error_description", Translator.get('code.validity.expired'));
 			location.href = 'error?' + searchParams.toString() + '#e';
 		}
-
+		
 		div.dataset.ttl = Translator.get('code.validity', (min > 0 ? min + 'min ' : '') + (sec > 0 ? sec + 's' : ''));
 		div.classList.toggle('__force_update');
 	}
-
+	
 	rule_0()
 	{
 		var self = this;
 		var div = document.getElementById('mfa_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		Ajax.get("/oauth/codeinfo", {data: {code: this.code}}).then((response) =>
 		{
 			self.code_epoch = response.response.epoch;
 			self.code_ttl = response.response.ttl;
 			self.updateCodeValidity();
 			setInterval(() => { self.updateCodeValidity(); }, 1000);
-
+			
 			self.rule_1();
 		}, (error) =>
 		{
@@ -71,13 +70,13 @@ class MfaPage extends Page
 			location.href = 'error?' + searchParams.toString() + '#e';
 		});
 	}
-
+	
 	rule_1()
 	{
 		var self = this;
 		var div = document.getElementById('mfa_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		Ajax.get("/oauth/otp/exists", {data: {code: this.code}}).then((response) =>
 		{
 			if( !response.response.hasOwnProperty("exists") )
@@ -91,7 +90,7 @@ class MfaPage extends Page
 				self.rule_2();
 			else
 				self.rule_1_display();
-
+			
 		}, (error) =>
 		{
 			var searchParams = new URLSearchParams();
@@ -100,13 +99,13 @@ class MfaPage extends Page
 			location.href = 'error?' + searchParams.toString() + '#e';
 		});
 	}
-
+	
 	rule_1_display()
 	{
 		var self = this;
 		var div = document.getElementById('mfa_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		div.append(
 			Node.p(Translator.get("mfa.register")),
 			Node.p({className: 'explain'}, Translator.get("mfa.register.detail")),
@@ -115,21 +114,22 @@ class MfaPage extends Page
 				e.stopImmediatePropagation();
 				e.preventDefault();
 				div.classList.add('wait');
-
+				
 				Ajax.post("/oauth/otp/generate", {data: {code: self.code}}).then((response) =>
 				{
-					var input = Node.input({type: 'text', placeholder: Translator.get('mfa.otp')});
-					Modal.alert([
+					var m = null
+					var input = Node.input({type: 'text', placeholder: Translator.get('mfa.otp'), enter: function() { m.ok(); }});
+					m = Modal.alert([
 						Translator.get('mfa.qrcode'),
 						Node.p({className: "qr"}, QRCode({msg: response.response.url, pad: 6, dim: 256, pal: ['#000', '#fff'], ecb: 0, ecl: 'M'})),
 						input
 					]).then(() =>
 					{
-						Ajax.post("/oauth/otp/register", {data: {code: self.code,
-							check: input.value,
-							period: response.response.period,
-							digits: response.response.digits,
-							algorithm: response.response.algorithm,
+						Ajax.post("/oauth/otp/register", {data: {code: self.code, 
+							check: input.value, 
+							period: response.response.period, 
+							digits: response.response.digits, 
+							algorithm: response.response.algorithm, 
 							secret: response.response.secret}}).then(() =>
 						{
 							self.rule_2();
@@ -150,13 +150,13 @@ class MfaPage extends Page
 		);
 		div.classList.remove('wait');
 	}
-
+	
 	rule_2()
 	{
 		var self = this;
 		var div = document.getElementById('mfa_panel');
 		while(div.firstChild) div.firstChild.remove();
-
+		
 		div.append(
 			Node.p(Translator.get("mfa.auth")),
 			Node.input({type: 'text', id: 'form_otp', placeholder: Translator.get('mfa.otp'), keydown: function(e) { if(this.value.length > 0 && (e.key === 'Enter' || e.keyCode === 13)) this.nextSibling.click(); }}),
@@ -166,7 +166,7 @@ class MfaPage extends Page
 				e.preventDefault();
 				var o = document.getElementById('form_otp').value;
 				if( !o ) return;
-
+				
 				div.classList.add('wait');
 				div.append(Node.form({id: 'form_form', action: '/oauth/otp', method: 'POST', enctype: 'application/x-www-form-urlencoded', style: {display: 'none'}}, [
 					Node.input({type: 'hidden', value: self.code, name: 'code'}),
