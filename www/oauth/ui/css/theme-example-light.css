@@ -1,0 +1,32 @@
+/**
+ * Example Light Theme Override
+ *
+ * This is an example showing how to override the default Bloodstream dark theme
+ * with a light theme (similar to Manager/Instance style).
+ *
+ * To use: Include this file AFTER theme.css in your HTML, or copy these rules
+ * into a <style> tag in your HTML file.
+ */
+
+:root {
+	/* Light theme with background image */
+	--oauth-bg: url('../images/background.jpg');
+
+	/* White panel background */
+	--oauth-panel-bg: #ffffff;
+
+	/* Dark text on light background */
+	--oauth-text: #333333;
+	--oauth-text-secondary: #999999;
+
+	/* Pink accent (Manager/Instance style) */
+	--oauth-accent: #d75d7f;
+	--oauth-accent-hover: #e76d8f;
+	--oauth-timer: #d75d7f;
+
+	/* Rounded corners */
+	--oauth-border-radius: 4px;
+
+	/* Softer shadow */
+	--oauth-panel-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}

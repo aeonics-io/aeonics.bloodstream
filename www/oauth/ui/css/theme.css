@@ -1,0 +1,60 @@
+/**
+ * OAuth UI Theme Variables
+ *
+ * Default theme: Bloodstream Dark Theme
+ *
+ * To customize for your project, override these variables in your HTML:
+ *
+ * <style>
+ *   :root {
+ *     --oauth-bg: url('images/background.jpg');
+ *     --oauth-panel-bg: #ffffff;
+ *     --oauth-text: #333333;
+ *     --oauth-accent: #d75d7f;
+ *   }
+ * </style>
+ */
+
+:root {
+	/* Page background (can be color or image) */
+	--oauth-bg: #1C1B21;
+
+	/* Login/consent/error panel background */
+	--oauth-panel-bg: #ffffff;
+
+	/* Primary text color (used in panels) */
+	--oauth-text: #000000;
+
+	/* Secondary text color (used for hints, onbehalf, etc.) */
+	--oauth-text-secondary: #888888;
+
+	/* Accent color (used for highlights, buttons, timer) */
+	--oauth-accent: #FB9B60;
+
+	/* Accent hover state */
+	--oauth-accent-hover: #FFA76F;
+
+	/* Timer/TTL display color */
+	--oauth-timer: #FB9B60;
+
+	/* Error message color */
+	--oauth-error: #f00;
+
+	/* Success/agree button color */
+	--oauth-success: #147A00;
+
+	/* Danger/disagree button color */
+	--oauth-danger: #9C0000;
+
+	/* Icon/avatar background color */
+	--oauth-icon-bg: #dddddd;
+
+	/* Panel border radius */
+	--oauth-border-radius: 0px;
+
+	/* Panel box shadow */
+	--oauth-panel-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px;
+
+	/* Font family (optional override) */
+	--oauth-font-family: inherit;
+}

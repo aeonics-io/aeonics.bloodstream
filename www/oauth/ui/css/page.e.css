@@ -1,17 +1,19 @@
 
-section.error { 
-	position: fixed; padding: 10vh 10vw; top: 0; bottom: 0; left: 0; right: 0; text-align: center; 
-	overflow: auto; background: #1C1B21;
+section.error {
+	position: fixed; padding: 10vh 10vw; top: 0; bottom: 0; left: 0; right: 0; text-align: center;
+	overflow: auto; background: var(--oauth-bg);
+	font-family: var(--oauth-font-family);
 }
 
-#error_panel { width: 450px; max-width: 95vw; max-height: 400px; min-height: 200px; background-color: #fff; 
-	padding: 45px; box-sizing: border-box; 
-	box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px; 
-	overflow-y: hidden; overflow-x: auto; 
-	color: #000; text-align: left; 
+#error_panel { width: 450px; max-width: 95vw; max-height: 400px; min-height: 200px; background-color: var(--oauth-panel-bg);
+	padding: 45px; box-sizing: border-box;
+	box-shadow: var(--oauth-panel-shadow);
+	border-radius: var(--oauth-border-radius);
+	overflow-y: hidden; overflow-x: auto;
+	color: var(--oauth-text); text-align: left;
 	position: absolute; left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%);
 }
 #error_panel p { text-align: left; margin: 0; line-height: unset; }
-#error_panel p.t1 { font-size: 1.3em; font-weight: 700; padding-bottom: 35px; color: #f00; }
-#error_panel p.t2 { color: #000; }
-#error_panel p.t3 { color: #888; font-family: monospace; margin-top: 20px; }
+#error_panel p.t1 { font-size: 1.3em; font-weight: 700; padding-bottom: 35px; color: var(--oauth-error); }
+#error_panel p.t2 { color: var(--oauth-text); }
+#error_panel p.t3 { color: var(--oauth-text-secondary); font-family: monospace; margin-top: 20px; }

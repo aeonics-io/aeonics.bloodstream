@@ -1,20 +1,22 @@
 
-section.mfa { 
-	position: fixed; padding: 10vh 10vw; top: 0; bottom: 0; left: 0; right: 0; text-align: center; 
-	overflow: auto; background: #1C1B21;
+section.mfa {
+	position: fixed; padding: 10vh 10vw; top: 0; bottom: 0; left: 0; right: 0; text-align: center;
+	overflow: auto; background: var(--oauth-bg);
+	font-family: var(--oauth-font-family);
 }
 
-#mfa_panel { width: 450px; max-width: 95vw; max-height: 400px; min-height: 200px; background-color: #fff; 
-	padding: 45px; box-sizing: border-box; 
-	box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 6px; 
-	overflow-y: hidden; overflow-x: auto; 
-	color: #000; text-align: left; 
+#mfa_panel { width: 450px; max-width: 95vw; max-height: 400px; min-height: 200px; background-color: var(--oauth-panel-bg);
+	padding: 45px; box-sizing: border-box;
+	box-shadow: var(--oauth-panel-shadow);
+	border-radius: var(--oauth-border-radius);
+	overflow-y: hidden; overflow-x: auto;
+	color: var(--oauth-text); text-align: left;
 	position: absolute; left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%);
 }
-#mfa_panel::after { content: attr(data-ttl); position: absolute; bottom: 5px; left: 5px; font-size: 0.8em; color: #FB9B60; }
+#mfa_panel::after { content: attr(data-ttl); position: absolute; bottom: 5px; left: 5px; font-size: 0.8em; color: var(--oauth-timer); }
 
 #mfa_panel button.raised { display: block; width: 100%; margin: 20px 0; }
 #mfa_panel p { font-size: 1.3em; font-weight: 700; }
-#mfa_panel p.explain { font-size: 1em; font-weight: 300; color: #000; text-align: left; padding: 20px 0; }
-#mfa_panel p.error { font-size: 1em; font-weight: 300; color: #f00; text-align: center; padding: 35px 0; }
+#mfa_panel p.explain { font-size: 1em; font-weight: 300; color: var(--oauth-text); text-align: left; padding: 20px 0; }
+#mfa_panel p.error { font-size: 1em; font-weight: 300; color: var(--oauth-error); text-align: center; padding: 35px 0; }
 p.qr { text-align: center; padding: 30px; }
