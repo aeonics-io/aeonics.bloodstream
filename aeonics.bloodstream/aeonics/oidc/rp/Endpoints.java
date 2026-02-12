@@ -191,7 +191,7 @@ public class Endpoints
 				if( jwt.asString("iss").equals(Common.OP_ISSUER_URL) )
 					token = response.asString("access_token");
 				else
-					token = Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL, true, "topic", "http").value();
+					token = Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, true, "topic", "http").value();
 				
 				String referer = relayState.asString("referer");
 				int start_host = referer.indexOf("//")+2;
@@ -209,8 +209,9 @@ public class Endpoints
 					 	// if no domain, then the current domain is used.
 						// ";domain=" + hostname +
 						";SameSite=Lax" +
-						";max-age=" + Common.OP_ACCESS_TOKEN_TTL + 
-						";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) + 
+						";Secure;HttpOnly" +
+						";max-age=" + Common.OP_ACCESS_TOKEN_TTL +
+						";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) +
 						";path=" + path));
 			}
 			catch(Exception e)

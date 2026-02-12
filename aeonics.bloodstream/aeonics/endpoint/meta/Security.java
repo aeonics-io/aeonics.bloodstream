@@ -139,6 +139,11 @@ public class Security
 		.template()
 		.summary("Change password")
 		.description("This endpoint can be used to change the current user password. All user tokens are invalidated.")
+		.add(new Parameter("current_password")
+			.summary("Current password")
+			.description("The current user password for verification")
+			.format(Parameter.Format.TEXT)
+			.optional(false))
 		.add(new Parameter("password")
 			.summary("Password")
 			.description("The new user password")
@@ -150,7 +155,11 @@ public class Security
 		{
 			Provider.Type provider = Registry.of(Provider.class).get(p -> p.type().equals(StringUtils.toLowerCase(Provider.Local.class)));
 			if( provider == null ) throw new HttpException(500, "Security provider unavailable");
-			
+
+			// verify current password
+			User.Type check = provider.authenticate(Data.map().put("username", user.login()).put("password", data.asString("current_password")));
+			if( check == null || !check.id().equals(user.id()) ) throw new HttpException(403, "Invalid current password");
+
 			// leave and rejoin
 			provider.leave(user);
 			provider.join(Data.map().put("password", data.asString("password")).put("username", user.login()), user);
@@ -193,13 +202,21 @@ public class Security
 		.template()
 		.summary("Reset OTP")
 		.description("This endpoint can be used to reset the OTP of the current user.")
+		.add(new Parameter("otp")
+			.summary("OTP")
+			.description("The current OTP code is required as proof of ownership.")
+			.optional(false)
+			.format(Parameter.Format.TEXT))
 		.create()
 		.<Rest.Type>cast()
 		.process((data, user) ->
 		{
+			if( !Multifactor.check(user, data) )
+				throw new HttpException(403, "OTP code mismatch");
+
 			for( Multifactor.Type m : Registry.of(Multifactor.class) )
 				m.forget(user);
-			
+
 			return Data.map().put("success", true);
 		})
 		.url("/api/security/me/otp")

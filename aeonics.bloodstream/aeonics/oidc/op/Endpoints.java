@@ -35,7 +35,15 @@ import aeonics.util.Tuples.Tuple;
 public class Endpoints 
 {
 	private Endpoints() { /* no instances */ }
-	
+
+	private static String findUserIdByLogin(String login)
+	{
+		if( login == null || login.isBlank() ) return null;
+		for( User.Type u : Registry.of(User.class) )
+			if( login.equals(u.login()) ) return u.id();
+		return null;
+	}
+
 	/**
 	 * Validates the input scope based on the existing roles available for that registered client
 	 * @param client the registered client
@@ -84,14 +92,16 @@ public class Endpoints
 		
 		if( token != null && !token.isBlank() )
 		{
-			signature.update(token.substring(0, 16).getBytes());
-			id_token.put("at_hash", Base64.getUrlEncoder().withoutPadding().encodeToString(signature.sign()));
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hash = md.digest(token.getBytes(StandardCharsets.US_ASCII));
+			id_token.put("at_hash", Base64.getUrlEncoder().withoutPadding().encodeToString(java.util.Arrays.copyOf(hash, hash.length / 2)));
 		}
-		
+
 		if( code != null && !code.isBlank() )
 		{
-			signature.update(code.substring(0, 16).getBytes());
-			id_token.put("c_hash", Base64.getUrlEncoder().withoutPadding().encodeToString(signature.sign()));
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hash = md.digest(code.getBytes(StandardCharsets.US_ASCII));
+			id_token.put("c_hash", Base64.getUrlEncoder().withoutPadding().encodeToString(java.util.Arrays.copyOf(hash, hash.length / 2)));
 		}
 		
 		if( nonce != null && !nonce.isBlank() )
@@ -267,9 +277,17 @@ public class Endpoints
 				Common.Code.remove(code);
 				throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid credentials"));
 			}
-			
+
+			// Rate limiting: try to extract user identifier from credentials
+			String _userId = findUserIdByLogin(params.get("credentials").asString("login"));
+			if( _userId != null && Manager.of(Security.class).isLocked(_userId) )
+			{
+				Common.Code.remove(code);
+				return redirectError(c, "access_denied", "Invalid credentials", data.asString("state"), data.asString("flow").equals("implicit"));
+			}
+
 			user = User.ANONYMOUS;
-			
+
 			if( !params.get("credentials").isEmpty("signin_token") )
 			{
 				Token t = Manager.of(Security.class).authenticate(params.get("credentials").asString("signin_token"), false);
@@ -287,13 +305,16 @@ public class Endpoints
 				if( p != null && p.valueOf("active").asBool() )
 					user = p.authenticate(params.get("credentials"));
 			}
-			
+
 			if( user == null || user == User.ANONYMOUS )
 			{
+				if( _userId != null ) Manager.of(Security.class).recordFailedAuthentication(_userId);
 				Common.Code.remove(code);
 				return redirectError(c, "access_denied", "Invalid credentials", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
-			
+
+			Manager.of(Security.class).recordSuccessfulAuthentication(user.id());
+
 			// check if user is allowed by the client groups
 			boolean member = false;
 			for( Tuple<Entity, Data> group : c.relations("groups") )
@@ -402,20 +423,29 @@ public class Endpoints
 				Common.Code.remove(code);
 				return redirectError(c, "access_denied", "Tampered", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
-			
+
+			// Rate limiting check
+			if( Manager.of(Security.class).isLocked(data.asString("otp_user")) )
+			{
+				Common.Code.remove(code);
+				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), data.asString("flow").equals("implicit"));
+			}
+
 			boolean valid = false;
 			for( Multifactor.Type m : Registry.of(Multifactor.class) )
 				if( m.check(user, Data.map().put("otp", params.asString("otp"))) )
 					valid = true;
-			
+
 			if( !valid )
 			{
+				Manager.of(Security.class).recordFailedAuthentication(data.asString("otp_user"));
 				Common.Code.remove(code);
 				return redirectError(c, "access_denied", "Unauthorized", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 			else
 			{
 				// otp success -> redirect to consent
+				Manager.of(Security.class).recordSuccessfulAuthentication(user.id());
 				data.put("user", user.id());
 				if( !data.containsKey("signin_token") )
 					data.put("signin_token", Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, false, "signin").value());
@@ -942,21 +972,22 @@ public class Endpoints
 			{
 				if( data.asString("code_challenge_method").equals("plain") )
 				{
-					if( !codeVerifier.equals(data.asString("code_verifier")) )
+					if( !codeVerifier.equals(data.asString("code_challenge")) )
 						throw new HttpException(400, Data.map().put("error", "invalid_grant").put("error_description", "A6"));
 				}
 				else if( data.asString("code_challenge_method").equals("S256") )
 				{
 					MessageDigest md = MessageDigest.getInstance("SHA-256");
 					String codeChallenge = new String(Base64.getEncoder().encode(md.digest(codeVerifier.getBytes())));
-					if( !codeChallenge.equals(data.asString("code_verifier")) )
+					if( !codeChallenge.equals(data.asString("code_challenge")) )
 						throw new HttpException(400, Data.map().put("error", "invalid_grant").put("error_description", "A7"));
 				}
 				else
 					throw new HttpException(400, Data.map().put("error", "invalid_grant").put("error_description", "A8"));
 			}
 			
-			if( c == null || params.isEmpty("client_secret") || !params.asString("client_secret").equals(c.clientSecret()) )
+			// prevent timing side-channel attack
+			if( c == null || params.isEmpty("client_secret") || !MessageDigest.isEqual(params.asString("client_secret").getBytes(), c.clientSecret().getBytes()) )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "A9"));
 			
 			user = Registry.of(User.class).get(data.asString("user"));
@@ -1005,7 +1036,8 @@ public class Endpoints
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "P1"));
 			
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(params.asString("client_id"));
-			if( c == null || !c.clientSecret().equals(params.asString("client_secret")) )
+			// prevent timing side-channel attack
+			if( c == null || !MessageDigest.isEqual(c.clientSecret().getBytes(), params.asString("client_secret").getBytes()) )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "P2"));
 			
 			if( !c.allowPasswordGrant() )
@@ -1013,7 +1045,12 @@ public class Endpoints
 			
 			if( username.isBlank() || password.isBlank() )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "P4"));
-			
+
+			// Rate limiting: try to find user by login to check throttle
+			String _userId = findUserIdByLogin(username);
+			if( _userId != null && Manager.of(Security.class).isLocked(_userId) )
+				throw new HttpException(401);
+
 			for( Provider.Type p : Registry.of(Provider.class) )
 			{
 				if( p.active() && p.supports(username) )
@@ -1026,10 +1063,15 @@ public class Endpoints
 					catch(Exception e) { Manager.of(Logger.class).fine(p.getClass(), e); }
 				}
 			}
-			
+
 			if( user == null || user == User.ANONYMOUS )
+			{
+				if( _userId != null ) Manager.of(Security.class).recordFailedAuthentication(_userId);
 				throw new HttpException(400, Data.map().put("error", "invalid_grant").put("error_description", "P5"));
-			
+			}
+
+			Manager.of(Security.class).recordSuccessfulAuthentication(user.id());
+
 			// validate the actual scope
 			scope = validateScope(c, scope, user);
 			
@@ -1064,7 +1106,8 @@ public class Endpoints
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "C1"));
 			
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(params.asString("client_id"));
-			if( c == null || !c.clientSecret().equals(params.asString("client_secret")) )
+			// prevent timing side-channel attack
+			if( c == null || !MessageDigest.isEqual(c.clientSecret().getBytes(), params.asString("client_secret").getBytes()) )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "C2"));
 			
 			if( !c.allowClientCredentialsGrant() )
@@ -1230,7 +1273,8 @@ public class Endpoints
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "X1"));
 			
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(params.asString("client_id"));
-			if( c == null || !c.clientSecret().equals(params.asString("client_secret")) )
+			// prevent timing side-channel attack
+			if( c == null || !MessageDigest.isEqual(c.clientSecret().getBytes(), params.asString("client_secret").getBytes()) )
 				throw new HttpException(400, Data.map().put("error", "invalid_client").put("error_description", "X2"));
 			
 			String token = params.asString("token");
