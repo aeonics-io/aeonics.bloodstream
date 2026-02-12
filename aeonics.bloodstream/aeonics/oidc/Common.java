@@ -72,7 +72,7 @@ public class Common
 	/**
 	 * the timeout tracker
 	 */
-	public static Tracker<Void> tracker = new Tracker<Void>(null)
+	public static Tracker<Void> tracker = new Tracker<Void>("OAuth Token Timeout Tracker")
 	{
 		private long next = 0;
 		public long delay()

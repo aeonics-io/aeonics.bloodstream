@@ -123,7 +123,8 @@ class MfaPage extends Page
 						Translator.get('mfa.qrcode'),
 						Node.p({className: "qr"}, QRCode({msg: response.response.url, pad: 6, dim: 256, pal: ['#000', '#fff'], ecb: 0, ecl: 'M'})),
 						input
-					]).then(() =>
+					]);
+					m.then(() =>
 					{
 						Ajax.post("/oauth/otp/register", {data: {code: self.code, 
 							check: input.value, 

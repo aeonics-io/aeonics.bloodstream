@@ -22,6 +22,7 @@ import aeonics.manager.Logger;
 import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
 import aeonics.manager.Scheduler;
+import aeonics.manager.Scheduler.Task;
 
 /**
  * Data is stored in a storage as JSON objects.
@@ -109,7 +110,7 @@ public class Monitoring
 			ZonedDateTime.now().getZone()
 		);
 		
-		Manager.of(Scheduler.class).every(this::tick, 10, ChronoUnit.SECONDS, first);
+		Manager.of(Scheduler.class).every(Task.of("Monitoring Tick", this::tick), 10, ChronoUnit.SECONDS, first);
 	}
 	
 	/**
