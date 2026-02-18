@@ -210,6 +210,8 @@ public class TOTP
 					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
 				user = Registry.of(User.class).get(data.asString("otp_user"));
 				if( user == null )
+					user = Manager.of(Security.class).populate(data.asString("otp_user"));
+				if( user == null )
 				{
 					Common.Code.remove(params.asString("code"));
 					throw new HttpException(400, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));

@@ -209,7 +209,7 @@ public class Endpoints
 					 	// if no domain, then the current domain is used.
 						// ";domain=" + hostname +
 						";SameSite=Lax" +
-						";Secure;HttpOnly" +
+						";Secure" +
 						";max-age=" + Common.OP_ACCESS_TOKEN_TTL +
 						";expires=" + DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(Common.OP_ACCESS_TOKEN_TTL)) +
 						";path=" + path));
