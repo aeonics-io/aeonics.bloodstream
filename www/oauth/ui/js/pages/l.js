@@ -186,10 +186,12 @@ class LoginPage extends Page
 		}
 		else if( providers.length == 1 )
 		{
+			self.singleProvider = true;
 			self.rule_3(providers[0].login_redirect, providers[0].id);
 		}
 		else
 		{
+			self.singleProvider = false;
 			div.append(
 				Node.p(Translator.get("login.choose.provider")),
 				Node.p({className: 'onbehalf'}, Translator.get("login.provider", safeHtml(this.providerName))),
@@ -226,7 +228,7 @@ class LoginPage extends Page
 		[
 			Node.p(Translator.get("login.auth.password")),
 			Node.p({className: 'onbehalf'}, Translator.get("login.provider", safeHtml(this.providerName))),
-			!self.forced ? Node.p({className: 'back', click: function() { self.rule_2(); }}, Translator.get('login.choose.provider')) : null,
+			!self.forced && !self.singleProvider ? Node.p({className: 'back', click: function() { self.rule_2(); }}, Translator.get('login.choose.provider')) : null,
 			Node.input({type: 'text', id: 'form_login', placeholder: Translator.get('login.username')}),
 			Node.input({type: 'password', id: 'form_password', placeholder: Translator.get('login.password'), keydown: function(e) { if(this.value.length > 0 && (e.key === 'Enter' || e.keyCode === 13)) this.nextSibling.click(); }}),
 			Node.button({className: 'raised', click: function(e)

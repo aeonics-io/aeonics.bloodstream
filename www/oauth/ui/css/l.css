@@ -19,7 +19,7 @@ section.login::after { content: attr(data-ttl); position: absolute; bottom: 10vh
 #login_panel ul { margin: 0; padding: 0; list-style: none; width: 100%; overflow: hidden; }
 #login_panel li { display: block; white-space: nowrap; cursor: pointer; border-radius: 4rem; width: 100%; 
 	overflow: hidden; text-overflow: ellipsis; padding-right: 1.5rem;
-	position: relative; z-index: 1; }
+	position: relative; z-index: 1; color: var(--oauth-icon-text, var(--text)); }
 #login_panel li:not(:last-of-type) { margin-bottom: 1.5rem; }
 #login_panel p { font-size: 1.5rem; font-weight: 300; color: var(--oauth-text, var(--text)); }
 #login_panel p.error { font-size: 1rem; font-weight: 300; color: var(--oauth-error-text, #f00); text-align: center; padding: 2rem 0; }
@@ -31,7 +31,7 @@ section.login::after { content: attr(data-ttl); position: absolute; bottom: 10vh
 	background-repeat: no-repeat; background-position: center center; background-size: 2rem auto;
 }
 #login_panel li::after { 
-	display: inline-block; content: ''; position: absolute; left: 0; width: 3rem; z-index: -1;
+	display: inline-block; content: ''; position: absolute; left: 0; width: 3rem; z-index: -1; 
 	background-color: var(--oauth-icon-bg, #ddd); height: 3rem; border-radius: 3rem; transition: all ease 0.2s;
 }
 #login_panel li:hover::after { width: 100%; }

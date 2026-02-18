@@ -118,7 +118,7 @@ class MfaPage extends Page
 				Ajax.post("/oauth/otp/generate", {data: {code: self.code}}).then((response) =>
 				{
 					var m = null
-					var input = Node.input({type: 'text', placeholder: Translator.get('mfa.otp'), enter: function() { m.ok(); }});
+					var input = Node.input({type: 'text', placeholder: Translator.get('mfa.otp'), keydown: function(e) { if( e.key === 'Enter' ) { m.ok(); e.stopImmediatePropagation(); e.preventDefault(); return false; } }});
 					m = Modal.alert([
 						Translator.get('mfa.qrcode'),
 						Node.p({className: "qr"}, QRCode({msg: response.response.url, pad: 6, dim: 256, pal: ['#000', '#fff'], ecb: 0, ecl: 'M'})),

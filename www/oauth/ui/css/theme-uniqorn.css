@@ -43,6 +43,7 @@
 
 	/* Icon/avatar background color */
 	--oauth-icon-bg: #ddd;
+	--oauth-icon-text: var(--text);
 
 	/* Panel border radius */
 	--oauth-border-radius: 0;
