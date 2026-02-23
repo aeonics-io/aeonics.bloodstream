@@ -89,7 +89,8 @@ class LoginPage extends Page
 	
 	rule_1()
 	{
-		var tokens = JSON.parse(localStorage.getItem('tokens') || "[]");
+		// check both storages for existing tokens
+		var tokens = JSON.parse(localStorage.getItem('tokens') || sessionStorage.getItem('tokens') || "[]");
 		if( tokens.length == 0 )
 		{
 			this.hasAccounts = false;
@@ -98,6 +99,7 @@ class LoginPage extends Page
 		else
 		{
 			var self = this;
+			var storage = sessionStorage.getItem('remember') === 'true' ? localStorage : sessionStorage;
 			var identities = [];
 			tokens.forEach((t) => { identities.push(Ajax.post("/oauth/session", {data: {signin_token: t}})); });
 			Promise.allSettled(identities).then((responses) =>
@@ -109,7 +111,7 @@ class LoginPage extends Page
 					if( responses[i].status == "rejected" )
 					{
 						tokens.splice(j, 1);
-						localStorage.setItem('tokens', JSON.stringify(tokens));
+						storage.setItem('tokens', JSON.stringify(tokens));
 						j--;
 					}
 					else
@@ -121,7 +123,7 @@ class LoginPage extends Page
 						}
 					}
 				}
-				
+
 				if( ids.length == 0 ) { self.hasAccounts = false; self.rule_2(); }
 				else { this.hasAccounts = true; self.rule_1_display(ids); }
 			});

@@ -296,7 +296,8 @@ public class Main extends Plugin
 		{
 			// default oidc client and rp
 			RelyingParty.Type rp = new RelyingParty().template().create(Data.map().put("parameters", Data.map()
-				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response")))
+				.put("redirect_uri", Common.OP_ISSUER_URL + "/oidc/response")
+				.put("trusted_auto_consent", true)))
 				.addRelation("groups", Group.ADMINISTRATORS)
 				.addRelation("groups", Group.USERS)
 				.name(Manager.of(Config.class).get(RelyingParty.class, "name").asString())

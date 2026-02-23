@@ -60,11 +60,12 @@ class ConsentPage extends Page
 				return;
 			}
 			
-			var tokens = JSON.parse(localStorage.getItem('tokens') || "[]");
+			var storage = sessionStorage.getItem('remember') === 'true' ? localStorage : sessionStorage;
+			var tokens = JSON.parse(storage.getItem('tokens') || "[]");
 			if( !tokens.includes(response.response.signin_token) )
 			{
 				tokens.push(response.response.signin_token);
-				localStorage.setItem('tokens', JSON.stringify(tokens));
+				storage.setItem('tokens', JSON.stringify(tokens));
 			}
 			
 			self.code_epoch = response.response.epoch;

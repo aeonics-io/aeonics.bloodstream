@@ -28,6 +28,7 @@ public class RelyingParty extends Item<RelyingParty.Type>
 		
 		public boolean allowPasswordGrant() { return valueOf("allow_password_grant").asBool(); }
 		public boolean allowClientCredentialsGrant() { return valueOf("allow_client_credentials_grant").asBool(); }
+		public boolean trusted() { return valueOf("trusted_auto_consent").asBool(); }
 		
 		public boolean hasScope(String scope)
 		{
@@ -69,6 +70,12 @@ public class RelyingParty extends Item<RelyingParty.Type>
 			.add(new Parameter("allow_client_credentials_grant")
 				.summary("Allow Client Credentials Grant")
 				.description("Allow this client to use the OAuth2 Client Credentials Grant flow and authenticate as an app.")
+				.format(Parameter.Format.BOOLEAN)
+				.rule(Parameter.Rule.BOOLEAN)
+				.defaultValue(false))
+			.add(new Parameter("trusted_auto_consent")
+				.summary("Trusted Consent")
+				.description("When enabled, the user consent screen is skipped for this client. Use this for first-party applications only.")
 				.format(Parameter.Format.BOOLEAN)
 				.rule(Parameter.Rule.BOOLEAN)
 				.defaultValue(false))

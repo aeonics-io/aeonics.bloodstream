@@ -353,7 +353,7 @@ public class Endpoints
 					data.put("signin_token", Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, false, "signin").value());
 				Common.Code.put(code, data);
 				
-				if( Common.Consent.get(user.id() + "_" + data.asString("client")) != null )
+				if( c.trusted() || Common.Consent.get(user.id() + "_" + data.asString("client")) != null )
 				{
 					try { return consent.process(params.put("granted", true), user, request); }
 					catch(HttpException e) { throw e; }
@@ -451,7 +451,7 @@ public class Endpoints
 					data.put("signin_token", Manager.of(Security.class).generateToken(user, Common.OP_ACCESS_TOKEN_TTL * 1000L, false, "signin").value());
 				Common.Code.put(code, data);
 				
-				if( Common.Consent.get(user.id() + "_" + data.asString("client")) != null )
+				if( c.trusted() || Common.Consent.get(user.id() + "_" + data.asString("client")) != null )
 				{
 					try { return consent.process(params.put("granted", true), user, request); }
 					catch(HttpException e) { throw e; }
@@ -732,7 +732,7 @@ public class Endpoints
 		.create()
 		.<Endpoint.Rest.Type>cast()
 		.url("/oauth/userinfo")
-		.method("GET")
+		.method("POST")
 		;
 	
 	private static class session_ extends Endpoint.Rest.Type
@@ -844,7 +844,7 @@ public class Endpoints
 				return redirectResponse(Common.OP_ISSUER_URL + "/oauth/ui/login?code=" + code);
 			else
 			{
-				if( Common.Consent.get(user.id() + "_" + c.id()) != null )
+				if( c.trusted() || Common.Consent.get(user.id() + "_" + c.id()) != null )
 				{
 					try { return consent.process(params.put("granted", true), user, request); }
 					catch(HttpException e) { throw e; }
