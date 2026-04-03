@@ -283,7 +283,7 @@ public class Endpoints
 			if( _userId != null && Manager.of(Security.class).isLocked(_userId) )
 			{
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Invalid credentials", data.asString("state"), data.asString("flow").equals("implicit"));
+				return redirectError(c, "access_denied", "Invalid credentials. 429.", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 
 			user = User.ANONYMOUS;
@@ -310,7 +310,7 @@ public class Endpoints
 			{
 				if( _userId != null ) Manager.of(Security.class).recordFailedAuthentication(_userId);
 				Common.Code.remove(code);
-				return redirectError(c, "access_denied", "Invalid credentials", data.asString("state"), data.asString("flow").equals("implicit"));
+				return redirectError(c, "access_denied", "Invalid credentials. 403.", data.asString("state"), data.asString("flow").equals("implicit"));
 			}
 
 			Manager.of(Security.class).recordSuccessfulAuthentication(user.id());
