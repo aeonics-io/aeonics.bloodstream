@@ -155,7 +155,8 @@ class LoginPage extends Page
 		
 		Ajax.get("/oidc/local").then((local) =>
 		{
-			self.forced = self.forced || localStorage.getItem('force_provider');
+			self.forced = self.forced || sessionStorage.getItem('force_provider');
+			sessionStorage.removeItem('force_provider');
 			Ajax.get("/oidc/providers" + (!!self.forced?'?force='+self.forced:'')).then((response) =>
 			{
 				self.rule_2_display(response.response.filter((p) => p.id != local.response.id));
