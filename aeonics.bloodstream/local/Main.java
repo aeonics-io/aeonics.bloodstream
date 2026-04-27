@@ -36,7 +36,7 @@ import aeonics.template.Parameter;
 
 public class Main extends Plugin
 {
-	public String summary() { return "Bloodstream v0.1"; }
+	public String summary() { return "Bloodstream v1.0.0"; }
 	public String description() { return "Aeonics Bloodstream Enterprise Suite"; }
 	
 	public void start()
