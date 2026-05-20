@@ -132,7 +132,7 @@ public class Snapshots
 			else zip = params.asString("zip").getBytes(StandardCharsets.ISO_8859_1);
 
 			try { Manager.of(Snapshot.class).upload(zip); }
-			catch(Exception e) { throw new HttpException(413, e); }
+			catch(Exception e) { throw new HttpException(422, e); }
 			return Data.map().put("success", true);
 		})
 		.url("/api/admin/snapshot/upload")

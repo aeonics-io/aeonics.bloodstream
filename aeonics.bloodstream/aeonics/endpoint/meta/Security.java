@@ -117,7 +117,7 @@ public class Security
 			if( !params.isMap("context") )
 				params.put("context", Json.decode(params.asString("context")));
 			if( !params.isMap("context") )
-				throw new HttpException(413, "Invalid context");
+				throw new HttpException(422, "Invalid context");
 			
 			boolean denied = Manager.of(aeonics.manager.Security.class).isExplicitlyDenied(user, params.asString("scope"), params.get("context"));
 			boolean allowed = Manager.of(aeonics.manager.Security.class).isExplicitlyAllowed(user, params.asString("scope"), params.get("context"));

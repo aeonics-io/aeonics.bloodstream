@@ -635,10 +635,10 @@ public class Endpoints
 			
 			String code = params.asString("code");
 			if( code.isBlank() )
-				throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+				throw new HttpException(422, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
 			
 			Data data = Common.Code.get(code);
-			if( data == null ) throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
+			if( data == null ) throw new HttpException(422, Data.map().put("error", "invalid_request").put("error_description", "Invalid code"));
 			
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(data.asString("client"));
 			if( c == null )
@@ -790,7 +790,7 @@ public class Endpoints
 
 			RelyingParty.Type c = Registry.of(RelyingParty.class).get(params.asString("client_id"));
 			if( c == null )
-				throw new HttpException(413, Data.map().put("error", "invalid_request").put("error_description", "Invalid relying party client_id"));
+				throw new HttpException(422, Data.map().put("error", "invalid_request").put("error_description", "Invalid relying party client_id"));
 			
 			boolean is_openid = params.asString("scope").contains("openid");
 			String response_type = params.asString("response_type");

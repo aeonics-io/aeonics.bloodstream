@@ -44,7 +44,7 @@ public class Storage
 		.process((params, user) ->
 		{
 			Database.Type db = Registry.of(Database.class).get(params.asString("id"));
-			if( db == null ) throw new HttpException(413, "Unknown database");
+			if( db == null ) throw new HttpException(422, "Unknown database");
 			
 			return db.query(params.asString("sql"));
 		})
@@ -74,7 +74,7 @@ public class Storage
 		.process((params, user) ->
 		{
 			aeonics.entity.Storage.Type s = Registry.of(aeonics.entity.Storage.class).get(params.asString("id"));
-			if( s == null ) throw new HttpException(413, "Unknown storage");
+			if( s == null ) throw new HttpException(422, "Unknown storage");
 			
 			return Data.of(s.tree(params.asString("path")));
 		})
@@ -110,7 +110,7 @@ public class Storage
 		.process((params, user) ->
 		{
 			aeonics.entity.Storage.Type s = Registry.of(aeonics.entity.Storage.class).get(params.asString("id"));
-			if( s == null ) throw new HttpException(413, "Unknown storage");
+			if( s == null ) throw new HttpException(422, "Unknown storage");
 			
 			byte[] file = null;
 			if( params.isMap("file") ) file = params.get("file").asString("content").getBytes(StandardCharsets.ISO_8859_1);
@@ -121,7 +121,7 @@ public class Storage
 			{
 				// path is a directory
 				if( !params.isMap("file") || params.get("file").isEmpty("name") )
-					throw new HttpException(413, "Missing file name, target path is a directory");
+					throw new HttpException(422, "Missing file name, target path is a directory");
 				if( !path.endsWith("/") ) path += "/";
 				path += Path.of(params.get("file").asString("name")).normalize().getFileName();
 			}
@@ -154,7 +154,7 @@ public class Storage
 		.process((params, user) ->
 		{
 			aeonics.entity.Storage.Type s = Registry.of(aeonics.entity.Storage.class).get(params.asString("id"));
-			if( s == null ) throw new HttpException(413, "Unknown storage");
+			if( s == null ) throw new HttpException(422, "Unknown storage");
 			
 			String filename = Path.of(params.asString("path")).normalize().getFileName().toString();
 			
@@ -190,7 +190,7 @@ public class Storage
 		.process((params, user) ->
 		{
 			aeonics.entity.Storage.Type s = Registry.of(aeonics.entity.Storage.class).get(params.asString("id"));
-			if( s == null ) throw new HttpException(413, "Unknown storage");
+			if( s == null ) throw new HttpException(422, "Unknown storage");
 			
 			s.remove(params.asString("path"));
 			return null;

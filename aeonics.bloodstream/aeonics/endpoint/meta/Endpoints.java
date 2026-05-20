@@ -412,11 +412,11 @@ public class Endpoints
 			if( !parameters.isMap("data") )
 				parameters.put("data", Json.decode(parameters.asString("data")));
 			if( !parameters.isMap("data") )
-				throw new HttpException(413, "Input data must be a json object");
+				throw new HttpException(422, "Input data must be a json object");
 			
 			Template<?> t = Factory.of(parameters.asString("category")).get(parameters.asString("type"));
 			if( t == null )
-				throw new HttpException(413, "Unknown entity template");
+				throw new HttpException(422, "Unknown entity template");
 			
 			Entity e = t.create(parameters.get("data"));
 			return Data.map().put("id", e.id());
@@ -458,7 +458,7 @@ public class Endpoints
 			if( !parameters.isMap("data") )
 				parameters.put("data", Json.decode(parameters.asString("data")));
 			if( !parameters.isMap("data") )
-				throw new HttpException(413, "Input data must be a json object");
+				throw new HttpException(422, "Input data must be a json object");
 			
 			Factory.of(e).update(parameters.get("data"), e);
 			return null; 

@@ -286,7 +286,7 @@ public class Flows
 				if( !parameters.isMap("data") )
 					parameters.put("data", Json.decode(parameters.asString("data")));
 				if( !parameters.isMap("data") )
-					throw new HttpException(413, "Input data must be a json object");
+					throw new HttpException(422, "Input data must be a json object");
 				
 				Data data = parameters.get("data");
 				if( data.containsKey("size") )

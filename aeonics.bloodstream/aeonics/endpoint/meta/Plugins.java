@@ -45,7 +45,7 @@ public class Plugins
 		.process((params, user, request) ->
 		{
 			if( !params.isMap("file") || params.get("file").isEmpty("name") || params.get("file").isEmpty("content") )
-				throw new HttpException(413, "Invalid plugin file");
+				throw new HttpException(422, "Invalid plugin file");
 			
 			try
 			{
@@ -58,7 +58,7 @@ public class Plugins
 				
 				Files.write(p.resolve(f), jar);
 			}
-			catch(Exception e) { throw new HttpException(413, e); }
+			catch(Exception e) { throw new HttpException(422, e); }
 			return Data.map().put("success", true);
 		})
 		.url(ROOT + "plugin")
@@ -88,7 +88,7 @@ public class Plugins
 				if( !Files.isRegularFile(p) ) throw new IllegalArgumentException("Target plugin does not exist");
 				Files.delete(p);
 			}
-			catch(IllegalArgumentException e) { throw new HttpException(413, e); }
+			catch(IllegalArgumentException e) { throw new HttpException(422, e); }
 			return Data.map().put("success", true);
 		})
 		.url(ROOT + "plugin/{file}")
