@@ -109,7 +109,7 @@ public class Security
 			.optional(true)
 			.rule(Parameter.Rule.JSON_MAP)
 			.format(Parameter.Format.JSON)
-			.defaultValue(Data.map()))
+			.defaultValue(() -> Data.map()))
 		.create()
 		.<Rest.Type>cast()
 		.process((params, user, request) ->

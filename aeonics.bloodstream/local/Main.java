@@ -133,17 +133,17 @@ public class Main extends Plugin
 			.summary("OIDC OP JWT public key")
 			.description("The public key used by this OIDC OP to verify the JWT signature. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.empty()));
+			.defaultValue(() -> Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.jwt.private")
 			.summary("OIDC OP JWT private key")
 			.description("The private key used by this OIDC OP to sign the JWT. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.empty()));
+			.defaultValue(() -> Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.storage")
 			.summary("OIDC OP storage")
 			.description("The name or id of the storage for this OIDC OP. If the storage does not exist, a local temporary (ouf-of-storage) location is used instead.")
 			.format(Parameter.Format.TEXT)
-			.defaultValue(Data.empty()));
+			.defaultValue(() -> Data.empty()));
 		c.declare(Security.class, new Parameter("local.provider")
 			.summary("Local OIDC identity provider")
 			.description("The ID of the local OIDC OP. This parameter is set automatically by the system on startup and should not be changed.")

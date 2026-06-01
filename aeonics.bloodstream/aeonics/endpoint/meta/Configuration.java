@@ -28,7 +28,7 @@ public class Configuration
 			.description("The entity filter allows to return all configuration parameters related to a specific entity type. If not specified, all entity types a returned.")
 			.format(Parameter.Format.TEXT)
 			.optional(true)
-			.defaultValue(Data.empty()))
+			.defaultValue(() -> Data.empty()))
 		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
@@ -129,7 +129,7 @@ public class Configuration
 			.description("The configuration parameter value.")
 			.format(Parameter.Format.TEXT)
 			.optional(true)
-			.defaultValue(Data.empty()))
+			.defaultValue(() -> Data.empty()))
 		.create()
 		.<Rest.Type>cast()
 		.process((params, user) ->
