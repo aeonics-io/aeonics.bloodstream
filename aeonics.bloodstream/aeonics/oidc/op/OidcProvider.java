@@ -103,7 +103,20 @@ public class OidcProvider extends Provider
 			}
 			if( !jwks.isList() ) throw new RuntimeException("Invalid jwks file");
 		}
-		
+
+		/**
+		 * Invalidates the cached OIDC discovery document and JWKS so they are refetched
+		 * from the {@code wellknown} url on next use.
+		 */
+		public void refresh()
+		{
+			synchronized(this)
+			{
+				urls = null;
+				jwks = null;
+			}
+		}
+
 		public String issuer() { fetchWellKnownIfNeeded(); return urls.asString("issuer"); }
 		public String autorizeUrl() { fetchWellKnownIfNeeded(); return urls.asString("authorization_endpoint"); }
 		public String tokenUrl() { fetchWellKnownIfNeeded(); return urls.asString("token_endpoint"); }
@@ -153,7 +166,7 @@ public class OidcProvider extends Provider
 		public String clientSecret() { return valueOf("client_secret").asString(); }
 		public String loginPageRedirectUrl() { return Common.OP_ISSUER_URL + "/oidc/login?provider=" + id(); }
 		public String redirectUri() { return Common.OP_ISSUER_URL + "/oidc/response"; }
-		
+
 		public boolean supports(String user)
 		{
 			if( user == null ) return false;

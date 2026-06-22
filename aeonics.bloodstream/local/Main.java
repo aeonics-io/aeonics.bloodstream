@@ -17,6 +17,7 @@ import aeonics.entity.Registry;
 import aeonics.entity.Storage;
 import aeonics.entity.security.Group;
 import aeonics.entity.security.Policy;
+import aeonics.entity.security.Provider;
 import aeonics.entity.security.Role;
 import aeonics.entity.security.Rule;
 import aeonics.manager.Config;
@@ -196,7 +197,27 @@ public class Main extends Plugin
 	{
 		// bind the config
 		Config c = Manager.of(Config.class);
-		c.watch(Security.class, "oidcissuer", (key, value) -> Common.OP_ISSUER_URL = value.asString());
+		c.watch(Security.class, "oidcissuer", (key, value) ->
+		{
+			Common.OP_ISSUER_URL = value.asString();
+			String issuer = value.asString();
+			
+			// the local self-provider and its relying party track the platform issuer
+			String localProviderId = Manager.of(Config.class).get(Security.class, "local.provider").asString();
+			if( !localProviderId.isBlank() )
+			{
+				OidcProvider.Type provider = Registry.of(Provider.class).get(localProviderId);	
+				if( provider != null )
+				{
+					provider.parameter("wellknown", issuer + "/.well-known/openid-configuration");
+					provider.refresh();
+					
+					RelyingParty.Type rp = Registry.of(RelyingParty.class).get(provider.clientId());
+					if( rp != null )
+						rp.parameter("redirect_uri", issuer + "/oidc/response");
+				}
+			}
+		});
 		c.watch(Security.class, "oidc.op.access_token.ttl", (key, value) -> Common.OP_ACCESS_TOKEN_TTL = value.asLong());
 		c.watch(Security.class, "oidc.op.id_token.ttl", (key, value) -> Common.OP_ID_TOKEN_TTL = value.asLong());
 		c.watch(Security.class, "oidc.op.refresh_token.ttl", (key, value) -> Common.OP_REFRESH_TOKEN_TTL = value.asLong());
