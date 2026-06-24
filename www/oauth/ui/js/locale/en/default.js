@@ -32,6 +32,7 @@ export default {
 	'login.provider': "Login requested by: {}",
 	'login.auth.password': "Password authentication",
 	'login.login': "Sign in",
+	'login.retry': "Try again",
 	'login.username': "Username",
 	'login.password': "Password",
 	

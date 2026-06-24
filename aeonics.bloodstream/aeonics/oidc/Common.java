@@ -116,12 +116,25 @@ public class Common
 					}
 				});
 				
-				Common.Consent.local.entrySet().removeIf((c) -> 
+				Common.Consent.local.entrySet().removeIf((c) ->
 				{
 					if( c == null ) return true;
-					
+
 					long left = (c.getValue().asLong("_time") + OP_REFRESH_TOKEN_TTL*1000) - now;
-					
+
+					if( left <= 0 ) return true;
+					else
+					{
+						min.set(Math.min(min.get(), left));
+						return false;
+					}
+				});
+
+				Common.AppCode.local.entrySet().removeIf((t) ->
+				{
+					if( t == null ) return true;
+					long left = (t.getValue().asLong("_time") + OP_AUTH_CODE_TTL*1000) - now;
+
 					if( left <= 0 ) return true;
 					else
 					{
@@ -158,10 +171,21 @@ public class Common
 				{
 					Data m = storage.getData(consent);
 					if( m == null || m.isEmpty() ) continue;
-					
+
 					long left = (m.asLong("_time") + OP_REFRESH_TOKEN_TTL*1000) - now;
-					
+
 					if( left <= 0 ) storage.remove(consent);
+					else min.set(Math.min(min.get(), left));
+				}
+
+				for( String code : storage.list(Common.AppCode.path) )
+				{
+					Data m = storage.getData(code);
+					if( m == null || m.isEmpty() ) continue;
+
+					long left = (m.asLong("_time") + OP_AUTH_CODE_TTL*1000) - now;
+
+					if( left <= 0 ) storage.remove(code);
 					else min.set(Math.min(min.get(), left));
 				}
 			}
@@ -333,6 +357,124 @@ public class Common
 				return storage.tree(path).size();
 			else
 				return local.size();
+		}
+	}
+
+	/**
+	 * Persistent registry of public client applications registered against the RP (identity broker).
+	 * Each entry is keyed by client_id and is durable: it is never expired by the timeout tracker.
+	 */
+	public static class App
+	{
+		private App() { /* no instances */ }
+
+		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
+
+		public static String path = "app/";
+
+		public static void put(String clientId, Data registration)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + clientId, registration);
+			else
+				local.put(clientId, registration);
+		}
+
+		public static Data get(String clientId)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + clientId);
+				if( m == null || m.length == 0 ) return null;
+				return Json.decode(new String(m));
+			}
+			else
+				return local.get(clientId);
+		}
+
+		public static Data remove(String clientId)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + clientId);
+				if( m == null ) return null;
+
+				storage.remove(path + clientId);
+				return Json.decode(new String(m));
+			}
+			else
+				return local.remove(clientId);
+		}
+
+		public static Data list()
+		{
+			Data result = Data.list();
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				for( String key : storage.list(path) )
+				{
+					Data m = storage.getData(key);
+					if( m == null || m.isEmpty() ) continue;
+					result.add(m);
+				}
+			}
+			else
+				for( Data m : local.values() ) result.add(m);
+			return result;
+		}
+	}
+
+	/**
+	 * Short-lived one-time authorization codes issued by the RP to registered apps for the PKCE handoff.
+	 * Entries are single-use and expire after OP_AUTH_CODE_TTL.
+	 */
+	public static class AppCode
+	{
+		private AppCode() { /* no instances */ }
+
+		static ConcurrentHashMap<String, Data> local = new ConcurrentHashMap<>();
+
+		public static String path = "appcode/";
+
+		public static void put(String code, Data state)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+				storage.put(path + code, state);
+			else
+				local.put(code, state);
+		}
+
+		public static Data get(String code)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + code);
+				if( m == null || m.length == 0 ) return null;
+				return Json.decode(new String(m));
+			}
+			else
+				return local.get(code);
+		}
+
+		public static Data remove(String code)
+		{
+			Storage.Type storage = storage();
+			if( storage != null )
+			{
+				byte[] m = storage.get(path + code);
+				if( m == null ) return null;
+
+				storage.remove(path + code);
+				return Json.decode(new String(m));
+			}
+			else
+				return local.remove(code);
 		}
 	}
 }

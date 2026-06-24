@@ -32,7 +32,8 @@ public class OidcProvider extends Provider
 			if( urls != null && urls.isMap() ) return;
 			synchronized(this)
 			{
-				urls = Http.get(valueOf("wellknown").asString());
+				String url = valueOf("wellknown").asString();
+				urls = Http.get(url, null, null, "GET", 0, url.startsWith(Common.OP_ISSUER_URL) ? Http.trustAll() : null);
 			}
 			
 			if( !urls.isMap() ) throw new RuntimeException("Invalid /.well-known/openid-configuration file");
@@ -98,7 +99,8 @@ public class OidcProvider extends Provider
 			fetchWellKnownIfNeeded();
 			synchronized(this)
 			{
-				jwks = Http.get(urls.asString("jwks_uri"));
+				String url = urls.asString("jwks_uri");
+				jwks = Http.get(url, null, null, "GET", 0, url.startsWith(Common.OP_ISSUER_URL) ? Http.trustAll() : null);
 				jwks = jwks.get("keys");
 			}
 			if( !jwks.isList() ) throw new RuntimeException("Invalid jwks file");

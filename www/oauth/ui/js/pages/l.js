@@ -36,8 +36,19 @@ class LoginPage extends Page
 	async show()
 	{
 		this.code = urlValue('code');
-		
 		this.dom.classList.add('login');
+
+		var oidcError = urlValue('oidc_error');
+		if( oidcError )
+		{
+			var self = this;
+			this.dom.appendChild(Node.div({id: 'login_panel'}, [
+				Node.p({className: 'error'}, Translator.get('error.class.' + oidcError)),
+				Node.p({className: 'back', click: function() { location.href = 'login?code=' + encodeURIComponent(self.code); }}, Translator.get('login.retry'))
+			]));
+			return Promise.resolve();
+		}
+
 		this.dom.appendChild(Node.div({className: 'wait', id: 'login_panel'}));
 		var self = this; setTimeout(function() { self.rule_0(); }, 1);
 		return Promise.resolve();

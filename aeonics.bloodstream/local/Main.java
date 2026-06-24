@@ -23,6 +23,7 @@ import aeonics.entity.security.Rule;
 import aeonics.manager.Config;
 import aeonics.manager.Lifecycle;
 import aeonics.manager.Lifecycle.Phase;
+import aeonics.manager.Logger;
 import aeonics.manager.Manager;
 import aeonics.manager.Monitor;
 import aeonics.manager.Security;
@@ -137,7 +138,9 @@ public class Main extends Plugin
 			.defaultValue(() -> Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.jwt.private")
 			.summary("OIDC OP JWT private key")
-			.description("The private key used by this OIDC OP to sign the JWT. The key should be provided in PEM-encoded base64 format. It may be the path to a local file.")
+			.description("The private key used by this OIDC OP to sign the JWT. Leave this value empty to let the system generate and manage the key in the vault (recommended). "
+				+ "It may be the path to a local PEM-encoded file managed outside of the system. If a PEM-encoded base64 key is provided directly, "
+				+ "it is moved to the vault and cleared from the config.")
 			.format(Parameter.Format.TEXT)
 			.defaultValue(() -> Data.empty()));
 		c.declare(Security.class, new Parameter("oidc.op.storage")
@@ -237,30 +240,51 @@ public class Main extends Plugin
 						k.replaceAll("\\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "")))
 				);
 		});
-		c.watch(Security.class, "oidc.op.jwt.private", (key, value) -> 
+		c.watch(Security.class, "oidc.op.jwt.private", (key, value) ->
 		{
 			if( value.isEmpty() )
 			{
-				// generate a new key now
-				KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-	            keyGen.initialize(4096);
-	            KeyPair pair = keyGen.generateKeyPair();
-	            
-	            // set the config -> re-trigger the watch
-	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.public", new String(Base64.getEncoder().encode(pair.getPublic().getEncoded())));
-	            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.private", new String(Base64.getEncoder().encode(pair.getPrivate().getEncoded())));
+				// the private key lives encrypted in the vault so that it never appears in the config or snapshot in clear form
+				Data stored = Manager.of(Vault.class).get("oidc.op.jwt.private");
+				if( stored == null || stored.isEmpty() )
+				{
+					// generate a new key now
+					KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+		            keyGen.initialize(4096);
+		            KeyPair pair = keyGen.generateKeyPair();
+
+		            stored = Data.of(new String(Base64.getEncoder().encode(pair.getPrivate().getEncoded())));
+		            Manager.of(Vault.class).set("oidc.op.jwt.private", stored);
+		            Manager.of(Config.class).set(Security.class, "oidc.op.jwt.public", new String(Base64.getEncoder().encode(pair.getPublic().getEncoded())));
+				}
+
+				Common.OP_PRIVATE_KEY = KeyFactory.getInstance("RSA").generatePrivate(
+					new PKCS8EncodedKeySpec(
+						Base64.getDecoder().decode(
+							stored.asString().replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")))
+					);
 			}
-			else
+			else if( Files.isRegularFile(Paths.get(value.asString())) )
 			{
-				String k = value.asString();
-				if( Files.isRegularFile(Paths.get(k)) )
-					k = new String(Files.readAllBytes(Paths.get(k)));
+				// operator-provided key file, managed outside of the config and snapshot
+				String k = new String(Files.readAllBytes(Paths.get(value.asString())));
 
 				Common.OP_PRIVATE_KEY = KeyFactory.getInstance("RSA").generatePrivate(
 					new PKCS8EncodedKeySpec(
 						Base64.getDecoder().decode(
 							k.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")))
 					);
+			}
+			else
+			{
+				// inline key in the config: move it to the vault and wipe it from the config so that it stops
+				// being included in snapshots. The key value is preserved so that issued tokens remain valid.
+				Manager.of(Vault.class).set("oidc.op.jwt.private", Data.of(
+					value.asString().replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "")));
+				// re-triggers the watch -> the key is loaded from the vault
+				Manager.of(Config.class).set(Security.class, "oidc.op.jwt.private", "");
+				Manager.of(Logger.class).warning(Security.class, "The OIDC OP private key was moved from the config to the vault. "
+					+ "Snapshots taken before this point still contain the key: consider rotating it.");
 			}
 		});
 		Manager.of(Timeout.class).watch(Common.tracker);

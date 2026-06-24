@@ -806,23 +806,23 @@ public class Endpoints
 				case "code id_token":       // hybrid
 				case "code token":          // hybrid
 				case "code id_token token": // hybrid
-					if( !is_openid ) return redirectError(c, "invalid_scope", "Missing openid scope", params.asString("scope"), flow.equals("implicit"));
+					if( !is_openid ) return redirectError(c, "invalid_scope", "Missing openid scope", params.asString("state"), flow.equals("implicit"));
 				case "code":                // normal
 				case "token":               // implicit
 					break;
 				default:
-					return redirectError(c, "unsupported_response_type", "Invalid response_type", params.asString("scope"), flow.equals("implicit"));
+					return redirectError(c, "unsupported_response_type", "Invalid response_type", params.asString("state"), flow.equals("implicit"));
 			}
 			
 			
 			String redirectUri = params.asString("redirect_uri");
 			if( !redirectUri.isBlank() && !redirectUri.equals(c.redirectUri()) )
-				return redirectError(c, "invalid_request", "Invalid redirect_uri", params.asString("scope"), flow.equals("implicit"));
+				return redirectError(c, "invalid_request", "Invalid redirect_uri", params.asString("state"), flow.equals("implicit"));
 			else
 				redirectUri = c.redirectUri();
 			
 			if( response_type.contains("id_token") && params.isEmpty("nonce") )
-				return redirectError(c, "invalid_request", "Missing nonce", params.asString("scope"), flow.equals("implicit"));
+				return redirectError(c, "invalid_request", "Missing nonce", params.asString("state"), flow.equals("implicit"));
 			
 			String code = Manager.of(Security.class).randomHash();
 			
