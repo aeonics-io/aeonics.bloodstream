@@ -60,7 +60,7 @@ The OAuth UI supports CSS custom properties for easy theming. The default theme 
 /* custom-theme.css */
 :root {
     /* Light theme with pink accent (Manager/Instance style) */
-    --oauth-bg: url('../images/b2.jpg');
+    --oauth-bg: url('../images/background.webp');
     --oauth-panel-bg: #ffffff;
     --oauth-text: #333333;
     --oauth-text-secondary: #999999;
@@ -87,7 +87,7 @@ Already applied by default. Dark background with orange accents.
 ### Manager/Instance Light Theme
 ```css
 :root {
-    --oauth-bg: url('../images/b2.jpg');
+    --oauth-bg: url('../images/background.webp');
     --oauth-panel-bg: #ffffff;
     --oauth-text: #333333;
     --oauth-accent: #d75d7f;

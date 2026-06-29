@@ -10,7 +10,7 @@
 
 :root {
 	/* Page background (can be color or image) */
-	--oauth-bg: var(--white) url(../images/b2.jpg) center / cover fixed;
+	--oauth-bg: var(--white) url(../images/background.webp) center / cover fixed;
 
 	/* Login/consent/error panel background */
 	--oauth-panel-bg: var(--background);
