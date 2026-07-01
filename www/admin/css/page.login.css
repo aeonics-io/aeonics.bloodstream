@@ -34,3 +34,4 @@ section.login {
 #login_panel li.provider::before { background-image: url('../images/provider.svg'); }
 
 #login_panel .warning { font-size: 1rem; font-weight: 300; color: #777; text-align: left; padding-bottom: 30px; }
+#login_panel label { display: block; }

@@ -28,8 +28,8 @@ section.security section .detail { padding: 1rem 1rem 2rem 1rem; }
 section.security section .detail p { padding: 0.5rem 0; display: flex; }
 section.security section .detail .title, section.security section .detail .value, section.security section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
 section.security section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
-section.security section .detail .text { color: var(--orange); flex: 1; }
-section.security section .detail .value { color: var(--blue); font-family: monospace; flex: 1; }
+section.security section .detail .text { color: var(--accent); flex: 1; }
+section.security section .detail .value { color: var(--accent2); font-family: monospace; flex: 1; }
 section.security section .detail .value .tag { 
 	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
 	margin-right: 0.5rem; margin-bottom: 0.2rem; color: #ccc;

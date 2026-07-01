@@ -18,12 +18,12 @@ section.esg .card p {
 }
 section.esg .card > div {
 	display: flex; border-radius: 0.5rem;
-	background-color: var(--orange);
+	background-color: var(--accent);
 	font-size: 1.2rem;
 }
 section.esg .card > div.negative { background-color: #D21D50; }
 section.esg .card > div.positive { background-color: #29C64B; }
-section.esg .card > div.blue { background-color: var(--blue); }
+section.esg .card > div.blue { background-color: var(--accent2); }
 section.esg .card .icon {
 	background-color: #00000000;
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;

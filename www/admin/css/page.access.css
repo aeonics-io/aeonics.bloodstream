@@ -25,7 +25,7 @@ section.access .search .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.access .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+section.access .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }
 section.access .tabcontent { position: relative; }
 section.access .tabcontent > .action { text-align: right; }
 section.access .tabcontent > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
@@ -39,7 +39,7 @@ section.access .tabcontent li {
 	display: inline-block; padding: 0.5rem 1rem; margin: 0.3rem; border: 1px solid #fff3; border-radius: 2rem; background-color: var(--black);
 	cursor: pointer;
 }
-section.access .tabcontent li:hover { border-color: var(--blue); color: var(--blue); }
+section.access .tabcontent li:hover { border-color: var(--accent2); color: var(--accent2); }
 
 #tab_security_targets li::before {
 	display: inline-block; margin-right: 0.5rem;
@@ -80,4 +80,4 @@ section.access .tabcontent li:hover { border-color: var(--blue); color: var(--bl
 #policyList section .detail .value, .configInfo .value,
 #policyList section .detail .text, .configInfo .text { display: inline-block; font-size: 0.8rem; vertical-align: top; word-break: break-word; }
 #policyList section .detail .title, .configInfo .title { width: 30%; min-width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
-#policyList section .detail .text, .configInfo .text { color: var(--orange); flex: 1; }
+#policyList section .detail .text, .configInfo .text { color: var(--accent); flex: 1; }

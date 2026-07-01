@@ -25,7 +25,7 @@ section.endpoints .search .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.endpoints .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+section.endpoints .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }
 
 #endpoint_list section { 
 	background: #ffffff10;
@@ -75,12 +75,12 @@ section.endpoints .search input:focus + .icon { color: var(--blue); border-botto
 	display: inline-block; font-size: 0.8rem; vertical-align: top; }
 #endpoint_list .detail .title, .parameterInfo .title { width: 10rem; color: #ffffff; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
 #endpoint_list .detail .value, .parameterInfo .value { color: #ffffffa0; font-family: monospace; flex: 1; }
-#endpoint_list .detail .text, .parameterInfo .text { color: var(--orange); flex: 1; }
+#endpoint_list .detail .text, .parameterInfo .text { color: var(--accent); flex: 1; }
 #endpoint_list .detail .value .tag { 
 	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
-	margin-right: 0.5rem; margin-bottom: 0.2rem; color: var(--blue); cursor: pointer;
+	margin-right: 0.5rem; margin-bottom: 0.2rem; color: var(--accent2); cursor: pointer;
 }
-.parameterInfo h2 { text-align: center !important; color: var(--blue); }
+.parameterInfo h2 { text-align: center !important; color: var(--accent2); }
 #endpoint_list button { width: auto; display: inline-block; margin-right: 0.5rem; }
 
 .endpoint_auth { padding-left: 3rem; white-space: nowrap; }

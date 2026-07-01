@@ -11,7 +11,7 @@ section.metrics > h1 + p { text-align: justify; padding: 0 4rem 3rem 4rem; }
 section.metrics .metrics_status.connected { color: var(--green); }
 section.metrics .metrics_status.disconnected { color: var(--red); }
 section.metrics .metrics_status.disconnected + div { display: none; }
-section.metrics .metrics_time { color: var(--blue); }
+section.metrics .metrics_time { color: var(--accent2); }
 
 section.metrics .action { text-align: right; }
 section.metrics .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
@@ -49,4 +49,4 @@ section.metrics .metrics_list li:hover { background-color: #fff1; }
 .metrics_table tbody tr:nth-child(even)  { background-color: #fff1; }
 .metrics_table tbody tr:nth-child(odd) { background-color: transparent; }
 .metrics_table tbody tr:hover { background-color: #36B0FB50; }
-.metrics_table tbody a { color: var(--blue); }
+.metrics_table tbody a { color: var(--accent2); }

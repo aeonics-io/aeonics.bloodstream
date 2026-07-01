@@ -23,13 +23,13 @@ section.me section.open > div { height: auto; overflow: auto; }
 
 section.me section .detail { padding: 1rem 1rem 2rem 1rem; }
 section.me section .detail p { padding: 0.5rem 0; display: flex; }
-section.me section .detail a { color: var(--blue); }
+section.me section .detail a { color: var(--accent2); }
 section.me section .detail .title, section.me section .detail .value, section.me section .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
 section.me section .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
 section.me section .detail .text { color: var(--white); flex: 1; }
-section.me section .detail .value { color: var(--orange); font-family: monospace; flex: 1; }
+section.me section .detail .value { color: var(--accent); font-family: monospace; flex: 1; }
 section.me section .detail .value .tag { 
 	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
 	margin-right: 0.5rem; margin-bottom: 0.2rem; color: #ccc; text-decoration: none;
 }
-section.me section .detail .value .tag:hover { color: var(--blue); }
+section.me section .detail .value .tag:hover { color: var(--accent2); }

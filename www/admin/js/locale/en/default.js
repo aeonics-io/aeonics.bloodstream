@@ -25,7 +25,9 @@ export default {
 	'login.no_access': "Unfortunately you do not have access to this application. Please login with another user.",
 	'login.required': "Authentication required",
 	'login.login': "Login",
+	'login.remember': "Remember me",
 	'login.error.fetch': "The required information could not be fetched at this time. Please try again or contact your system administrator.",
+	'login.error.auth': "Authentication failed. Please try again.",
 	
 	'fetch.error': "Communication with the server failed.",
 	

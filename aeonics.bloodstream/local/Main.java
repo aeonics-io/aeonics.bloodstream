@@ -47,6 +47,33 @@ public class Main extends Plugin
 		Lifecycle.on(Phase.CONFIG, this::onConfig);
 		Lifecycle.on(Phase.RUN, this::onRun);
 		Lifecycle.after(Phase.RUN, this::afterRun);
+		Lifecycle.after(Phase.RUN, this::registerApps);
+	}
+
+	// the admin panel is a public PKCE client of the relying party; the broker looks up the
+	// redirect_uri from this registration so the panel login.js only has to send the client_id
+	private static final String ADMIN_CLIENT_ID = "30aabe1e047a9c371bffebe48da239870f78434e8486ef19753ae3929ad959a9";
+
+	private void registerApps()
+	{
+		aeonics.http.Endpoint.Type ep = Registry.of(aeonics.http.Endpoint.class).get("POST /api/admin/oidc/app");
+		if( ep == null )
+		{
+			Manager.of(Logger.class).warning(Security.class, "App registration endpoint unavailable; /admin app not registered");
+			return;
+		}
+
+		try
+		{
+			ep.<aeonics.http.Endpoint.Rest.Type>cast().process(Data.map()
+				.put("client_id", ADMIN_CLIENT_ID)
+				.put("redirect_uri", "/admin")
+				.put("name", "Bloodstream Admin"));
+		}
+		catch(Exception e)
+		{
+			Manager.of(Logger.class).warning(Security.class, "Could not register /admin app: " + e.getMessage());
+		}
 	}
 	
 	private void onLoad()

@@ -26,7 +26,7 @@ section.workflow > .search .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.workflow > .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+section.workflow > .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }
 section.workflow > .action { text-align: right; }
 section.workflow > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.workflow > .action button .icon {
@@ -37,10 +37,10 @@ section.workflow > .action button .icon {
 #flowList { list-style: none; margin: 0; padding: 0; }
 #flowList li { background: #ffffff10; margin: 0; margin-bottom: 0.5rem; padding: 0; }
 #flowList li h2 { text-align: left; font-size: 1.1rem; font-weight: normal; padding: 1rem; }
-#flowList li p { padding: 1rem; font-size: 0.8rem; color: var(--orange); }
+#flowList li p { padding: 1rem; font-size: 0.8rem; color: var(--accent); }
 #flowList li h2 .actions { display: inline-block; margin-left: 3rem; }
 #flowList li h2 span { cursor: pointer; }
-#flowList li h2 span:hover { color: var(--blue); }
+#flowList li h2 span:hover { color: var(--accent2); }
 #flowList li h2 .actions span { 
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	margin-right: 0.5rem;
@@ -49,20 +49,20 @@ section.workflow > .action button .icon {
 #flowAddButton {
 	font-family: material !important; font-feature-settings: "liga" 1;
 	position: absolute; bottom: 2rem; left: 2rem; font-size: 1.5rem;
-	background-color: var(--orange); z-index: 10; width: 3rem; height: 3rem;
+	background-color: var(--accent); z-index: 10; width: 3rem; height: 3rem;
 	text-align: center; line-height: 3rem; border-radius: 3rem; cursor: pointer;
 	box-shadow: inset 0 3px 4px #ffffff30, inset 0 -5px 5px -5px #000;
 	transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
-#flowAddButton:hover { background-color: var(--blue); }
+#flowAddButton:hover { background-color: var(--accent2); }
 
 
 section.workflow .flowTitle { position: absolute; top: 0rem; left: 0rem; padding: 0.5rem 2rem; z-index: 10; }
 section.workflow .flowTitle > span { display: inline-block; font-size: 1.4rem; font-family: material !important; font-feature-settings: "liga" 1; vertical-align: middle; cursor: pointer; }
 section.workflow .flowTitle > p { 
 	display: inline-block; font-size: 1.2rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem; min-width: 15ch;
-	max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; color: var(--orange); }
-section.workflow .flowTitle > span:hover { color: var(--blue); }
+	max-width: 60vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; color: var(--accent); }
+section.workflow .flowTitle > span:hover { color: var(--accent2); }
 section.workflow .flowTitle > span:last-of-type { margin-left: 0.5rem; }
 
 section.workflow .controls { position: absolute; top: 4rem; left: 2rem; z-index: 10; user-select: none; }
@@ -75,16 +75,16 @@ section.workflow .controls span {
 	text-align: center; margin-top: 3px; border-radius: 5px;
 	background-color: #fff1;
 }
-section.workflow .controls span:hover { color: var(--blue); }
+section.workflow .controls span:hover { color: var(--accent2); }
 
 
 .chooseElementType { list-style: none; margin: 0; padding: 0; }
 .chooseElementType li { 
 	display: inline-block; padding: 1rem; border-radius: 1rem; border: 1px solid transparent; 
 	text-align: center; cursor: pointer; min-width: 7rem; }
-.chooseElementType li:hover { border: 1px solid var(--orange); background: #FB813620; }
+.chooseElementType li:hover { border: 1px solid var(--accent); background: #FB813620; }
 .chooseElementType p { }
-.chooseElementType p.description { font-size: 0.7rem; color: var(--orange); line-height: 1rem; }
+.chooseElementType p.description { font-size: 0.7rem; color: var(--accent); line-height: 1rem; }
 .chooseElementType span { font-family: material !important; font-feature-settings: "liga" 1; font-size: 2.5rem; }
 .chooseElementType.flex { display: flex; flex-flow: row wrap; justify-content: center; align-content: stretch; max-height: 50vh; overflow: auto; }
 .chooseElementType.flex li { flex: 0 0 30%; padding: 1rem 0.5rem; }
@@ -103,7 +103,7 @@ section.workflow .flow {
 	width: calc(var(--size) * 10 * var(--ws)); height: calc(var(--size) * 10 * var(--ws));
 	margin-top: 0; padding: 0;
 	background-color: #FB813630; 
-	border: calc(.23 * var(--ws)) solid var(--orange);
+	border: calc(.23 * var(--ws)) solid var(--accent);
 	color: var(--white);
 	display: inline-block;
 	position: relative;
@@ -112,7 +112,7 @@ section.workflow .flow {
 	transform-style: preserve-3d;
 	border-radius: calc(2 * var(--ws));
 	box-shadow:
-		calc(.35 * var(--ws)) calc(.35 * var(--ws)) 0 calc(.35 * var(--ws)) var(--orange),
+		calc(.35 * var(--ws)) calc(.35 * var(--ws)) 0 calc(.35 * var(--ws)) var(--accent),
 		calc(-.11 * var(--ws)) 0 calc(3.3 * var(--ws)) 0 rgba(251, 129, 54, 0.01),
 		calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) calc(3.3 * var(--ws)) 0 rgba(251, 129, 54, 0.25);
 	transition:
@@ -127,7 +127,7 @@ section.workflow .flow::before, section.workflow .flow::after {
 	display: block; position: absolute;
 	width: calc(var(--size) * 10 * var(--ws)); height: calc(var(--size) * 10 * var(--ws));
 	background-color: #FB813630; 
-	border: calc(.23 * var(--ws)) solid var(--orange);
+	border: calc(.23 * var(--ws)) solid var(--accent);
 	border-radius: calc(2 * var(--ws));
 	z-index: -1; pointer-events: none;
 	transition:
@@ -156,8 +156,8 @@ section.workflow .flat .flow {
 
 section.workflow .flow aside {
 	cursor: ns-resize;
-	border-bottom: calc(.59 * var(--ws)) solid var(--orange);
-	border-right: calc(.59 * var(--ws)) solid var(--orange);
+	border-bottom: calc(.59 * var(--ws)) solid var(--accent);
+	border-right: calc(.59 * var(--ws)) solid var(--accent);
 	position: absolute; bottom: calc(.59 * var(--ws)); right: calc(.59 * var(--ws)); width: calc(3 * var(--ws)); height: calc(3 * var(--ws));
 	transition: 
 		.2s linear border-bottom,
@@ -191,7 +191,7 @@ section.workflow .item { cursor: pointer; }
 section.workflow .item {
 	display: inline-block;
 	margin-right: calc(.59 * var(--ws));
-	border: 0 solid var(--blue);
+	border: 0 solid var(--accent2);
 	background: #3e6f90;
 	width: calc(8 * var(--ws)); height: calc(8 * var(--ws));
 	border-radius: calc(10 * var(--ws));
@@ -199,7 +199,7 @@ section.workflow .item {
 	text-align: center;
 
 	box-shadow:
-		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) var(--blue),
+		calc(.23 * var(--ws)) calc(.23 * var(--ws)) 0 calc(.23 * var(--ws)) var(--accent2),
 		calc(-.11 * var(--ws)) 0 calc(2.15 * var(--ws)) 0 rgba(54, 176, 251, 0.01),
 		calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) calc(2.15 * var(--ws)) 0 rgba(54, 176, 251, 0.25);
 	transition:
@@ -348,7 +348,7 @@ section.workflow  .connector::after {
 #flowSidePanel.open { right: 0; }
 
 #flowSidePanel h1 { text-align: center; margin-bottom: 2rem; font-size: 1.2rem; font-weight: 300; }
-#flowSidePanel h1 + p { text-align: justify; margin-bottom: 2rem; color: var(--orange); font-size: 0.8rem; line-height: 1rem; }
+#flowSidePanel h1 + p { text-align: justify; margin-bottom: 2rem; color: var(--accent); font-size: 0.8rem; line-height: 1rem; }
 
 #flowSidePanel h2 { text-align: left; font-size: 1.1rem; font-weight: normal; cursor: pointer; }
 #flowSidePanel section { 
@@ -370,7 +370,7 @@ section.workflow  .connector::after {
 
 #flowSidePanel .itemicon, .pickchannel .itemicon, .linkbuilder .itemicon {
 	font-family: material !important; font-feature-settings: "liga" 1; display: inline-block; vertical-align: middle;
-	border-radius: 3rem; border: 2px solid var(--blue); background-color: #3e6f90; font-size: 1.5rem; width: 2rem; height: 2rem; text-align: center;
+	border-radius: 3rem; border: 2px solid var(--accent2); background-color: #3e6f90; font-size: 1.5rem; width: 2rem; height: 2rem; text-align: center;
 	margin: 0 1rem; line-height: normal;
 }
 #flowSidePanel .channel, .pickchannel .channel, .linkbuilder .channel { 
@@ -387,15 +387,15 @@ section.workflow  .connector::after {
 #flowSidePanel .detail .value, 
 #flowSidePanel .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
 #flowSidePanel .detail .title { width: 8rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
-#flowSidePanel .detail .title.orange { color: var(--orange); }
+#flowSidePanel .detail .title.orange { color: var(--accent); }
 #flowSidePanel .detail .value { color: var(--white); flex: 1; }
-#flowSidePanel .detail a { color: var(--blue); }
-#flowSidePanel .detail .text { color: var(--orange); flex: 1; }
+#flowSidePanel .detail a { color: var(--accent2); }
+#flowSidePanel .detail .text { color: var(--accent); flex: 1; }
 #flowSidePanel .detail .icon { 
 	font-size: 1.3rem; color: var(--white); cursor: pointer; margin-right: 1rem;
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
-#flowSidePanel .detail .icon:hover { color: var(--blue); }
+#flowSidePanel .detail .icon:hover { color: var(--accent2); }
 #flowSidePanel .empty { text-align: center; color: #fffa; font-size: 0.8rem; padding: 1rem; }
 #flowSidePanel .detail .value .channel { margin-left: 0; }
 
@@ -405,7 +405,7 @@ section.workflow  .connector::after {
 	vertical-align: -0.32rem; text-transform: none !important; font-size: 1.2rem;
 }
 #flowSidePanel fieldset label { font-size: 0.8rem; }
-#flowSidePanel fieldset p { color: var(--blue); font-size: 0.8rem; line-height: 1rem; text-align: justify; }
+#flowSidePanel fieldset p { color: var(--accent2); font-size: 0.8rem; line-height: 1rem; text-align: justify; }
 #flowSidePanel fieldset input, #flowSidePanel fieldset select, #flowSidePanel fieldset textarea { 
 	clear: both; width: 100%; margin: 20px 0; padding: 10px;
 	background-color: transparent; border: 1px solid #ffffff40; color: #ffffff;
@@ -443,24 +443,24 @@ section.workflow  .connector::after {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-#flowSidePanel .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+#flowSidePanel .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }
 
 #flowSidePanel .stepList { list-style: none; margin: 0; padding: 0; padding-bottom: 1rem; }
 #flowSidePanel .stepList li { list-style: none; padding: 1rem; cursor: pointer; }
 #flowSidePanel .stepList li:hover { background: #fff2; }
 #flowSidePanel .stepList li h3 { font-weight: 200; font-size: 0.9rem; }
-#flowSidePanel .stepList li p { font-size: 0.7rem; color: var(--orange); padding-left: 4rem; }
+#flowSidePanel .stepList li p { font-size: 0.7rem; color: var(--accent); padding-left: 4rem; }
 
 .linkbuilder { display: flex; align-items: stretch; align-content: stretch; }
 .linkbuilder > span { padding: 1rem; font-family: material !important; font-feature-settings: "liga" 1; font-size: 2.5rem; flex: 0 0; align-self: center; }
 .linkbuilder > div { flex: 1 1 50%; text-align: center; border-radius: 0.5rem; cursor: pointer; padding: 1rem; align-self: center; }
 .linkbuilder > div:hover { background-color: #fff2; }
-.linkbuilder > div > p { color: var(--orange); font-size: 0.9rem; text-transform: uppercase; }
+.linkbuilder > div > p { color: var(--accent); font-size: 0.9rem; text-transform: uppercase; }
 .modalbuttons { text-align: right; margin-top: 1rem; }
 
 .pickchannel { margin: 0; line-height: normal; padding: 0.5rem; border-radius: 0.5rem; }
 .pickchannel:hover { background: #fff2; }
 .pickchannel div { display: inline-block; text-align: center; vertical-align: middle; padding: 1rem; width: 50%; }
 .pickchannel p { max-width: 20ch; word-break: break-word; }
-.pickchannel .channel { cursor: pointer; color: var(--orange); margin: 0.3rem; }
+.pickchannel .channel { cursor: pointer; color: var(--accent); margin: 0.3rem; }
 .pickchannel .channel:hover { background-color: #FB813622; }

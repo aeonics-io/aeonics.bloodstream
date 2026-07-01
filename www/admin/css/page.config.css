@@ -34,8 +34,8 @@ section.config section .detail .title, .configInfo .title,
 section.config section .detail .value, .configInfo .value,
 section.config section .detail .text, .configInfo .text { display: inline-block; font-size: 0.8rem; vertical-align: top; word-break: break-word; }
 section.config section .detail .title, .configInfo .title { width: 30%; min-width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
-section.config section .detail .text, .configInfo .text { color: var(--orange); flex: 1; }
-section.config section .detail .value, .configInfo .value { color: var(--blue); font-family: monospace; flex: 1; }
+section.config section .detail .text, .configInfo .text { color: var(--accent); flex: 1; }
+section.config section .detail .value, .configInfo .value { color: var(--accent2); font-family: monospace; flex: 1; }
 section.config section .detail .value .tag, .configInfo .value .tag { 
 	display: inline-block; padding: 0.2rem 0.4rem; background-color: #ffffff20; border-radius: 0.3rem;
 	margin-right: 0.5rem; margin-bottom: 0.2rem; color: #ccc;
@@ -44,7 +44,7 @@ section.config section .detail .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; line-height: 1rem; vertical-align: -0.4rem; text-transform: none !important;
 	color: var(--white); font-size: 0.9rem; display: inline-block; margin-right: 0.5rem; cursor: pointer;
 }
-section.config section .detail .icon:hover { color: var(--blue); }
+section.config section .detail .icon:hover { color: var(--accent2); }
 
 .configInfo h2 { text-align: center !important; }
 
@@ -65,4 +65,4 @@ section.config .search .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.config .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+section.config .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }

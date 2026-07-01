@@ -24,7 +24,7 @@ section.storage .search .icon {
 	font-family: material !important; font-feature-settings: "liga" 1; font-size: 1.4rem; line-height: 1rem; vertical-align: bottom; text-transform: none !important;
 	border-bottom: 2px solid #aaa;
 }
-section.storage .search input:focus + .icon { color: var(--blue); border-bottom-color: var(--blue); }
+section.storage .search input:focus + .icon { color: var(--accent2); border-bottom-color: var(--accent2); }
 section.storage .tabcontent > .action { text-align: right; }
 section.storage .tabcontent > .action button { display: inline-block; width: unset; margin-left: 0.5rem; }
 section.storage .tabcontent > .action button .icon {
@@ -36,7 +36,7 @@ section.storage .tab ul { margin: 0; list-style: none; padding: 0; }
 section.storage .tab li { background: #ffffff10; margin: 0; margin-bottom: 0.5rem; padding: 0; }
 section.storage .tab li h2 { text-align: left; font-size: 1.1rem; font-weight: normal; padding: 1rem; }
 section.storage .tab li h2 .actions { display: inline-block; margin-left: 3rem; }
-section.storage .tab li h2 .actions span:hover { color: var(--blue); }
+section.storage .tab li h2 .actions span:hover { color: var(--accent2); }
 section.storage .tab li h2 .actions span { 
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	margin-right: 0.5rem; cursor: pointer;
@@ -50,15 +50,15 @@ section.storage .tab li .detail .title,
 section.storage .tab li .detail .value, 
 section.storage .tab li .detail .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
 section.storage .tab li .detail .title { width: 10rem; color: #ffffffa0; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
-section.storage .tab li .detail .title.orange { color: var(--orange); }
+section.storage .tab li .detail .title.orange { color: var(--accent); }
 section.storage .tab li .detail .value { color: var(--white); font-family: monospace; flex: 1; }
-section.storage .tab li .detail a { color: var(--blue); }
-section.storage .tab li .detail .text { color: var(--orange); flex: 1; }
+section.storage .tab li .detail a { color: var(--accent2); }
+section.storage .tab li .detail .text { color: var(--accent); flex: 1; }
 section.storage .tab li .detail .icon { 
 	font-size: 1.3rem; color: var(--white); cursor: pointer; margin-right: 1rem;
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
-section.storage section .detail .icon:hover { color: var(--blue); }
+section.storage section .detail .icon:hover { color: var(--accent2); }
 
 code-input#sql { width: 30rem; height: 10rem; max-width: 50vw; max-height: 65vh; font-size: 0.85rem !important; line-height: 1.1rem !important; 
 	border: 1px solid #ffffff30; }
@@ -67,12 +67,12 @@ code-input#sql textarea::selection { background-color: #FB813660 !important; col
 .queryResult .title, .queryResult .value, .queryResult .text { display: inline-block; font-size: 0.8rem; vertical-align: top; }
 .queryResult .title { width: 10rem; color: #ffffff; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; padding-right: 0.3rem; }
 .queryResult .value { color: #ffffffa0; font-family: monospace; flex: 1; }
-.queryResult .text { color: var(--orange); flex: 1; }
+.queryResult .text { color: var(--accent); flex: 1; }
 .queryResult pre.response { max-height: 50vh; max-width: 40rem; }
 
 #storageBrowser { width: 60vw; height: 60vh; }
 #storageBrowser .addressBar { display: flex; align-items: center; }
-#storageBrowser .addressBar span.icon:hover { color: var(--blue); }
+#storageBrowser .addressBar span.icon:hover { color: var(--accent2); }
 #storageBrowser .addressBar span.icon {
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important;
 	padding: 0.2rem 0.5rem; cursor: pointer;
@@ -82,10 +82,10 @@ code-input#sql textarea::selection { background-color: #FB813660 !important; col
 #storageBrowser ol:focus { outline: none; }
 #storageBrowser li { display: inline-block; cursor: default; padding: 0.5rem; width: 20ch; overflow: hidden; text-overflow: ellipsis; 
 	border-radius: 0.3rem; margin: 0 0.2rem; border: 1px solid #fff1; white-space: nowrap; }
-#storageBrowser li.selected { border-color: var(--blue); }
+#storageBrowser li.selected { border-color: var(--accent2); }
 #storageBrowser li::before {
 	display: inline-block; margin-right: 0.5rem;
 	font-family: material !important; font-feature-settings: "liga" 1; vertical-align: -0.4rem; text-transform: none !important; 
 }
-#storageBrowser li.folder::before { content: '\e2c7'; color: var(--orange); }
+#storageBrowser li.folder::before { content: '\e2c7'; color: var(--accent); }
 #storageBrowser li.file::before { content: '\e873'; }
